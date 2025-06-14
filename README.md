@@ -64,3 +64,14 @@ npx snyk test
 npx snyk monitor
 ```
 
+## 📊 Performance Auditing with Lighthouse
+
+This project uses [Lighthouse](https://developer.chrome.com/docs/lighthouse/) to audit performance, accessibility, and SEO. To run an audit locally, first make sure the development server is running (`npm run dev`), then execute the following command in a separate terminal:
+
+```sh
+# Create a reports directory and run the audit
+npx lighthouse http://localhost:8080 --output html --output-path ./reports/lighthouse.html --view
+```
+
+This will generate an HTML report and automatically open it in your browser.
+
