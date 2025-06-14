@@ -1,3 +1,4 @@
+
 import React from "react";
 import * as Sentry from "@sentry/react";
 import { Toaster } from "@/components/ui/toaster";
@@ -25,8 +26,22 @@ import AppLayout from "./components/AppLayout";
 import AuthPage from "./pages/Auth";
 import ProtectedRoute from "./components/ProtectedRoute";
 import FloatingAuthStatus from "./components/FloatingAuthStatus";
+import ErrorBoundary from "./components/ErrorBoundary";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: (failureCount, error) => {
+        // Don't retry on auth errors
+        if (error && typeof error === 'object' && 'status' in error && error.status === 401) {
+          return false;
+        }
+        return failureCount < 3;
+      },
+      staleTime: 5 * 60 * 1000, // 5 minutes
+    },
+  },
+});
 
 const SentryRoutes = Sentry.withSentryReactRouterV6Routing(Routes);
 
@@ -37,80 +52,92 @@ if (!CLERK_PUBLISHABLE_KEY) {
   throw new Error("Missing Clerk Publishable Key");
 }
 
-const App: React.FC = () => {
+const AppContent: React.FC = () => {
   return (
-    <ClerkProvider publishableKey={CLERK_PUBLISHABLE_KEY}>
+    <ErrorBoundary>
       <ThemeProvider attribute="class" defaultTheme="dark">
         <QueryClientProvider client={queryClient}>
           <AuthProvider>
-            <PlayFabProvider>
-              <SettingsProvider>
-                <DifficultyProvider>
-                  <LanguageProvider>
-                    <GameModeProvider>
-                      <OpponentProvider>
-                        <TooltipProvider>
-                          <Toaster />
-                          <Sonner />
-                          <BrowserRouter>
-                            <FloatingAuthStatus />
-                            <SentryRoutes>
-                              {/* Public route for authentication */}
-                              <Route path="/auth" element={<AuthPage />} />
-                              
-                              {/* Protected routes - require authentication */}
-                              <Route path="/" element={
-                                <ProtectedRoute>
-                                  <MainMenu />
-                                </ProtectedRoute>
-                              } />
-                              
-                              {/* Routes with the shared layout - all protected */}
-                              <Route element={<AppLayout />}>
-                                <Route path="/game" element={
+            <ErrorBoundary>
+              <PlayFabProvider>
+                <SettingsProvider>
+                  <DifficultyProvider>
+                    <LanguageProvider>
+                      <GameModeProvider>
+                        <OpponentProvider>
+                          <TooltipProvider>
+                            <Toaster />
+                            <Sonner />
+                            <BrowserRouter>
+                              <FloatingAuthStatus />
+                              <SentryRoutes>
+                                {/* Public route for authentication */}
+                                <Route path="/auth" element={<AuthPage />} />
+                                
+                                {/* Protected routes - require authentication */}
+                                <Route path="/" element={
                                   <ProtectedRoute>
-                                    <Game />
+                                    <MainMenu />
                                   </ProtectedRoute>
                                 } />
-                                <Route path="/settings" element={
-                                  <ProtectedRoute>
-                                    <Settings />
-                                  </ProtectedRoute>
-                                } />
-                                <Route path="/statistics" element={
-                                  <ProtectedRoute>
-                                    <Statistics />
-                                  </ProtectedRoute>
-                                } />
-                                <Route path="/leaderboards" element={
-                                  <ProtectedRoute>
-                                    <Leaderboards />
-                                  </ProtectedRoute>
-                                } />
-                              </Route>
+                                
+                                {/* Routes with the shared layout - all protected */}
+                                <Route element={<AppLayout />}>
+                                  <Route path="/game" element={
+                                    <ProtectedRoute>
+                                      <Game />
+                                    </ProtectedRoute>
+                                  } />
+                                  <Route path="/settings" element={
+                                    <ProtectedRoute>
+                                      <Settings />
+                                    </ProtectedRoute>
+                                  } />
+                                  <Route path="/statistics" element={
+                                    <ProtectedRoute>
+                                      <Statistics />
+                                    </ProtectedRoute>
+                                  } />
+                                  <Route path="/leaderboards" element={
+                                    <ProtectedRoute>
+                                      <Leaderboards />
+                                    </ProtectedRoute>
+                                  } />
+                                </Route>
 
-                              {/* Tutorial without layout but still protected */}
-                              <Route path="/tutorial" element={
-                                <ProtectedRoute>
-                                  <Tutorial />
-                                </ProtectedRoute>
-                              } />
-                              
-                              {/* 404 page */}
-                              <Route path="*" element={<NotFound />} />
-                            </SentryRoutes>
-                          </BrowserRouter>
-                        </TooltipProvider>
-                      </OpponentProvider>
-                    </GameModeProvider>
-                  </LanguageProvider>
-                </DifficultyProvider>
-              </SettingsProvider>
-            </PlayFabProvider>
+                                {/* Tutorial without layout but still protected */}
+                                <Route path="/tutorial" element={
+                                  <ProtectedRoute>
+                                    <Tutorial />
+                                  </ProtectedRoute>
+                                } />
+                                
+                                {/* 404 page */}
+                                <Route path="*" element={<NotFound />} />
+                              </SentryRoutes>
+                            </BrowserRouter>
+                          </TooltipProvider>
+                        </OpponentProvider>
+                      </GameModeProvider>
+                    </LanguageProvider>
+                  </DifficultyProvider>
+                </SettingsProvider>
+              </PlayFabProvider>
+            </ErrorBoundary>
           </AuthProvider>
         </QueryClientProvider>
       </ThemeProvider>
-    </ClerkProvider>
+    </ErrorBoundary>
+  );
+};
+
+const App: React.FC = () => {
+  return (
+    <ErrorBoundary>
+      <ClerkProvider publishableKey={CLERK_PUBLISHABLE_KEY}>
+        <AppContent />
+      </ClerkProvider>
+    </ErrorBoundary>
   );
 };
 

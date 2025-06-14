@@ -17,7 +17,10 @@ serve(async (req) => {
     const secretKey = Deno.env.get('PLAYFAB_SECRET_KEY');
     const titleId = Deno.env.get('PLAYFAB_TITLE_ID');
 
+    console.log('PlayFab server function called:', { action, titleId: titleId?.slice(0, 4) + '***' });
+
     if (!secretKey || !titleId) {
+      console.error('PlayFab credentials not configured');
       throw new Error('PlayFab credentials not configured');
     }
 
@@ -36,10 +39,14 @@ serve(async (req) => {
       case 'awardAchievement':
         result = await awardAchievement(data, secretKey, titleId);
         break;
+      case 'getLeaderboard':
+        result = await getLeaderboard(data, secretKey, titleId);
+        break;
       default:
         throw new Error(`Unknown action: ${action}`);
     }
 
+    console.log('PlayFab operation successful:', action);
     return new Response(
       JSON.stringify({ success: true, data: result }),
       { 
@@ -50,7 +57,11 @@ serve(async (req) => {
   } catch (error) {
     console.error('PlayFab server error:', error);
     return new Response(
-      JSON.stringify({ success: false, error: error.message }),
+      JSON.stringify({ 
+        success: false, 
+        error: error.message,
+        details: error.toString()
+      }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 400 
@@ -60,7 +71,10 @@ serve(async (req) => {
 });
 
 async function createPlayer(data: any, secretKey: string, titleId: string) {
-  const response = await fetch('https://titleId.playfabapi.com/Server/LoginWithServerCustomId', {
+  const url = `https://${titleId}.playfabapi.com/Server/LoginWithServerCustomId`;
+  console.log('Creating player with URL:', url);
+  
+  const response = await fetch(url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -74,11 +88,20 @@ async function createPlayer(data: any, secretKey: string, titleId: string) {
     })
   });
 
-  return await response.json();
+  const result = await response.json();
+  if (!response.ok) {
+    console.error('PlayFab createPlayer error:', result);
+    throw new Error(`PlayFab API error: ${result.errorMessage || response.statusText}`);
+  }
+  
+  return result;
 }
 
 async function updatePlayerData(data: any, secretKey: string, titleId: string) {
-  const response = await fetch('https://titleId.playfabapi.com/Server/UpdateUserData', {
+  const url = `https://${titleId}.playfabapi.com/Server/UpdateUserData`;
+  console.log('Updating player data with URL:', url);
+  
+  const response = await fetch(url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -91,11 +114,20 @@ async function updatePlayerData(data: any, secretKey: string, titleId: string) {
     })
   });
 
-  return await response.json();
+  const result = await response.json();
+  if (!response.ok) {
+    console.error('PlayFab updatePlayerData error:', result);
+    throw new Error(`PlayFab API error: ${result.errorMessage || response.statusText}`);
+  }
+  
+  return result;
 }
 
 async function getPlayerData(data: any, secretKey: string, titleId: string) {
-  const response = await fetch('https://titleId.playfabapi.com/Server/GetUserData', {
+  const url = `https://${titleId}.playfabapi.com/Server/GetUserData`;
+  console.log('Getting player data with URL:', url);
+  
+  const response = await fetch(url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -107,11 +139,20 @@ async function getPlayerData(data: any, secretKey: string, titleId: string) {
     })
   });
 
-  return await response.json();
+  const result = await response.json();
+  if (!response.ok) {
+    console.error('PlayFab getPlayerData error:', result);
+    throw new Error(`PlayFab API error: ${result.errorMessage || response.statusText}`);
+  }
+  
+  return result;
 }
 
 async function awardAchievement(data: any, secretKey: string, titleId: string) {
-  const response = await fetch('https://titleId.playfabapi.com/Server/GrantItemsToUser', {
+  const url = `https://${titleId}.playfabapi.com/Server/GrantItemsToUser`;
+  console.log('Awarding achievement with URL:', url);
+  
+  const response = await fetch(url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -127,5 +168,38 @@ async function awardAchievement(data: any, secretKey: string, titleId: string) {
     })
   });
 
-  return await response.json();
+  const result = await response.json();
+  if (!response.ok) {
+    console.error('PlayFab awardAchievement error:', result);
+    throw new Error(`PlayFab API error: ${result.errorMessage || response.statusText}`);
+  }
+  
+  return result;
+}
+
+async function getLeaderboard(data: any, secretKey: string, titleId: string) {
+  const url = `https://${titleId}.playfabapi.com/Server/GetLeaderboard`;
+  console.log('Getting leaderboard with URL:', url);
+  
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-SecretKey': secretKey
+    },
+    body: JSON.stringify({
+      TitleId: titleId,
+      StatisticName: data.statisticName,
+      StartPosition: data.startPosition || 0,
+      MaxResultsCount: data.maxResults || 10
+    })
+  });
+
+  const result = await response.json();
+  if (!response.ok) {
+    console.error('PlayFab getLeaderboard error:', result);
+    throw new Error(`PlayFab API error: ${result.errorMessage || response.statusText}`);
+  }
+  
+  return result;
 }

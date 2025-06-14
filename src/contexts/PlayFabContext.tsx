@@ -9,6 +9,7 @@ interface PlayFabContextType {
   submitGameResult: (gameData: any) => Promise<void>;
   getLeaderboard: (leaderboardName: string) => Promise<any>;
   trackMathChallenge: (challengeData: any) => Promise<void>;
+  retryConnection: () => void;
 }
 
 const PlayFabContext = createContext<PlayFabContextType | undefined>(undefined);
