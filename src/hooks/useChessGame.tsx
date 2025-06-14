@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback } from 'react';
 
 export type ChessPiece = 'wp' | 'wn' | 'wb' | 'wr' | 'wq' | 'wk' | 'bp' | 'bn' | 'bb' | 'br' | 'bq' | 'bk' | null;
@@ -36,8 +35,10 @@ const defaultPosition: ChessPiece[][] = [
   ["wr", "wn", "wb", "wq", "wk", "wb", "wn", "wr"],
 ];
 
+const pieceValues = { 'p': 1, 'n': 3, 'b': 3, 'r': 5, 'q': 9, 'k': 100 };
+
 // Simple AI move generator
-const generateAIMove = (board: ChessPiece[][], player: Player): ChessMove | null => {
+const generateAIMove = (board: ChessPiece[][], player: Player, difficulty: 'easy' | 'medium' | 'hard'): ChessMove | null => {
   const possibleMoves: ChessMove[] = [];
   
   // Find all possible moves for AI player
@@ -63,7 +64,48 @@ const generateAIMove = (board: ChessPiece[][], player: Player): ChessMove | null
     }
   }
   
-  // Return random move for now (can be improved with minimax)
+  if (possibleMoves.length === 0) return null;
+
+  if (difficulty === 'easy') {
+    // Easy: return random move
+    return possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
+  }
+
+  if (difficulty === 'medium') {
+    // Medium: prefer captures, otherwise random
+    const captureMoves = possibleMoves.filter(move => move.captured);
+    if (captureMoves.length > 0) {
+      return captureMoves[Math.floor(Math.random() * captureMoves.length)];
+    }
+    return possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
+  }
+
+  if (difficulty === 'hard') {
+    // Hard: choose move with best outcome (simple evaluation)
+    let bestScore = -Infinity;
+    let bestMoves: ChessMove[] = [];
+
+    for (const move of possibleMoves) {
+      let score = 0;
+      if (move.captured) {
+        const pieceType = move.captured[1];
+        score = pieceValues[pieceType as keyof typeof pieceValues] || 0;
+      }
+      
+      if (score > bestScore) {
+        bestScore = score;
+        bestMoves = [move];
+      } else if (score === bestScore) {
+        bestMoves.push(move);
+      }
+    }
+    
+    if (bestMoves.length > 0) {
+      return bestMoves[Math.floor(Math.random() * bestMoves.length)];
+    }
+    return possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
+  }
+  
   return possibleMoves.length > 0 ? possibleMoves[Math.floor(Math.random() * possibleMoves.length)] : null;
 };
 
@@ -134,7 +176,7 @@ const isPathClearAI = (board: ChessPiece[][], from: { row: number; col: number }
   return true;
 };
 
-export const useChessGame = () => {
+export const useChessGame = (aiDifficulty: 'easy' | 'medium' | 'hard') => {
   const [gameState, setGameState] = useState<ChessGameState>({
     board: defaultPosition.map(row => [...row]),
     currentPlayer: 'white',
@@ -186,7 +228,7 @@ export const useChessGame = () => {
     // AI move after player move
     if (gameState.currentPlayer === 'white') {
       setTimeout(() => {
-        const aiMove = generateAIMove(newBoard, 'black');
+        const aiMove = generateAIMove(newBoard, 'black', aiDifficulty);
         if (aiMove) {
           const aiBoardCopy = newBoard.map(row => [...row]);
           aiBoardCopy[aiMove.to.row][aiMove.to.col] = aiBoardCopy[aiMove.from.row][aiMove.from.col];
@@ -204,7 +246,7 @@ export const useChessGame = () => {
     }
 
     return true;
-  }, [gameState.board, gameState.currentPlayer, isValidMove]);
+  }, [gameState.board, gameState.currentPlayer, isValidMove, aiDifficulty]);
 
   const selectSquare = useCallback((row: number, col: number) => {
     const piece = gameState.board[row][col];
