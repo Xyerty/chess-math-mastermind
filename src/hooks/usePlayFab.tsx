@@ -1,6 +1,6 @@
 
 import { useState, useEffect, useCallback } from 'react';
-import { useAuth as useClerkAuth } from '@clerk/clerk-react';
+import { useAuth as useClerkAuth, useUser } from '@clerk/clerk-react';
 import { useAuth as useSupabaseAuth } from '@/contexts/AuthContext';
 import { PlayFabService } from '@/services/playfab';
 import { supabase } from '@/integrations/supabase/client';
@@ -19,7 +19,8 @@ export const usePlayFab = () => {
   });
   const [loading, setLoading] = useState(false);
   
-  const { user: clerkUser } = useClerkAuth();
+  const { isSignedIn } = useClerkAuth();
+  const { user: clerkUser } = useUser();
   const { user: supabaseUser } = useSupabaseAuth();
   
   const user = clerkUser || supabaseUser;

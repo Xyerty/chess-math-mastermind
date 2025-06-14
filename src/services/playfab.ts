@@ -75,6 +75,7 @@ export class PlayFabService {
     return new Promise((resolve, reject) => {
       PlayFabClient.GetLeaderboard({
         StatisticName: leaderboardName,
+        StartPosition: 0,
         MaxResultsCount: maxResults
       }, (result, error) => {
         if (error) {
