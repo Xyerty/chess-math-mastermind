@@ -1,5 +1,4 @@
-
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { useLanguage } from "../contexts/LanguageContext";
 import { useChessGame } from "../hooks/useChessGame";
 import ChessBoard from "../components/ChessBoard";
@@ -13,25 +12,30 @@ const Game = () => {
   const { t } = useLanguage();
   const { aiDifficulty, mathDifficulty } = useDifficulty();
   const { settings } = useSettings();
-  const { gameState, selectSquare, resetGame } = useChessGame(aiDifficulty);
+  const { gameState, handleSquareClick, makeMove, clearSelection, resetGame } = useChessGame(aiDifficulty);
   const [showMathChallenge, setShowMathChallenge] = useState(false);
-  const [pendingMove, setPendingMove] = useState<{row: number, col: number} | null>(null);
+  const [pendingMove, setPendingMove] = useState<{ from: { row: number, col: number }, to: { row: number, col: number } } | null>(null);
 
   const mathTimeLimit = settings.timeLimits.unlimited
     ? Infinity
     : settings.timeLimits[mathDifficulty];
 
-  const handlePieceClick = (row: number, col: number, piece: string | null) => {
-    if (piece && piece[0] === gameState.currentPlayer[0]) {
-      setPendingMove({ row, col });
+  const onChessBoardClick = useCallback((row: number, col: number) => {
+    const result = handleSquareClick(row, col);
+
+    if (result?.type === 'move_attempt') {
+      // Before showing the math challenge, clear the visual selection on the board
+      // to avoid confusion, and store the intended move.
+      clearSelection(); 
+      setPendingMove(result.payload);
       setShowMathChallenge(true);
     }
-  };
+  }, [handleSquareClick, clearSelection]);
 
   const handleMathSuccess = () => {
     setShowMathChallenge(false);
     if (pendingMove) {
-      selectSquare(pendingMove.row, pendingMove.col);
+      makeMove(pendingMove.from, pendingMove.to);
       setPendingMove(null);
     }
   };
@@ -52,7 +56,7 @@ const Game = () => {
         <div className="flex justify-center items-start p-2 sm:p-4 bg-gradient-to-b from-slate-50 to-slate-50/0 dark:from-slate-900/50 dark:to-slate-900/0">
           <ChessBoard 
             position={gameState.board}
-            onPieceClick={handlePieceClick}
+            onPieceClick={onChessBoardClick}
             selectedSquare={gameState.selectedSquare}
             lastMove={gameState.lastMove}
           />

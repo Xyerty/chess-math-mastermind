@@ -1,10 +1,14 @@
-
 import React, { useState, useCallback } from 'react';
-import { ChessGameState, ChessMove, GameStatus } from '../features/chess/types';
+import { ChessGameState, ChessMove, GameStatus, ChessPiece } from '../features/chess/types';
 import { defaultPosition } from '../features/chess/constants';
 import { isKingInCheck } from '../features/chess/utils/board';
 import { isValidMoveInternal } from '../features/chess/utils/moveValidation';
 import { generateAIMove } from '../features/chess/utils/ai';
+
+type HandleSquareClickResult = 
+  | { type: 'selected'; payload: { row: number; col: number } }
+  | { type: 'deselected' }
+  | { type: 'move_attempt'; payload: { from: { row: number; col: number }; to: { row: number; col: number } } };
 
 export const useChessGame = (aiDifficulty: 'easy' | 'medium' | 'hard') => {
   const [gameState, setGameState] = useState<ChessGameState>({
@@ -103,38 +107,33 @@ export const useChessGame = (aiDifficulty: 'easy' | 'medium' | 'hard') => {
     return true;
   }, [gameState.board, gameState.currentPlayer, aiDifficulty]);
 
-  const selectSquare = useCallback((row: number, col: number) => {
+  const handleSquareClick = useCallback((row: number, col: number): HandleSquareClickResult | null => {
+    if (gameState.gameStatus === 'checkmate' || gameState.gameStatus === 'stalemate') {
+        return null;
+    }
+
     const piece = gameState.board[row][col];
     
-    if (gameState.gameStatus === 'checkmate' || gameState.gameStatus === 'stalemate') {
-        return; // Game is over
-    }
-
     if (gameState.selectedSquare) {
-      const selected = gameState.selectedSquare;
-      if (selected.row === row && selected.col === col) {
-        // Deselect
+      if (gameState.selectedSquare.row === row && gameState.selectedSquare.col === col) {
         setGameState(prev => ({ ...prev, selectedSquare: null }));
+        return { type: 'deselected' };
       } else {
-        // Try to move
-        const success = makeMove(selected, { row, col });
-        if (!success) {
-          // Select new piece if it belongs to current player
-          if (piece && piece[0] === gameState.currentPlayer[0]) {
-            setGameState(prev => ({ ...prev, selectedSquare: { row, col } }));
-          } else {
-            setGameState(prev => ({ ...prev, selectedSquare: null }));
-          }
-        }
+        return { type: 'move_attempt', payload: { from: gameState.selectedSquare, to: { row, col } } };
       }
     } else {
-      // Select piece if it belongs to current player
       if (piece && piece[0] === gameState.currentPlayer[0]) {
         setGameState(prev => ({ ...prev, selectedSquare: { row, col } }));
+        return { type: 'selected', payload: { row, col } };
       }
     }
-  }, [gameState.board, gameState.selectedSquare, gameState.currentPlayer, gameState.gameStatus, makeMove]);
+    return null;
+  }, [gameState.board, gameState.selectedSquare, gameState.currentPlayer, gameState.gameStatus]);
 
+  const clearSelection = useCallback(() => {
+    setGameState(prev => ({ ...prev, selectedSquare: null }));
+  }, []);
+  
   const resetGame = useCallback(() => {
     setGameState({
       board: defaultPosition.map(row => [...row]),
@@ -151,7 +150,9 @@ export const useChessGame = (aiDifficulty: 'easy' | 'medium' | 'hard') => {
 
   return {
     gameState,
-    selectSquare,
+    handleSquareClick,
+    makeMove,
+    clearSelection,
     resetGame,
   };
 };
