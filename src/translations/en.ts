@@ -14,6 +14,15 @@ export const en = {
   'mainMenu.statistics': 'Statistics',
   'mainMenu.footer': 'Think fast, move smart, solve math!',
   
+  // Game Setup
+  'gameSetup.title': 'Game Setup',
+  'gameSetup.description': 'Configure difficulty and game mode before you start the game.',
+  'gameSetup.gameMode': 'Game Mode',
+  'gameSetup.startGame': 'Start Game',
+  'gameMode.classic': 'Classic (10m)',
+  'gameMode.speed': 'Speed Chess (3m+2s)',
+  'gameMode.mathMaster': 'Math Master (10m)',
+
   // Game
   'game.title': 'Chess Math Mastermind',
   'game.currentTurn': 'Current Turn',
@@ -25,6 +34,11 @@ export const en = {
   'game.checkmate': 'Checkmate!',
   'game.stalemate': 'Stalemate',
   'game.move': 'Move',
+  'game.whiteTime': "White's Time",
+  'game.blackTime': "Black's Time",
+  'game.aiStats': 'AI Analysis',
+  'game.aiThinkingTime': 'Thinking Time',
+  'game.aiEvaluation': 'Evaluation',
   
   // Game Controls
   'controls.title': 'Game Controls',

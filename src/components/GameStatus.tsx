@@ -1,8 +1,8 @@
-
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Clock, User, Trophy, Target } from "lucide-react";
+import { Clock, User, Trophy, Target, BrainCircuit } from "lucide-react";
 import { useLanguage } from "../contexts/LanguageContext";
+import { AIStats } from "../features/chess/types";
 
 interface GameStatusProps {
   currentPlayer: 'white' | 'black';
@@ -10,6 +10,7 @@ interface GameStatusProps {
   moveCount: number;
   time: { white: number, black: number };
   mathAccuracy?: number;
+  aiStats?: AIStats | null;
 }
 
 const GameStatus: React.FC<GameStatusProps> = ({
@@ -17,7 +18,8 @@ const GameStatus: React.FC<GameStatusProps> = ({
   gameStatus,
   moveCount,
   time,
-  mathAccuracy = 100
+  mathAccuracy = 100,
+  aiStats = null
 }) => {
   const { t } = useLanguage();
 
@@ -96,12 +98,34 @@ const GameStatus: React.FC<GameStatusProps> = ({
         </CardContent>
       </Card>
 
+      {/* AI Stats Card */}
+      {aiStats && (
+        <Card className="sm:col-span-2">
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <BrainCircuit className="h-5 w-5" />
+              {t('game.aiStats')}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="grid grid-cols-2 gap-4 text-sm">
+            <div>
+              <p className="text-muted-foreground">{t('game.aiThinkingTime')}</p>
+              <p className="font-semibold">{(aiStats.thinkingTime / 1000).toFixed(2)}s</p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">{t('game.aiEvaluation')}</p>
+              <p className="font-semibold">{aiStats.score.toFixed(2)}</p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* White Player Clock */}
       <Card className={currentPlayer === 'white' && gameStatus === 'playing' ? 'ring-2 ring-primary' : ''}>
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-lg">
             <User className="h-5 w-5" />
-            White's Time
+            {t('game.whiteTime')}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -116,7 +140,7 @@ const GameStatus: React.FC<GameStatusProps> = ({
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-lg">
             <User className="h-5 w-5" />
-            Black's Time
+            {t('game.blackTime')}
           </CardTitle>
         </CardHeader>
         <CardContent>

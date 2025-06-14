@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback } from "react";
 import { useLanguage } from "../contexts/LanguageContext";
 import { useChessGame } from "../hooks/useChessGame";
@@ -79,6 +78,7 @@ const Game = () => {
                 moveCount={gameState.moveCount}
                 time={gameState.time}
                 mathAccuracy={mathAccuracy}
+                aiStats={gameState.aiStats}
               />
             </div>
             <div className="lg:col-span-1">

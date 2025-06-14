@@ -1,3 +1,4 @@
+
 import React, { useState, useCallback, useEffect } from 'react';
 import { ChessGameState, ChessMove, GameStatus, ChessPiece, GameMode } from '../features/chess/types';
 import { defaultPosition } from '../features/chess/constants';
@@ -35,6 +36,7 @@ export const useChessGame = (aiDifficulty: 'easy' | 'medium' | 'hard', gameMode:
       gameStartTime: Date.now(),
       moveCount: 1,
       time: { white: initialTime, black: initialTime },
+      aiStats: null,
     };
   });
 
@@ -118,8 +120,10 @@ export const useChessGame = (aiDifficulty: 'easy' | 'medium' | 'hard', gameMode:
         setGameState(prev => {
           if (prev.currentPlayer !== 'black' || (prev.gameStatus !== 'playing' && prev.gameStatus !== 'check')) return prev;
 
-          const aiMove = generateAIMove(prev.board, 'black', aiDifficulty);
-          if (aiMove) {
+          const aiMoveResult = generateAIMove(prev.board, 'black', aiDifficulty);
+          if (aiMoveResult) {
+            const { move: aiMove, score, thinkingTime } = aiMoveResult;
+
             const aiBoardCopy = prev.board.map(row => [...row]);
             aiBoardCopy[aiMove.to.row][aiMove.to.col] = aiBoardCopy[aiMove.from.row][aiMove.from.col];
             aiBoardCopy[aiMove.from.row][aiMove.from.col] = null;
@@ -149,6 +153,7 @@ export const useChessGame = (aiDifficulty: 'easy' | 'medium' | 'hard', gameMode:
               isInCheck: isPlayerInCheckAfterAI,
               gameStatus: gameStatusAfterAI,
               time: newTime,
+              aiStats: { score, thinkingTime },
             };
           }
           return prev;
@@ -199,6 +204,7 @@ export const useChessGame = (aiDifficulty: 'easy' | 'medium' | 'hard', gameMode:
       gameStartTime: Date.now(),
       moveCount: 1,
       time: { white: initialTime, black: initialTime },
+      aiStats: null,
     });
   }, [gameMode]);
 

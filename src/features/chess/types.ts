@@ -12,6 +12,11 @@ export interface ChessMove {
   timestamp: number;
 }
 
+export interface AIStats {
+  score: number;
+  thinkingTime: number; // in ms
+}
+
 export interface ChessGameState {
   board: ChessPiece[][];
   currentPlayer: Player;
@@ -23,4 +28,5 @@ export interface ChessGameState {
   gameStartTime: number;
   moveCount: number;
   time: { white: number; black: number };
+  aiStats: AIStats | null;
 }

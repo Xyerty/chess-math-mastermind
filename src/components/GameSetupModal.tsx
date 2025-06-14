@@ -36,10 +36,10 @@ const GameSetupModal: React.FC<GameSetupModalProps> = ({ isOpen, onClose, onStar
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-center text-primary flex items-center justify-center gap-2">
             <Play className="h-6 w-6" />
-            Game Setup
+            {t('gameSetup.title')}
           </DialogTitle>
           <DialogDescription className="text-center text-muted-foreground pt-2">
-            Configure difficulty and game mode before you start the game.
+            {t('gameSetup.description')}
           </DialogDescription>
         </DialogHeader>
         
@@ -48,16 +48,16 @@ const GameSetupModal: React.FC<GameSetupModalProps> = ({ isOpen, onClose, onStar
           <div className="grid grid-cols-4 items-center gap-4">
             <label htmlFor="game-mode" className="text-right col-span-1 flex items-center justify-end gap-2 text-sm font-medium">
               <Clock className="h-4 w-4 text-muted-foreground" />
-              Game Mode
+              {t('gameSetup.gameMode')}
             </label>
             <Select value={localGameMode} onValueChange={(value: GameMode) => setLocalGameMode(value)}>
               <SelectTrigger id="game-mode" className="col-span-3">
                 <SelectValue placeholder="Select game mode" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="classic">Classic (10m)</SelectItem>
-                <SelectItem value="speed">Speed Chess (3m+2s)</SelectItem>
-                <SelectItem value="math-master">Math Master (10m)</SelectItem>
+                <SelectItem value="classic">{t('gameMode.classic')}</SelectItem>
+                <SelectItem value="speed">{t('gameMode.speed')}</SelectItem>
+                <SelectItem value="math-master">{t('gameMode.mathMaster')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -102,7 +102,7 @@ const GameSetupModal: React.FC<GameSetupModalProps> = ({ isOpen, onClose, onStar
         <DialogFooter>
           <Button onClick={handleStart} className="w-full text-lg h-12 bg-primary hover:bg-primary/90">
             <Play className="mr-2 h-5 w-5" />
-            Start Game
+            {t('gameSetup.startGame')}
           </Button>
         </DialogFooter>
       </DialogContent>

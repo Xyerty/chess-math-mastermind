@@ -13,6 +13,15 @@ export const es = {
   'mainMenu.settings': 'Configuración',
   'mainMenu.statistics': 'Estadísticas',
   'mainMenu.footer': '¡Piensa rápido, mueve inteligente, resuelve matemáticas!',
+
+  // Game Setup
+  'gameSetup.title': 'Configuración de Partida',
+  'gameSetup.description': 'Configura la dificultad y el modo de juego antes de empezar.',
+  'gameSetup.gameMode': 'Modo de Juego',
+  'gameSetup.startGame': 'Empezar Partida',
+  'gameMode.classic': 'Clásico (10m)',
+  'gameMode.speed': 'Ajedrez Rápido (3m+2s)',
+  'gameMode.mathMaster': 'Maestro Matemático (10m)',
   
   // Juego
   'game.title': 'Maestro del Ajedrez Matemático',
@@ -25,6 +34,11 @@ export const es = {
   'game.checkmate': '¡Jaque Mate!',
   'game.stalemate': 'Ahogado',
   'game.move': 'Movimiento',
+  'game.whiteTime': 'Tiempo Blancas',
+  'game.blackTime': 'Tiempo Negras',
+  'game.aiStats': 'Análisis de IA',
+  'game.aiThinkingTime': 'Tiempo de Pensamiento',
+  'game.aiEvaluation': 'Evaluación',
   
   // Controles del Juego
   'controls.title': 'Controles del Juego',

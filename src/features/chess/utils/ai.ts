@@ -4,6 +4,12 @@ import { pieceValues } from '../constants';
 import { isValidMoveInternal } from './moveValidation';
 import { isKingInCheck } from './board';
 
+export interface AIMoveResult {
+  move: ChessMove;
+  score: number;
+  thinkingTime: number; // in milliseconds
+}
+
 // Helper to check if a square is attacked by a player.
 // This is crucial for the AI to understand threats.
 const isSquareAttacked = (board: ChessPiece[][], square: {row: number, col: number}, attacker: Player): boolean => {
@@ -29,7 +35,8 @@ const isSquareAttacked = (board: ChessPiece[][], square: {row: number, col: numb
 
 
 // Enhanced AI move generator
-export const generateAIMove = (board: ChessPiece[][], player: Player, difficulty: 'easy' | 'medium' | 'hard'): ChessMove | null => {
+export const generateAIMove = (board: ChessPiece[][], player: Player, difficulty: 'easy' | 'medium' | 'hard'): AIMoveResult | null => {
+  const startTime = performance.now();
   const possibleMoves: ChessMove[] = [];
   
   // Find all possible moves for AI player
@@ -63,7 +70,8 @@ export const generateAIMove = (board: ChessPiece[][], player: Player, difficulty
 
   if (difficulty === 'easy') {
     // Easy: return a completely random move
-    return possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
+    const move = possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
+    return { move, score: 0, thinkingTime: performance.now() - startTime };
   }
 
   // For medium and hard, we score moves to find the best one
@@ -121,13 +129,16 @@ export const generateAIMove = (board: ChessPiece[][], player: Player, difficulty
   
   // For medium difficulty, if no move has a positive score (e.g. no captures or good moves), pick a random one.
   if (difficulty === 'medium' && bestScore <= 0) {
-      return possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
+      const move = possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
+      return { move, score: bestScore, thinkingTime: performance.now() - startTime };
   }
 
   if (bestMoves.length > 0) {
-    return bestMoves[Math.floor(Math.random() * bestMoves.length)];
+    const move = bestMoves[Math.floor(Math.random() * bestMoves.length)];
+    return { move, score: bestScore, thinkingTime: performance.now() - startTime };
   }
   
   // Fallback to a random move if no suitable move is found
-  return possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
+  const move = possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
+  return { move, score: bestScore, thinkingTime: performance.now() - startTime };
 };
