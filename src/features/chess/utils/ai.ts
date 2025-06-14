@@ -18,7 +18,7 @@ const isSquareAttacked = (board: ChessPiece[][], square: {row: number, col: numb
       const piece = board[r][c];
       if (piece && piece[0] === attacker[0]) {
         // Check if the piece has a valid move to the target square
-        if (isValidMoveInternal(board, { row: r, col: c }, square)) {
+        if (isValidMoveInternal(board, { row: r, col: c }, square, null)) {
             // A move is only a threat if it doesn't leave the king in check (i.e., it's a legal move)
             const tempBoard = board.map(r => [...r]);
             tempBoard[square.row][square.col] = piece;
@@ -35,7 +35,7 @@ const isSquareAttacked = (board: ChessPiece[][], square: {row: number, col: numb
 
 
 // Enhanced AI move generator
-export const generateAIMove = (board: ChessPiece[][], player: Player, difficulty: 'easy' | 'medium' | 'hard'): AIMoveResult | null => {
+export const generateAIMove = (board: ChessPiece[][], player: Player, difficulty: 'easy' | 'medium' | 'hard', lastMove: ChessMove | null = null): AIMoveResult | null => {
   const startTime = performance.now();
   const possibleMoves: ChessMove[] = [];
   
@@ -46,7 +46,7 @@ export const generateAIMove = (board: ChessPiece[][], player: Player, difficulty
       if (piece && piece[0] === player[0]) {
         for (let toRow = 0; toRow < 8; toRow++) {
           for (let toCol = 0; toCol < 8; toCol++) {
-            if (isValidMoveInternal(board, { row, col }, { row: toRow, col: toCol })) {
+            if (isValidMoveInternal(board, { row, col }, { row: toRow, col: toCol }, lastMove)) {
               const tempBoard = board.map(r => [...r]);
               tempBoard[toRow][toCol] = piece;
               tempBoard[row][col] = null;

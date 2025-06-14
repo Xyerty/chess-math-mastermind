@@ -1,3 +1,4 @@
+
 import { ChessPiece, Player, ChessMove } from '../types';
 import { isValidMoveInternal } from './moveValidation';
 
@@ -18,7 +19,7 @@ export const isSquareAttacked = (board: ChessPiece[][], row: number, col: number
         for (let c = 0; c < 8; c++) {
             const piece = board[r][c];
             if (piece && piece[0] === attackerColor[0]) {
-                if (isValidMoveInternal(board, { row: r, col: c }, { row, col })) {
+                if (isValidMoveInternal(board, { row: r, col: c }, { row, col }, null)) {
                     return true;
                 }
             }
