@@ -39,39 +39,60 @@ export const useChessGame = (aiDifficulty: 'easy' | 'medium' | 'hard', gameMode:
   });
 
   useEffect(() => {
-    if (gameState.gameStatus !== 'playing' && gameState.gameStatus !== 'check') {
-      return;
-    }
-    const timer = setInterval(() => {
-      setGameState(prev => {
-        if (prev.gameStatus !== 'playing' && prev.gameStatus !== 'check') {
-            clearInterval(timer);
+    let timerId: NodeJS.Timeout | undefined;
+
+    if (gameState.gameStatus === 'playing' || gameState.gameStatus === 'check') {
+      timerId = setInterval(() => {
+        setGameState(prev => {
+          if (prev.gameStatus !== 'playing' && prev.gameStatus !== 'check') {
             return prev;
-        }
-        const newTime = { ...prev.time };
-        const newCurrentPlayerTime = newTime[prev.currentPlayer] - 1;
+          }
 
-        if (newCurrentPlayerTime <= 0) {
-          clearInterval(timer);
-          return { ...prev, time: { ...newTime, [prev.currentPlayer]: 0 }, gameStatus: 'timeout' };
-        }
-        return { ...prev, time: { ...newTime, [prev.currentPlayer]: newCurrentPlayerTime } };
-      });
-    }, 1000);
+          const newTime = { ...prev.time };
+          const newCurrentPlayerTime = newTime[prev.currentPlayer] - 1;
 
-    return () => clearInterval(timer);
-  }, [gameState.gameStatus, gameState.currentPlayer]);
+          if (newCurrentPlayerTime <= 0) {
+            return {
+              ...prev,
+              time: { ...newTime, [prev.currentPlayer]: 0 },
+              gameStatus: 'timeout',
+            };
+          }
+
+          return {
+            ...prev,
+            time: { ...newTime, [prev.currentPlayer]: newCurrentPlayerTime },
+          };
+        });
+      }, 1000);
+    }
+
+    return () => {
+      if (timerId) {
+        clearInterval(timerId);
+      }
+    };
+  }, [gameState.gameStatus]);
 
   const makeMove = useCallback((from: { row: number; col: number }, to: { row: number; col: number }): boolean => {
     if (gameState.gameStatus !== 'playing' && gameState.gameStatus !== 'check') return false;
-    if (!isValidMoveInternal(gameState.board, from, to)) return false;
+    if (!isValidMoveInternal(gameState.board, from, to, gameState.lastMove)) return false;
 
     const tempBoard = gameState.board.map(row => [...row]);
     const piece = tempBoard[from.row][from.col];
-    const captured = gameState.board[to.row][to.col];
+    let captured = gameState.board[to.row][to.col];
+
+    const isEnPassant = piece?.[1] === 'p' && from.col !== to.col && !captured;
 
     tempBoard[to.row][to.col] = piece;
     tempBoard[from.row][from.col] = null;
+    
+    if (isEnPassant) {
+        const capturedPawnRow = from.row;
+        const capturedPawnCol = to.col;
+        captured = gameState.board[capturedPawnRow][capturedPawnCol];
+        tempBoard[capturedPawnRow][capturedPawnCol] = null;
+    }
 
     if (isKingInCheck(tempBoard, gameState.currentPlayer)) {
       console.log("Illegal move: king would be in check.");
@@ -81,8 +102,10 @@ export const useChessGame = (aiDifficulty: 'easy' | 'medium' | 'hard', gameMode:
     const newBoard = tempBoard;
     const nextPlayer = gameState.currentPlayer === 'white' ? 'black' : 'white';
 
+    const move: ChessMove = { from, to, piece, captured: captured || undefined, timestamp: Date.now() };
+
     const newIsInCheck = isKingInCheck(newBoard, nextPlayer);
-    const opponentHasMoves = hasAnyValidMoves(newBoard, nextPlayer); 
+    const opponentHasMoves = hasAnyValidMoves(newBoard, nextPlayer, move); 
 
     let newGameStatus: GameStatus = 'playing';
     if (!opponentHasMoves) {
@@ -90,8 +113,6 @@ export const useChessGame = (aiDifficulty: 'easy' | 'medium' | 'hard', gameMode:
     } else if (newIsInCheck) {
       newGameStatus = 'check';
     }
-
-    const move: ChessMove = { from, to, piece, captured, timestamp: Date.now() };
 
     setGameState(prev => {
       const newTime = { ...prev.time };
