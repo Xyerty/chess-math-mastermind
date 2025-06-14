@@ -3,6 +3,8 @@ import { ChessGameState, ChessMove, GameStatus, ChessPiece, GameMode, Player } f
 import { defaultPosition } from '../features/chess/constants';
 import { isKingInCheck, hasAnyValidMoves } from '../features/chess/utils/board';
 import { isValidMoveInternal } from '../features/chess/utils/moveValidation';
+import { generateAIMove } from '../features/chess/utils/ai';
+import { useOpponent } from '../contexts/OpponentContext';
 
 type HandleSquareClickResult = 
   | { type: 'selected'; payload: { row: number; col: number } }
@@ -21,6 +23,9 @@ const getInitialTime = (gameMode: GameMode) => {
 };
 
 export const useChessGame = (aiDifficulty: 'easy' | 'medium' | 'hard', gameMode: GameMode) => {
+  const { opponentType, playerColor } = useOpponent();
+  const [isAIThinking, setIsAIThinking] = useState(false);
+  
   const [gameState, setGameState] = useState<ChessGameState>(() => {
     const initialTime = getInitialTime(gameMode);
     return {
@@ -37,6 +42,93 @@ export const useChessGame = (aiDifficulty: 'easy' | 'medium' | 'hard', gameMode:
       aiStats: null,
     };
   });
+
+  // AI move logic
+  const makeAIMove = useCallback(async () => {
+    if (opponentType !== 'ai' || gameState.gameStatus !== 'playing' && gameState.gameStatus !== 'check') {
+      return;
+    }
+
+    const aiPlayer = playerColor === 'white' ? 'black' : 'white';
+    if (gameState.currentPlayer !== aiPlayer) {
+      return;
+    }
+
+    setIsAIThinking(true);
+    
+    // Add a small delay to make AI moves feel more natural
+    const minThinkingTime = aiDifficulty === 'easy' ? 500 : aiDifficulty === 'medium' ? 1000 : 1500;
+    
+    setTimeout(() => {
+      const aiMoveResult = generateAIMove(gameState.board, aiPlayer, aiDifficulty, gameState.lastMove);
+      
+      if (aiMoveResult) {
+        const { move, score, thinkingTime } = aiMoveResult;
+        console.log(`AI (${aiDifficulty}) move:`, move, `Score: ${score}, Time: ${thinkingTime}ms`);
+        
+        // Execute the AI move
+        const tempBoard = gameState.board.map(row => [...row]);
+        const piece = tempBoard[move.from.row][move.from.col];
+        let captured = gameState.board[move.to.row][move.to.col];
+
+        const isEnPassant = piece?.[1] === 'p' && move.from.col !== move.to.col && !captured;
+
+        tempBoard[move.to.row][move.to.col] = piece;
+        tempBoard[move.from.row][move.from.col] = null;
+        
+        if (isEnPassant) {
+          const capturedPawnRow = move.from.row;
+          const capturedPawnCol = move.to.col;
+          captured = gameState.board[capturedPawnRow][capturedPawnCol];
+          tempBoard[capturedPawnRow][capturedPawnCol] = null;
+        }
+
+        const nextPlayer = aiPlayer === 'white' ? 'black' : 'white';
+        const newIsInCheck = isKingInCheck(tempBoard, nextPlayer);
+        const opponentHasMoves = hasAnyValidMoves(tempBoard, nextPlayer, move);
+
+        let newGameStatus: GameStatus = 'playing';
+        if (!opponentHasMoves) {
+          newGameStatus = newIsInCheck ? 'checkmate' : 'stalemate';
+        } else if (newIsInCheck) {
+          newGameStatus = 'check';
+        }
+
+        setGameState(prev => {
+          const newTime = { ...prev.time };
+          if (gameMode === 'speed') {
+            newTime[aiPlayer] += 2; // +2s increment
+          }
+
+          return {
+            ...prev,
+            board: tempBoard,
+            currentPlayer: nextPlayer,
+            moveHistory: [...prev.moveHistory, { ...move, captured: captured || undefined }],
+            selectedSquare: null,
+            lastMove: { ...move, captured: captured || undefined },
+            isInCheck: newIsInCheck,
+            gameStatus: newGameStatus,
+            moveCount: aiPlayer === 'black' ? prev.moveCount + 1 : prev.moveCount,
+            time: newTime,
+            aiStats: { score, thinkingTime },
+          };
+        });
+      }
+      
+      setIsAIThinking(false);
+    }, minThinkingTime);
+  }, [gameState, aiDifficulty, opponentType, playerColor, gameMode]);
+
+  // Trigger AI move when it's AI's turn
+  useEffect(() => {
+    if (opponentType === 'ai' && !isAIThinking) {
+      const aiPlayer = playerColor === 'white' ? 'black' : 'white';
+      if (gameState.currentPlayer === aiPlayer && (gameState.gameStatus === 'playing' || gameState.gameStatus === 'check')) {
+        makeAIMove();
+      }
+    }
+  }, [gameState.currentPlayer, gameState.gameStatus, opponentType, playerColor, isAIThinking, makeAIMove]);
 
   useEffect(() => {
     let timerId: NodeJS.Timeout | undefined;
@@ -76,6 +168,13 @@ export const useChessGame = (aiDifficulty: 'easy' | 'medium' | 'hard', gameMode:
 
   const makeMove = useCallback((from: { row: number; col: number }, to: { row: number; col: number }): boolean => {
     if (gameState.gameStatus !== 'playing' && gameState.gameStatus !== 'check') return false;
+    
+    // Prevent human moves when it's AI's turn
+    if (opponentType === 'ai') {
+      const aiPlayer = playerColor === 'white' ? 'black' : 'white';
+      if (gameState.currentPlayer === aiPlayer) return false;
+    }
+    
     if (!isValidMoveInternal(gameState.board, from, to, gameState.lastMove)) return false;
 
     const tempBoard = gameState.board.map(row => [...row]);
@@ -131,16 +230,23 @@ export const useChessGame = (aiDifficulty: 'easy' | 'medium' | 'hard', gameMode:
         gameStatus: newGameStatus,
         moveCount: prev.currentPlayer === 'black' ? prev.moveCount + 1 : prev.moveCount,
         time: newTime,
-        aiStats: null, // AI is disabled
+        aiStats: null,
       }
     });
 
     return true;
-  }, [gameState, gameMode]);
+  }, [gameState, gameMode, opponentType, playerColor]);
 
   const handleSquareClick = useCallback((row: number, col: number): HandleSquareClickResult | null => {
     if (gameState.gameStatus !== 'playing' && gameState.gameStatus !== 'check') {
         return null;
+    }
+
+    // Prevent clicks when AI is thinking or when it's AI's turn
+    if (opponentType === 'ai') {
+      if (isAIThinking) return null;
+      const aiPlayer = playerColor === 'white' ? 'black' : 'white';
+      if (gameState.currentPlayer === aiPlayer) return null;
     }
 
     const piece = gameState.board[row][col];
@@ -159,7 +265,7 @@ export const useChessGame = (aiDifficulty: 'easy' | 'medium' | 'hard', gameMode:
       }
     }
     return null;
-  }, [gameState.board, gameState.selectedSquare, gameState.currentPlayer, gameState.gameStatus]);
+  }, [gameState.board, gameState.selectedSquare, gameState.currentPlayer, gameState.gameStatus, opponentType, playerColor, isAIThinking]);
 
   const clearSelection = useCallback(() => {
     setGameState(prev => ({ ...prev, selectedSquare: null }));
@@ -189,6 +295,7 @@ export const useChessGame = (aiDifficulty: 'easy' | 'medium' | 'hard', gameMode:
       time: { white: initialTime, black: initialTime },
       aiStats: null,
     });
+    setIsAIThinking(false);
   }, [gameMode]);
 
   return {
@@ -198,5 +305,6 @@ export const useChessGame = (aiDifficulty: 'easy' | 'medium' | 'hard', gameMode:
     clearSelection,
     resetGame,
     resignGame,
+    isAIThinking,
   };
 };

@@ -17,7 +17,7 @@ const Game = () => {
   const navigate = useNavigate();
   const { aiDifficulty } = useDifficulty();
   const { gameMode } = useGameMode();
-  const { gameState, handleSquareClick, makeMove, clearSelection, resetGame, resignGame } = useChessGame(aiDifficulty, gameMode);
+  const { gameState, handleSquareClick, makeMove, clearSelection, resetGame, resignGame, isAIThinking } = useChessGame(aiDifficulty, gameMode);
 
   const onChessBoardClick = useCallback((row: number, col: number) => {
     const result = handleSquareClick(row, col);
@@ -63,6 +63,9 @@ const Game = () => {
                 gameStatus={gameState.gameStatus}
                 moveCount={gameState.moveCount}
                 time={gameState.time}
+                aiStats={gameState.aiStats}
+                isAIThinking={isAIThinking}
+                aiDifficulty={aiDifficulty}
               />
             </div>
             <div className="lg:col-span-1">

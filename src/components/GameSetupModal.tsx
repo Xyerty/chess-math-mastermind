@@ -6,8 +6,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useLanguage } from '../contexts/LanguageContext';
 import { useDifficulty, Difficulty } from '../contexts/DifficultyContext';
 import { useGameMode } from '../contexts/GameModeContext';
+import { useOpponent, OpponentType, PlayerColor } from '../contexts/OpponentContext';
 import { GameMode } from '../features/chess/types';
-import { BrainCircuit, Calculator, Play, Clock } from 'lucide-react';
+import { BrainCircuit, Calculator, Play, Clock, Users, User } from 'lucide-react';
 
 interface GameSetupModalProps {
   isOpen: boolean;
@@ -19,13 +20,18 @@ const GameSetupModal: React.FC<GameSetupModalProps> = ({ isOpen, onClose, onStar
   const { t } = useLanguage();
   const { mathDifficulty: currentMathDifficulty, aiDifficulty: currentAiDifficulty } = useDifficulty();
   const { gameMode: currentGameMode, setGameMode } = useGameMode();
+  const { opponentType: currentOpponentType, setOpponentType, playerColor: currentPlayerColor, setPlayerColor } = useOpponent();
   
   const [mathDifficulty, setMathDifficulty] = useState<Difficulty>(currentMathDifficulty);
   const [aiDifficulty, setAiDifficulty] = useState<Difficulty>(currentAiDifficulty);
   const [localGameMode, setLocalGameMode] = useState<GameMode>(currentGameMode);
+  const [localOpponentType, setLocalOpponentType] = useState<OpponentType>(currentOpponentType);
+  const [localPlayerColor, setLocalPlayerColor] = useState<PlayerColor>(currentPlayerColor);
 
   const handleStart = () => {
     setGameMode(localGameMode);
+    setOpponentType(localOpponentType);
+    setPlayerColor(localPlayerColor);
     onStartGame(mathDifficulty, aiDifficulty);
     onClose();
   };
@@ -44,6 +50,42 @@ const GameSetupModal: React.FC<GameSetupModalProps> = ({ isOpen, onClose, onStar
         </DialogHeader>
         
         <div className="grid gap-6 py-6">
+          {/* Opponent Type */}
+          <div className="grid grid-cols-4 items-center gap-4">
+            <label htmlFor="opponent-type" className="text-right col-span-1 flex items-center justify-end gap-2 text-sm font-medium">
+              <Users className="h-4 w-4 text-muted-foreground" />
+              Opponent
+            </label>
+            <Select value={localOpponentType} onValueChange={(value: OpponentType) => setLocalOpponentType(value)}>
+              <SelectTrigger id="opponent-type" className="col-span-3">
+                <SelectValue placeholder="Select opponent" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="human">Human vs Human</SelectItem>
+                <SelectItem value="ai">Human vs AI</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Player Color (only show when playing against AI) */}
+          {localOpponentType === 'ai' && (
+            <div className="grid grid-cols-4 items-center gap-4">
+              <label htmlFor="player-color" className="text-right col-span-1 flex items-center justify-end gap-2 text-sm font-medium">
+                <User className="h-4 w-4 text-muted-foreground" />
+                Play as
+              </label>
+              <Select value={localPlayerColor} onValueChange={(value: PlayerColor) => setLocalPlayerColor(value)}>
+                <SelectTrigger id="player-color" className="col-span-3">
+                  <SelectValue placeholder="Select color" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="white">White</SelectItem>
+                  <SelectItem value="black">Black</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+
           {/* Game Mode */}
           <div className="grid grid-cols-4 items-center gap-4">
             <label htmlFor="game-mode" className="text-right col-span-1 flex items-center justify-end gap-2 text-sm font-medium">
@@ -80,23 +122,25 @@ const GameSetupModal: React.FC<GameSetupModalProps> = ({ isOpen, onClose, onStar
             </Select>
           </div>
 
-          {/* AI Strength */}
-          <div className="grid grid-cols-4 items-center gap-4">
-            <label htmlFor="ai-difficulty" className="text-right col-span-1 flex items-center justify-end gap-2 text-sm font-medium">
-                <BrainCircuit className="h-4 w-4 text-muted-foreground" />
-              {t('settings.aiStrength')}
-            </label>
-            <Select value={aiDifficulty} onValueChange={(value: Difficulty) => setAiDifficulty(value)}>
-              <SelectTrigger id="ai-difficulty" className="col-span-3">
-                <SelectValue placeholder={t('settings.aiStrength')} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="easy">Easy</SelectItem>
-                <SelectItem value="medium">Medium</SelectItem>
-                <SelectItem value="hard">Hard</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          {/* AI Strength (only show when playing against AI) */}
+          {localOpponentType === 'ai' && (
+            <div className="grid grid-cols-4 items-center gap-4">
+              <label htmlFor="ai-difficulty" className="text-right col-span-1 flex items-center justify-end gap-2 text-sm font-medium">
+                  <BrainCircuit className="h-4 w-4 text-muted-foreground" />
+                {t('settings.aiStrength')}
+              </label>
+              <Select value={aiDifficulty} onValueChange={(value: Difficulty) => setAiDifficulty(value)}>
+                <SelectTrigger id="ai-difficulty" className="col-span-3">
+                  <SelectValue placeholder={t('settings.aiStrength')} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="easy">Easy</SelectItem>
+                  <SelectItem value="medium">Medium</SelectItem>
+                  <SelectItem value="hard">Hard</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          )}
         </div>
 
         <DialogFooter>
