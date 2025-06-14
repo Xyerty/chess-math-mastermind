@@ -33,37 +33,56 @@ if (!container) {
 
 const root = createRoot(container);
 
-// Create a fallback component for when Sentry is not configured
-const ErrorFallback = ({ error }: { error: Error }) => (
-  <div style={{ 
-    display: 'flex', 
-    justifyContent: 'center', 
-    alignItems: 'center', 
-    height: '100vh', 
-    flexDirection: 'column', 
-    fontFamily: 'sans-serif',
-    padding: '2rem',
-    textAlign: 'center'
-  }}>
-    <h2 style={{ marginBottom: '1rem', color: '#dc2626' }}>Something went wrong</h2>
-    <p style={{ marginBottom: '1rem', color: '#6b7280' }}>
-      {error.message || 'An unexpected error occurred'}
-    </p>
-    <button 
-      onClick={() => window.location.reload()} 
-      style={{
-        padding: '0.5rem 1rem',
-        backgroundColor: '#3b82f6',
-        color: 'white',
-        border: 'none',
-        borderRadius: '0.375rem',
-        cursor: 'pointer'
-      }}
-    >
-      Reload Page
-    </button>
-  </div>
-);
+// Create a fallback component that matches Sentry's expected interface
+const ErrorFallback = ({ error, resetError }: { error: unknown; resetError: () => void }) => {
+  const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
+  
+  return (
+    <div style={{ 
+      display: 'flex', 
+      justifyContent: 'center', 
+      alignItems: 'center', 
+      height: '100vh', 
+      flexDirection: 'column', 
+      fontFamily: 'sans-serif',
+      padding: '2rem',
+      textAlign: 'center'
+    }}>
+      <h2 style={{ marginBottom: '1rem', color: '#dc2626' }}>Something went wrong</h2>
+      <p style={{ marginBottom: '1rem', color: '#6b7280' }}>
+        {errorMessage}
+      </p>
+      <div style={{ display: 'flex', gap: '1rem' }}>
+        <button 
+          onClick={resetError}
+          style={{
+            padding: '0.5rem 1rem',
+            backgroundColor: '#3b82f6',
+            color: 'white',
+            border: 'none',
+            borderRadius: '0.375rem',
+            cursor: 'pointer'
+          }}
+        >
+          Try Again
+        </button>
+        <button 
+          onClick={() => window.location.reload()} 
+          style={{
+            padding: '0.5rem 1rem',
+            backgroundColor: '#6b7280',
+            color: 'white',
+            border: 'none',
+            borderRadius: '0.375rem',
+            cursor: 'pointer'
+          }}
+        >
+          Reload Page
+        </button>
+      </div>
+    </div>
+  );
+};
 
 // Use Sentry ErrorBoundary if available, otherwise use a simple fallback
 const AppWithErrorBoundary = sentryDsn ? (
