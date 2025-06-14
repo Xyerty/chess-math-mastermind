@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
@@ -6,6 +5,7 @@ import { Play, Settings, BookOpen, BarChart3 } from "lucide-react";
 import { useLanguage } from "../contexts/LanguageContext";
 import GameSetupModal from "../components/GameSetupModal";
 import { useDifficulty, Difficulty } from "../contexts/DifficultyContext";
+import { Button } from "@/components/ui/button";
 
 const MainMenu = () => {
   const navigate = useNavigate();
@@ -104,6 +104,19 @@ const MainMenu = () => {
               </CardContent>
             </Card>
           ))}
+        </div>
+
+        {/* Sentry Test Button */}
+        <div className="my-8 bg-yellow-100/70 border-l-4 border-yellow-500 text-yellow-800 p-4 rounded-md shadow-sm" role="alert">
+          <p className="font-bold">Developer Test Panel</p>
+          <p className="text-sm">Click the button below to test Sentry error tracking. This will throw a harmless error that should appear in your Sentry dashboard.</p>
+          <Button
+            variant="destructive"
+            className="mt-3"
+            onClick={() => { throw new Error("Sentry test error from Main Menu! This is a test."); }}
+          >
+            Trigger Sentry Error
+          </Button>
         </div>
 
         {/* Footer */}
