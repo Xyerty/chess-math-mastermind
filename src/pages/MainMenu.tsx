@@ -50,7 +50,7 @@ const MainMenu = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-100 via-white to-green-100 dark:from-blue-950/50 dark:via-background dark:to-green-950/50 flex flex-col items-center justify-center p-4">
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
       <div className="absolute top-4 right-4 z-20">
         <Button
             variant="ghost"

@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 type Language = 'en' | 'es';
@@ -75,11 +74,23 @@ const translations: Record<Language, Translation> = {
     'settings.spanish': 'Spanish',
     'settings.comingSoon': 'Settings panel coming soon!',
     'settings.features': 'Here you\'ll be able to configure:',
-    'settings.mathDifficulty': '• Math difficulty level',
+    'settings.mathDifficulty': 'Math Difficulty',
     'settings.aiStrength': '• AI opponent strength',
-    'settings.soundPrefs': '• Sound preferences',
-    'settings.visualThemes': '• Visual themes',
-    'settings.timeLimits': '• Time limits',
+    'settings.soundPrefs': 'Sound Preferences',
+    'settings.visualThemes': 'Visual Themes',
+    'settings.timeLimits': 'Time Limits',
+    'settings.sound.masterVolume': 'Master Volume',
+    'settings.sound.sfx': 'Sound Effects',
+    'settings.sound.sfxVolume': 'SFX Volume',
+    'settings.sound.bgm': 'Background Music',
+    'settings.sound.bgmVolume': 'BGM Volume',
+    'settings.visualThemes.description': 'Switch between light and dark themes.',
+    'settings.darkMode': 'Dark Mode',
+    
+    // Difficulty
+    'difficulty.easy': 'Easy',
+    'difficulty.medium': 'Medium',
+    'difficulty.hard': 'Hard',
     
     // Tutorial
     'tutorial.title': 'How to Play',
@@ -188,11 +199,23 @@ const translations: Record<Language, Translation> = {
     'settings.spanish': 'Español',
     'settings.comingSoon': '¡Panel de configuración próximamente!',
     'settings.features': 'Aquí podrás configurar:',
-    'settings.mathDifficulty': '• Nivel de dificultad matemática',
+    'settings.mathDifficulty': 'Dificultad Matemática',
     'settings.aiStrength': '• Fuerza del oponente IA',
-    'settings.soundPrefs': '• Preferencias de sonido',
-    'settings.visualThemes': '• Temas visuales',
-    'settings.timeLimits': '• Límites de tiempo',
+    'settings.soundPrefs': 'Preferencias de Sonido',
+    'settings.visualThemes': 'Temas Visuales',
+    'settings.timeLimits': 'Límites de Tiempo',
+    'settings.sound.masterVolume': 'Volumen Principal',
+    'settings.sound.sfx': 'Efectos de Sonido',
+    'settings.sound.sfxVolume': 'Volumen de SFX',
+    'settings.sound.bgm': 'Música de Fondo',
+    'settings.sound.bgmVolume': 'Volumen de Música de Fondo',
+    'settings.visualThemes.description': 'Cambia entre temas claros y oscuros.',
+    'settings.darkMode': 'Modo Oscuro',
+    
+    // Dificultad
+    'difficulty.easy': 'Fácil',
+    'difficulty.medium': 'Medio',
+    'difficulty.hard': 'Difícil',
     
     // Tutorial
     'tutorial.title': 'Cómo Jugar',

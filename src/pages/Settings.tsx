@@ -53,9 +53,9 @@ const Settings = () => {
               <SelectValue placeholder={t('settings.mathDifficulty')} />
             </SelectTrigger>
             <SelectContent className="bg-card">
-              <SelectItem value="easy">Easy</SelectItem>
-              <SelectItem value="medium">Medium</SelectItem>
-              <SelectItem value="hard">Hard</SelectItem>
+              <SelectItem value="easy">{t('difficulty.easy')}</SelectItem>
+              <SelectItem value="medium">{t('difficulty.medium')}</SelectItem>
+              <SelectItem value="hard">{t('difficulty.hard')}</SelectItem>
             </SelectContent>
           </Select>
         </CardContent>
@@ -75,9 +75,9 @@ const Settings = () => {
               <SelectValue placeholder={t('settings.aiStrength')} />
             </SelectTrigger>
             <SelectContent className="bg-card">
-              <SelectItem value="easy">Easy</SelectItem>
-              <SelectItem value="medium">Medium</SelectItem>
-              <SelectItem value="hard">Hard</SelectItem>
+              <SelectItem value="easy">{t('difficulty.easy')}</SelectItem>
+              <SelectItem value="medium">{t('difficulty.medium')}</SelectItem>
+              <SelectItem value="hard">{t('difficulty.hard')}</SelectItem>
             </SelectContent>
           </Select>
         </CardContent>
@@ -100,9 +100,9 @@ const Settings = () => {
         <CardContent>
            <div className="flex items-center justify-between">
             <Label htmlFor="dark-mode" className="flex flex-col gap-1 cursor-pointer">
-              <span>Dark Mode</span>
+              <span>{t('settings.darkMode')}</span>
               <span className="font-normal text-sm text-muted-foreground">
-                Switch between light and dark themes.
+                {t('settings.visualThemes.description')}
               </span>
             </Label>
             <div className="flex items-center gap-2">
