@@ -29,8 +29,8 @@ const queryClient = new QueryClient();
 
 const SentryRoutes = Sentry.withSentryReactRouterV6Routing(Routes);
 
-// Get Clerk publishable key from environment
-const CLERK_PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
+// Use the provided Clerk publishable key
+const CLERK_PUBLISHABLE_KEY = "pk_test_cmVsYXhpbmctc2hlcGhlcmQtMTAuY2xlcmsuYWNjb3VudHMuZGV2JA";
 
 if (!CLERK_PUBLISHABLE_KEY) {
   throw new Error("Missing Clerk Publishable Key");
