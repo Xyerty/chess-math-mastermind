@@ -2,7 +2,7 @@
 import React from "react";
 import { ChessMove } from "../hooks/useChessGame";
 
-// Unicode chess pieces for easy visualization
+// Use solid piece characters for easier styling
 const PIECE_UNICODES: Record<string, string> = {
   wp: "♙", wn: "♘", wb: "♗", wr: "♖", wq: "♕", wk: "♔",
   bp: "♟", bn: "♞", bb: "♝", br: "♜", bq: "♛", bk: "♚",
@@ -21,9 +21,10 @@ const ChessBoard: React.FC<ChessBoardProps> = ({
   selectedSquare,
   lastMove
 }) => {
-  const boardSizeClass = 'w-full max-w-[320px] sm:max-w-md md:max-w-lg lg:max-w-xl';
-  const squareSizeClass = 'h-10 sm:h-12 md:h-14 lg:h-16';
-  const textSizeClass = 'text-2xl sm:text-3xl md:text-4xl';
+  const boardSizeClass = 'w-full max-w-[90vmin] sm:max-w-[700px]';
+  const textSizeClass = 'text-3xl sm:text-4xl md:text-5xl';
+  const labelSizeClass = 'text-xs sm:text-base';
+  const labelHeightClass = 'h-10 sm:h-12 md:h-14 lg:h-16';
 
   const handleSquareClick = (row: number, col: number, piece: string | null) => {
     onPieceClick?.(row, col, piece);
@@ -41,7 +42,7 @@ const ChessBoard: React.FC<ChessBoardProps> = ({
       <div className="flex justify-center mb-1 sm:mb-2">
         <div className={`grid grid-cols-8 ${boardSizeClass} px-2 sm:px-4`}>
           {['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'].map(letter => (
-            <div key={letter} className="text-center text-muted-foreground font-semibold text-xs sm:text-sm">
+            <div key={letter} className={`text-center text-muted-foreground font-semibold ${labelSizeClass}`}>
               {letter}
             </div>
           ))}
@@ -52,7 +53,7 @@ const ChessBoard: React.FC<ChessBoardProps> = ({
         {/* Row Labels (8-1) - Left */}
         <div className="flex flex-col mr-1 sm:mr-2">
           {[8, 7, 6, 5, 4, 3, 2, 1].map(number => (
-            <div key={number} className={`flex items-center justify-center ${squareSizeClass} text-muted-foreground font-semibold text-xs sm:text-sm`}>
+            <div key={number} className={`flex items-center justify-center ${labelHeightClass} text-muted-foreground font-semibold ${labelSizeClass}`}>
               {number}
             </div>
           ))}
@@ -65,6 +66,11 @@ const ChessBoard: React.FC<ChessBoardProps> = ({
               const dark = (rowIdx + colIdx) % 2 === 1;
               const isSelected = selectedSquare?.row === rowIdx && selectedSquare?.col === colIdx;
               const isLastMove = isLastMoveSquare(rowIdx, colIdx);
+              const isWhitePiece = piece?.[0] === 'w';
+
+              const pieceStyle = {
+                textShadow: `0 1px 3px hsla(var(--piece-${isWhitePiece ? 'white' : 'black'}-stroke), 0.7)`
+              };
               
               return (
                 <div
@@ -72,22 +78,18 @@ const ChessBoard: React.FC<ChessBoardProps> = ({
                   className={`
                     relative w-full aspect-square flex items-center justify-center ${textSizeClass} font-bold 
                     transition-all duration-200 cursor-pointer hover:brightness-110 active:scale-95
-                    ${dark ? "bg-[#779556]" : "bg-[#eeeed2]"}
-                    ${isSelected ? "ring-2 sm:ring-4 ring-blue-500 ring-inset" : ""}
-                    ${isLastMove ? "ring-2 ring-yellow-400 ring-inset" : ""}
-                    ${piece && !isSelected && !isLastMove ? "hover:ring-1 sm:hover:ring-2 hover:ring-yellow-400 hover:ring-inset" : ""}
+                    ${dark ? "bg-board-dark" : "bg-board-light"}
+                    ${isSelected ? "ring-4 ring-ring ring-inset" : ""}
+                    ${isLastMove ? "ring-2 ring-last-move-highlight ring-inset" : ""}
+                    ${piece && !isSelected && !isLastMove ? "hover:ring-2 hover:ring-last-move-highlight/70 hover:ring-inset" : ""}
                   `}
                   style={{ userSelect: "none" }}
                   onClick={() => handleSquareClick(rowIdx, colIdx, piece)}
                 >
                   {piece ? (
                     <span
-                      className="select-none transition-transform duration-200 hover:scale-110 active:scale-95"
-                      style={{
-                        filter: dark
-                          ? "drop-shadow(0 1px 2px #222)"
-                          : "drop-shadow(0 1px 2px #ccc)",
-                      }}
+                      className={`select-none transition-transform duration-200 hover:scale-110 active:scale-95 ${isWhitePiece ? 'text-piece-white-fill' : 'text-piece-black-fill'}`}
+                      style={pieceStyle}
                     >
                       {PIECE_UNICODES[piece]}
                     </span>
@@ -101,7 +103,7 @@ const ChessBoard: React.FC<ChessBoardProps> = ({
         {/* Row Labels (8-1) - Right */}
         <div className="flex flex-col ml-1 sm:ml-2">
           {[8, 7, 6, 5, 4, 3, 2, 1].map(number => (
-            <div key={number} className={`flex items-center justify-center ${squareSizeClass} text-muted-foreground font-semibold text-xs sm:text-sm`}>
+            <div key={number} className={`flex items-center justify-center ${labelHeightClass} text-muted-foreground font-semibold ${labelSizeClass}`}>
               {number}
             </div>
           ))}
@@ -112,7 +114,7 @@ const ChessBoard: React.FC<ChessBoardProps> = ({
       <div className="flex justify-center mt-1 sm:mt-2">
         <div className={`grid grid-cols-8 ${boardSizeClass} px-2 sm:px-4`}>
           {['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'].map(letter => (
-            <div key={letter} className="text-center text-muted-foreground font-semibold text-xs sm:text-sm">
+            <div key={letter} className={`text-center text-muted-foreground font-semibold ${labelSizeClass}`}>
               {letter}
             </div>
           ))}

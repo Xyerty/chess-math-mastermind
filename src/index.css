@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -35,6 +34,14 @@
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+    /* Chessboard Colors */
+    --board-light-square: 60 38% 88%; /* #eeeed2 */
+    --board-dark-square: 88 25% 45%; /* #779556 */
+    --piece-white-fill: 0 0% 100%;
+    --piece-black-fill: 0 0% 13%;
+    --piece-white-stroke: 0 0% 13%;
+    --piece-black-stroke: 0 0% 100%;
+    --board-last-move-highlight: 54 96% 72%;
   }
 
   .dark {
@@ -65,6 +72,14 @@
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+    /* Chessboard Colors */
+    --board-light-square: 220 13% 47%;
+    --board-dark-square: 220 14% 30%;
+    --piece-white-fill: 210 40% 98%;
+    --piece-black-fill: 222.2 84% 4.9%;
+    --piece-white-stroke: 0 0% 0%;
+    --piece-black-stroke: 210 40% 98%;
+    --board-last-move-highlight: 48 96% 71%;
   }
 }
 

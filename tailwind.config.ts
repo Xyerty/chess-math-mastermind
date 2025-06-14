@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -52,6 +53,21 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
+        'last-move-highlight': 'hsl(var(--board-last-move-highlight))',
+        board: {
+          light: 'hsl(var(--board-light-square))',
+          dark: 'hsl(var(--board-dark-square))',
+        },
+        piece: {
+          white: {
+            fill: 'hsl(var(--piece-white-fill))',
+            stroke: 'hsl(var(--piece-white-stroke))',
+          },
+          black: {
+            fill: 'hsl(var(--piece-black-fill))',
+            stroke: 'hsl(var(--piece-black-stroke))',
+          },
+        },
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
 					foreground: 'hsl(var(--sidebar-foreground))',
