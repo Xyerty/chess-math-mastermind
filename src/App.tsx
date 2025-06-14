@@ -7,13 +7,13 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
+import { ClerkProvider } from "@clerk/clerk-react";
 import { LanguageProvider } from "./contexts/LanguageContext";
 import { DifficultyProvider } from "./contexts/DifficultyContext";
 import { SettingsProvider } from "./contexts/SettingsContext";
 import { GameModeProvider } from "./contexts/GameModeContext";
 import { OpponentProvider } from "./contexts/OpponentContext";
 import { AuthProvider } from "./contexts/AuthContext";
-import { MagicAuthProvider } from "./contexts/MagicAuthContext";
 import MainMenu from "./pages/MainMenu";
 import Game from "./pages/Game";
 import Tutorial from "./pages/Tutorial";
@@ -29,11 +29,18 @@ const queryClient = new QueryClient();
 
 const SentryRoutes = Sentry.withSentryReactRouterV6Routing(Routes);
 
+// Get Clerk publishable key from environment
+const CLERK_PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
+
+if (!CLERK_PUBLISHABLE_KEY) {
+  throw new Error("Missing Clerk Publishable Key");
+}
+
 const App: React.FC = () => {
   return (
-    <ThemeProvider attribute="class" defaultTheme="dark">
-      <QueryClientProvider client={queryClient}>
-        <MagicAuthProvider>
+    <ClerkProvider publishableKey={CLERK_PUBLISHABLE_KEY}>
+      <ThemeProvider attribute="class" defaultTheme="dark">
+        <QueryClientProvider client={queryClient}>
           <AuthProvider>
             <SettingsProvider>
               <DifficultyProvider>
@@ -93,9 +100,9 @@ const App: React.FC = () => {
               </DifficultyProvider>
             </SettingsProvider>
           </AuthProvider>
-        </MagicAuthProvider>
-      </QueryClientProvider>
-    </ThemeProvider>
+        </QueryClientProvider>
+      </ThemeProvider>
+    </ClerkProvider>
   );
 };
 

@@ -1,7 +1,7 @@
 
 import React from 'react';
-import { useMagicAuth } from '@/contexts/MagicAuthContext';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@clerk/clerk-react';
+import { useAuth as useSupabaseAuth } from '@/contexts/AuthContext';
 import { Navigate } from 'react-router-dom';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -10,11 +10,11 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-  const { user: magicUser, loading: magicLoading } = useMagicAuth();
-  const { user: supabaseUser, loading: supabaseLoading } = useAuth();
+  const { isSignedIn, isLoaded } = useAuth();
+  const { user: supabaseUser, loading: supabaseLoading } = useSupabaseAuth();
 
-  const loading = magicLoading || supabaseLoading;
-  const isAuthenticated = magicUser || supabaseUser;
+  const loading = !isLoaded || supabaseLoading;
+  const isAuthenticated = isSignedIn || supabaseUser;
 
   if (loading) {
     return (
