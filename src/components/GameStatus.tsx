@@ -1,8 +1,9 @@
+
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Clock, User, Trophy } from "lucide-react";
 import { useLanguage } from "../contexts/LanguageContext";
-import { GameStatus } from "../features/chess/types";
+import type { GameStatus } from "../features/chess/types";
 
 interface GameStatusProps {
   currentPlayer: 'white' | 'black';
