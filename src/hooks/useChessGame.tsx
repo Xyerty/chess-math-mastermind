@@ -1,3 +1,4 @@
+
 import React, { useState, useCallback } from 'react';
 
 export type ChessPiece = 'wp' | 'wn' | 'wb' | 'wr' | 'wq' | 'wk' | 'bp' | 'bn' | 'bb' | 'br' | 'bq' | 'bk' | null;
@@ -215,10 +216,12 @@ export const useChessGame = (aiDifficulty: 'easy' | 'medium' | 'hard') => {
       timestamp: Date.now()
     };
 
+    const nextPlayer = gameState.currentPlayer === 'white' ? 'black' : 'white';
+
     setGameState(prev => ({
       ...prev,
       board: newBoard,
-      currentPlayer: prev.currentPlayer === 'white' ? 'black' : 'white',
+      currentPlayer: nextPlayer,
       moveHistory: [...prev.moveHistory, move],
       selectedSquare: null,
       lastMove: move,
@@ -226,27 +229,35 @@ export const useChessGame = (aiDifficulty: 'easy' | 'medium' | 'hard') => {
     }));
 
     // AI move after player move
-    if (gameState.currentPlayer === 'white') {
+    if (nextPlayer === 'black') {
       setTimeout(() => {
-        const aiMove = generateAIMove(newBoard, 'black', aiDifficulty);
-        if (aiMove) {
-          const aiBoardCopy = newBoard.map(row => [...row]);
-          aiBoardCopy[aiMove.to.row][aiMove.to.col] = aiBoardCopy[aiMove.from.row][aiMove.from.col];
-          aiBoardCopy[aiMove.from.row][aiMove.from.col] = null;
+        setGameState(prev => {
+          // Check if it's still AI's turn, in case of quick reset or other actions
+          if (prev.currentPlayer !== 'black') {
+            return prev;
+          }
 
-          setGameState(prev => ({
-            ...prev,
-            board: aiBoardCopy,
-            currentPlayer: 'white',
-            moveHistory: [...prev.moveHistory, aiMove],
-            lastMove: aiMove,
-          }));
-        }
+          const aiMove = generateAIMove(prev.board, 'black', aiDifficulty);
+          if (aiMove) {
+            const aiBoardCopy = prev.board.map(row => [...row]);
+            aiBoardCopy[aiMove.to.row][aiMove.to.col] = aiBoardCopy[aiMove.from.row][aiMove.from.col];
+            aiBoardCopy[aiMove.from.row][aiMove.from.col] = null;
+
+            return {
+              ...prev,
+              board: aiBoardCopy,
+              currentPlayer: 'white',
+              moveHistory: [...prev.moveHistory, aiMove],
+              lastMove: aiMove,
+            };
+          }
+          return prev;
+        });
       }, 1000);
     }
 
     return true;
-  }, [gameState.board, gameState.currentPlayer, isValidMove, aiDifficulty]);
+  }, [gameState, isValidMove, aiDifficulty]);
 
   const selectSquare = useCallback((row: number, col: number) => {
     const piece = gameState.board[row][col];

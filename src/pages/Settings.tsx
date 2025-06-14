@@ -31,7 +31,7 @@ const Settings = () => {
             <SelectTrigger className="w-full">
               <SelectValue placeholder={t('settings.language')} />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-card">
               <SelectItem value="en">{t('settings.english')}</SelectItem>
               <SelectItem value="es">{t('settings.spanish')}</SelectItem>
             </SelectContent>
@@ -52,7 +52,7 @@ const Settings = () => {
             <SelectTrigger className="w-full">
               <SelectValue placeholder={t('settings.mathDifficulty')} />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-card">
               <SelectItem value="easy">Easy</SelectItem>
               <SelectItem value="medium">Medium</SelectItem>
               <SelectItem value="hard">Hard</SelectItem>
@@ -74,7 +74,7 @@ const Settings = () => {
             <SelectTrigger className="w-full">
               <SelectValue placeholder={t('settings.aiStrength')} />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-card">
               <SelectItem value="easy">Easy</SelectItem>
               <SelectItem value="medium">Medium</SelectItem>
               <SelectItem value="hard">Hard</SelectItem>

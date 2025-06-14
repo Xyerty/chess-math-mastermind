@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -26,6 +26,7 @@ const MathChallenge: React.FC<MathChallengeProps> = ({
   const [userAnswer, setUserAnswer] = useState('');
   const [timeLeft, setTimeLeft] = useState(timeLimit);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const isMounted = useRef(true);
 
   // Generate math problem based on difficulty
   const generateProblem = () => {
@@ -86,6 +87,7 @@ const MathChallenge: React.FC<MathChallengeProps> = ({
 
   // Timer countdown
   useEffect(() => {
+    isMounted.current = true;
     generateProblem();
     
     if (timeLimit === Infinity) return;
@@ -94,14 +96,19 @@ const MathChallenge: React.FC<MathChallengeProps> = ({
       setTimeLeft(prev => {
         if (prev <= 1) {
           clearInterval(timer);
-          onFailure();
+          if (isMounted.current) {
+            onFailure();
+          }
           return 0;
         }
         return prev - 1;
       });
     }, 1000);
 
-    return () => clearInterval(timer);
+    return () => {
+      isMounted.current = false;
+      clearInterval(timer);
+    };
   }, []);
 
   const handleSubmit = () => {

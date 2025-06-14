@@ -42,7 +42,7 @@ const SoundSettings = () => {
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="space-y-2">
-          <Label>Master Volume</Label>
+          <Label>{t('settings.sound.masterVolume', 'Master Volume')}</Label>
           <div className="flex items-center gap-4">
             <VolumeX className="h-5 w-5 text-muted-foreground" />
             <Slider
@@ -58,13 +58,13 @@ const SoundSettings = () => {
         <div className="flex items-center justify-between">
             <Label htmlFor="sfx-toggle" className="flex items-center gap-2 cursor-pointer">
               <Volume1 className="h-5 w-5"/>
-              <span>Sound Effects</span>
+              <span>{t('settings.sound.sfx', 'Sound Effects')}</span>
             </Label>
             <Switch id="sfx-toggle" checked={!settings.sound.isSfxMuted} onCheckedChange={toggleSfx} />
         </div>
          {!settings.sound.isSfxMuted && (
           <div className="space-y-2 pl-7">
-              <Label className="text-sm text-muted-foreground">SFX Volume</Label>
+              <Label className="text-sm text-muted-foreground">{t('settings.sound.sfxVolume', 'SFX Volume')}</Label>
               <Slider
                 value={[settings.sound.sfxVolume]}
                 onValueChange={handleSfxVolumeChange}
@@ -78,13 +78,13 @@ const SoundSettings = () => {
         <div className="flex items-center justify-between">
             <Label htmlFor="music-toggle" className="flex items-center gap-2 cursor-pointer">
               <Volume className="h-5 w-5"/>
-              <span>Background Music</span>
+              <span>{t('settings.sound.bgm', 'Background Music')}</span>
             </Label>
             <Switch id="music-toggle" checked={!settings.sound.isMusicMuted} onCheckedChange={toggleMusic} />
         </div>
         {!settings.sound.isMusicMuted && (
           <div className="space-y-2 pl-7">
-              <Label className="text-sm text-muted-foreground">BGM Volume</Label>
+              <Label className="text-sm text-muted-foreground">{t('settings.sound.bgmVolume', 'BGM Volume')}</Label>
               <Slider
                 value={[settings.sound.musicVolume]}
                 onValueChange={handleMusicVolumeChange}
