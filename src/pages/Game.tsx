@@ -6,6 +6,7 @@ import ChessBoard from "../components/ChessBoard";
 import GameStatus from "../components/GameStatus";
 import BottomActionMenu from "../components/BottomActionMenu";
 import HintDisplay from "../components/HintDisplay";
+import GameErrorBoundary from "../components/GameErrorBoundary";
 import { useDifficulty } from "../contexts/DifficultyContext";
 import { useGameMode } from "../contexts/GameModeContext";
 import MoveHistory from "../components/MoveHistory";
@@ -39,29 +40,46 @@ const Game = () => {
   const [showHint, setShowHint] = useState(false);
 
   const onChessBoardClick = useCallback((row: number, col: number) => {
-    const result = handleSquareClick(row, col);
+    try {
+      const result = handleSquareClick(row, col);
 
-    if (result?.type === 'move_attempt') {
-      const moveSuccessful = makeMove(result.payload.from, result.payload.to);
-      if (!moveSuccessful) {
-        clearSelection();
+      if (result?.type === 'move_attempt') {
+        const moveSuccessful = makeMove(result.payload.from, result.payload.to);
+        if (!moveSuccessful) {
+          clearSelection();
+        }
       }
+    } catch (error) {
+      console.error('Error handling chess board click:', error);
+      clearSelection();
     }
   }, [handleSquareClick, makeMove, clearSelection]);
 
   const handleNewGame = () => {
-    resetGame();
-    setShowHint(false);
+    try {
+      resetGame();
+      setShowHint(false);
+    } catch (error) {
+      console.error('Error starting new game:', error);
+    }
   };
 
   const handleHintRequest = async () => {
-    await requestHint();
-    setShowHint(true);
+    try {
+      await requestHint();
+      setShowHint(true);
+    } catch (error) {
+      console.error('Error requesting hint:', error);
+    }
   };
 
   const handleCloseHint = () => {
     setShowHint(false);
     clearHint();
+  };
+
+  const handleGoHome = () => {
+    navigate('/');
   };
 
   const isGameOver = ['checkmate', 'stalemate', 'timeout', 'resigned'].includes(gameState.gameStatus);
@@ -74,7 +92,7 @@ const Game = () => {
   }
 
   return (
-    <>
+    <GameErrorBoundary onReset={handleNewGame} onGoHome={handleGoHome}>
       <div className="flex flex-col h-full" style={{ paddingBottom: '70px' }}>
         <div className="flex justify-center items-start p-2 sm:p-4 bg-gradient-to-b from-slate-50 to-slate-50/0 dark:from-slate-900/50 dark:to-slate-900/0">
           <ChessBoard 
@@ -131,9 +149,9 @@ const Game = () => {
         status={gameState.gameStatus}
         winner={winner}
         onNewGame={handleNewGame}
-        onGoHome={() => navigate('/')}
+        onGoHome={handleGoHome}
       />
-    </>
+    </GameErrorBoundary>
   );
 };
 

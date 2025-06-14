@@ -22,18 +22,22 @@ export default defineConfig(({ mode }) => ({
   },
   build: {
     outDir: 'dist',
-    sourcemap: false,
+    sourcemap: mode === 'development',
     rollupOptions: {
       output: {
         manualChunks: {
           vendor: ['react', 'react-dom'],
           router: ['react-router-dom'],
           ui: ['@radix-ui/react-slot', '@radix-ui/react-dialog', 'lucide-react'],
+          chess: ['@tanstack/react-query'],
         },
       },
     },
   },
   define: {
     'process.env.NODE_ENV': JSON.stringify(mode),
+  },
+  optimizeDeps: {
+    exclude: ['lucide-react'],
   },
 }));
