@@ -1,18 +1,10 @@
+
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 
-// In a real app, this would come from an API or local storage.
+// Mock data for features not yet implemented in the database
 const MOCK_DATA = {
-  summary: {
-    wins: 28,
-    losses: 15,
-    draws: 7,
-    mathCorrect: 230,
-    mathIncorrect: 45,
-    avgSolveTime: 8.7,
-    bestSolveTime: 2.1,
-  },
   progress: Array.from({ length: 10 }, (_, i) => ({
     game: i + 1,
     accuracy: Math.min(98, 65 + i * 3 + Math.random() * 5),
@@ -32,37 +24,44 @@ const MOCK_DATA = {
 };
 
 interface GameStatistics {
-    user_id: string;
-    total_games: number;
-    wins: number;
-    losses: number;
-    draws: number;
-    win_rate: number;
-    total_math_problems: number;
-    correct_math_problems: number;
-    math_accuracy: number;
-    avg_solve_time_s: number | null;
-    best_solve_time_s: number | null;
-    updated_at: string | null;
+  user_id: string;
+  total_games: number;
+  wins: number;
+  losses: number;
+  draws: number;
+  win_rate: number;
+  total_math_problems: number;
+  correct_math_problems: number;
+  math_accuracy: number;
+  avg_solve_time_s: number | null;
+  best_solve_time_s: number | null;
+  updated_at: string;
 }
 
 export const useStatisticsData = () => {
   const { user } = useAuth();
 
   const fetchStatistics = async (userId: string) => {
+    console.log('Fetching statistics for user:', userId);
+    
     const { data: stats, error } = await supabase
       .from('game_statistics')
       .select('*')
       .eq('user_id', userId)
-      .single<GameStatistics>();
+      .single();
 
     if (error) {
       console.error("Error fetching statistics:", error.message);
-      // Let's not throw here, but return null so the UI can handle it gracefully.
+      // Return null so the UI can handle it gracefully
       return null;
     }
 
-    if (!stats) return null;
+    if (!stats) {
+      console.log('No statistics found for user');
+      return null;
+    }
+    
+    console.log('Statistics fetched successfully:', stats);
     
     const totalGames = stats.total_games ?? 0;
     const totalMathProblems = stats.total_math_problems ?? 0;
@@ -83,7 +82,10 @@ export const useStatisticsData = () => {
       },
       // The following data is still mocked and can be implemented later
       progress: MOCK_DATA.progress.map(p => ({ ...p, time: parseFloat(p.time.toFixed(1)) })),
-      accuracyByDifficulty: MOCK_DATA.accuracyByDifficulty.map(d => ({...d, accuracy: (d.correct / (d.correct + d.incorrect)) * 100})),
+      accuracyByDifficulty: MOCK_DATA.accuracyByDifficulty.map(d => ({
+        ...d, 
+        accuracy: (d.correct / (d.correct + d.incorrect)) * 100
+      })),
       openings: MOCK_DATA.openings,
       winLossData: [
         { result: 'wins', value: stats.wins ?? 0, fill: 'hsl(var(--chart-1))' },
@@ -93,20 +95,29 @@ export const useStatisticsData = () => {
     };
   };
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, error } = useQuery({
     queryKey: ['statistics', user?.id],
     queryFn: () => {
-        if (!user?.id) return Promise.resolve(null);
-        return fetchStatistics(user.id);
+      if (!user?.id) {
+        console.log('No user ID available for statistics query');
+        return Promise.resolve(null);
+      }
+      return fetchStatistics(user.id);
     },
     enabled: !!user,
+    retry: 1,
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
   if (isLoading) {
-    // Return a loading state or null to be handled by the component
+    console.log('Statistics loading...');
     return null;
   }
   
-  // The useQuery will return data as null if fetching failed or user is not logged in.
+  if (error) {
+    console.error('Statistics query error:', error);
+    return null;
+  }
+  
   return data;
 };
