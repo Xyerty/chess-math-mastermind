@@ -3,6 +3,7 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RotateCcw, Flag, Lightbulb, Pause, Settings } from "lucide-react";
+import { useLanguage } from "../contexts/LanguageContext";
 
 interface GameControlsProps {
   onNewGame: () => void;
@@ -19,12 +20,14 @@ const GameControls: React.FC<GameControlsProps> = ({
   onPause,
   onSettings
 }) => {
+  const { t } = useLanguage();
+
   return (
     <div className="space-y-4">
       {/* Game Actions */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Game Controls</CardTitle>
+          <CardTitle className="text-lg">{t('controls.title')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <Button 
@@ -33,7 +36,7 @@ const GameControls: React.FC<GameControlsProps> = ({
             variant="outline"
           >
             <RotateCcw className="mr-2 h-4 w-4" />
-            New Game
+            {t('controls.newGame')}
           </Button>
           
           <Button 
@@ -42,7 +45,7 @@ const GameControls: React.FC<GameControlsProps> = ({
             variant="outline"
           >
             <Pause className="mr-2 h-4 w-4" />
-            Pause Game
+            {t('controls.pauseGame')}
           </Button>
           
           <Button 
@@ -51,7 +54,7 @@ const GameControls: React.FC<GameControlsProps> = ({
             variant="outline"
           >
             <Lightbulb className="mr-2 h-4 w-4" />
-            Get Hint
+            {t('controls.getHint')}
           </Button>
           
           <Button 
@@ -60,7 +63,7 @@ const GameControls: React.FC<GameControlsProps> = ({
             variant="destructive"
           >
             <Flag className="mr-2 h-4 w-4" />
-            Resign
+            {t('controls.resign')}
           </Button>
         </CardContent>
       </Card>
@@ -68,7 +71,7 @@ const GameControls: React.FC<GameControlsProps> = ({
       {/* Quick Settings */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Quick Settings</CardTitle>
+          <CardTitle className="text-lg">{t('controls.quickSettings')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <Button 
@@ -77,7 +80,7 @@ const GameControls: React.FC<GameControlsProps> = ({
             variant="outline"
           >
             <Settings className="mr-2 h-4 w-4" />
-            Game Settings
+            {t('controls.gameSettings')}
           </Button>
         </CardContent>
       </Card>
@@ -85,15 +88,15 @@ const GameControls: React.FC<GameControlsProps> = ({
       {/* Game Info */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">How to Play</CardTitle>
+          <CardTitle className="text-lg">{t('controls.howToPlay')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-sm text-muted-foreground space-y-2">
-            <p>1. Click a chess piece to select it</p>
-            <p>2. Solve the math problem that appears</p>
-            <p>3. If correct, make your chess move</p>
-            <p>4. AI will respond with its move</p>
-            <p>5. Repeat until checkmate!</p>
+            <p>{t('controls.instruction1')}</p>
+            <p>{t('controls.instruction2')}</p>
+            <p>{t('controls.instruction3')}</p>
+            <p>{t('controls.instruction4')}</p>
+            <p>{t('controls.instruction5')}</p>
           </div>
         </CardContent>
       </Card>

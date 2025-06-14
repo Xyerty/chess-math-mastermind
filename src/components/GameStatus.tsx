@@ -2,6 +2,7 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Clock, User, Trophy, Target } from "lucide-react";
+import { useLanguage } from "../contexts/LanguageContext";
 
 interface GameStatusProps {
   currentPlayer: 'white' | 'black';
@@ -18,6 +19,8 @@ const GameStatus: React.FC<GameStatusProps> = ({
   timeRemaining = 600,
   mathAccuracy = 85
 }) => {
+  const { t } = useLanguage();
+
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -35,10 +38,10 @@ const GameStatus: React.FC<GameStatusProps> = ({
 
   const getStatusText = () => {
     switch (gameStatus) {
-      case 'check': return 'Check!';
-      case 'checkmate': return 'Checkmate!';
-      case 'stalemate': return 'Stalemate';
-      default: return 'Game Active';
+      case 'check': return t('game.check');
+      case 'checkmate': return t('game.checkmate');
+      case 'stalemate': return t('game.stalemate');
+      default: return t('game.gameActive');
     }
   };
 
@@ -49,7 +52,7 @@ const GameStatus: React.FC<GameStatusProps> = ({
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-lg">
             <User className="h-5 w-5" />
-            Current Turn
+            {t('game.currentTurn')}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -58,7 +61,7 @@ const GameStatus: React.FC<GameStatusProps> = ({
             <span className="font-semibold text-lg capitalize">{currentPlayer}</span>
           </div>
           <div className="mt-2">
-            <span className="text-sm text-muted-foreground">Move {moveCount}</span>
+            <span className="text-sm text-muted-foreground">{t('game.move')} {moveCount}</span>
           </div>
         </CardContent>
       </Card>
@@ -68,7 +71,7 @@ const GameStatus: React.FC<GameStatusProps> = ({
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-lg">
             <Trophy className="h-5 w-5" />
-            Game Status
+            {t('game.gameStatus')}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -83,7 +86,7 @@ const GameStatus: React.FC<GameStatusProps> = ({
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-lg">
             <Clock className="h-5 w-5" />
-            Time Remaining
+            {t('game.timeRemaining')}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -98,7 +101,7 @@ const GameStatus: React.FC<GameStatusProps> = ({
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-lg">
             <Target className="h-5 w-5" />
-            Math Accuracy
+            {t('game.mathAccuracy')}
           </CardTitle>
         </CardHeader>
         <CardContent>

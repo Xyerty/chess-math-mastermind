@@ -3,13 +3,17 @@ import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 type Language = 'en' | 'es';
 
+interface Translation {
+  [key: string]: string | string[];
+}
+
 interface LanguageContextType {
   language: Language;
   setLanguage: (lang: Language) => void;
   t: (key: string) => string;
 }
 
-const translations = {
+const translations: Record<Language, Translation> = {
   en: {
     // Navigation
     'nav.backToMenu': 'Back to Menu',
@@ -46,13 +50,11 @@ const translations = {
     'controls.quickSettings': 'Quick Settings',
     'controls.gameSettings': 'Game Settings',
     'controls.howToPlay': 'How to Play',
-    'controls.instructions': [
-      '1. Click a chess piece to select it',
-      '2. Solve the math problem that appears',
-      '3. If correct, make your chess move',
-      '4. AI will respond with its move',
-      '5. Repeat until checkmate!'
-    ],
+    'controls.instruction1': '1. Click a chess piece to select it',
+    'controls.instruction2': '2. Solve the math problem that appears',
+    'controls.instruction3': '3. If correct, make your chess move',
+    'controls.instruction4': '4. AI will respond with its move',
+    'controls.instruction5': '5. Repeat until checkmate!',
     
     // Math Challenge
     'math.title': 'Math Challenge',
@@ -84,21 +86,17 @@ const translations = {
     'tutorial.welcome': 'Welcome to Chess Math Mastermind!',
     'tutorial.description': 'This unique game combines chess strategy with mathematical problem-solving.',
     'tutorial.rulesTitle': 'Game Rules:',
-    'tutorial.rules': [
-      'Click on any chess piece you want to move',
-      'A math problem will appear that you must solve',
-      'If you solve it correctly, you can make your chess move',
-      'If you fail, you lose your turn',
-      'The AI will then make its move',
-      'Continue until checkmate!'
-    ],
+    'tutorial.rule1': 'Click on any chess piece you want to move',
+    'tutorial.rule2': 'A math problem will appear that you must solve',
+    'tutorial.rule3': 'If you solve it correctly, you can make your chess move',
+    'tutorial.rule4': 'If you fail, you lose your turn',
+    'tutorial.rule5': 'The AI will then make its move',
+    'tutorial.rule6': 'Continue until checkmate!',
     'tutorial.tipsTitle': 'Tips for Success:',
-    'tutorial.tips': [
-      'Practice mental math to solve problems quickly',
-      'Think about your chess strategy before clicking pieces',
-      'Use the hint system when you\'re stuck',
-      'Start with easier difficulty levels'
-    ],
+    'tutorial.tip1': 'Practice mental math to solve problems quickly',
+    'tutorial.tip2': 'Think about your chess strategy before clicking pieces',
+    'tutorial.tip3': 'Use the hint system when you\'re stuck',
+    'tutorial.tip4': 'Start with easier difficulty levels',
     
     // Statistics
     'stats.title': 'Statistics',
@@ -146,13 +144,11 @@ const translations = {
     'controls.quickSettings': 'Configuración Rápida',
     'controls.gameSettings': 'Configuración del Juego',
     'controls.howToPlay': 'Cómo Jugar',
-    'controls.instructions': [
-      '1. Haz clic en una pieza de ajedrez para seleccionarla',
-      '2. Resuelve el problema matemático que aparece',
-      '3. Si es correcto, haz tu movimiento de ajedrez',
-      '4. La IA responderá con su movimiento',
-      '5. ¡Repite hasta el jaque mate!'
-    ],
+    'controls.instruction1': '1. Haz clic en una pieza de ajedrez para seleccionarla',
+    'controls.instruction2': '2. Resuelve el problema matemático que aparece',
+    'controls.instruction3': '3. Si es correcto, haz tu movimiento de ajedrez',
+    'controls.instruction4': '4. La IA responderá con su movimiento',
+    'controls.instruction5': '5. ¡Repite hasta el jaque mate!',
     
     // Desafío Matemático
     'math.title': 'Desafío Matemático',
@@ -184,21 +180,17 @@ const translations = {
     'tutorial.welcome': '¡Bienvenido al Maestro del Ajedrez Matemático!',
     'tutorial.description': 'Este juego único combina la estrategia del ajedrez con la resolución de problemas matemáticos.',
     'tutorial.rulesTitle': 'Reglas del Juego:',
-    'tutorial.rules': [
-      'Haz clic en cualquier pieza de ajedrez que quieras mover',
-      'Aparecerá un problema matemático que debes resolver',
-      'Si lo resuelves correctamente, puedes hacer tu movimiento de ajedrez',
-      'Si fallas, pierdes tu turno',
-      'La IA hará su movimiento',
-      '¡Continúa hasta el jaque mate!'
-    ],
+    'tutorial.rule1': 'Haz clic en cualquier pieza de ajedrez que quieras mover',
+    'tutorial.rule2': 'Aparecerá un problema matemático que debes resolver',
+    'tutorial.rule3': 'Si lo resuelves correctamente, puedes hacer tu movimiento de ajedrez',
+    'tutorial.rule4': 'Si fallas, pierdes tu turno',
+    'tutorial.rule5': 'La IA hará su movimiento',
+    'tutorial.rule6': '¡Continúa hasta el jaque mate!',
     'tutorial.tipsTitle': 'Consejos para el Éxito:',
-    'tutorial.tips': [
-      'Practica cálculo mental para resolver problemas rápidamente',
-      'Piensa en tu estrategia de ajedrez antes de hacer clic en las piezas',
-      'Usa el sistema de pistas cuando estés atascado',
-      'Comienza con niveles de dificultad más fáciles'
-    ],
+    'tutorial.tip1': 'Practica cálculo mental para resolver problemas rápidamente',
+    'tutorial.tip2': 'Piensa en tu estrategia de ajedrez antes de hacer clic en las piezas',
+    'tutorial.tip3': 'Usa el sistema de pistas cuando estés atascado',
+    'tutorial.tip4': 'Comienza con niveles de dificultad más fáciles',
     
     // Estadísticas
     'stats.title': 'Estadísticas',
@@ -218,7 +210,8 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
   const [language, setLanguage] = useState<Language>('en');
 
   const t = (key: string): string => {
-    return translations[language][key as keyof typeof translations[typeof language]] || key;
+    const value = translations[language][key];
+    return typeof value === 'string' ? value : key;
   };
 
   return (

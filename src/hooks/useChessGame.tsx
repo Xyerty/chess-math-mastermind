@@ -5,7 +5,7 @@ export type ChessPiece = 'wp' | 'wn' | 'wb' | 'wr' | 'wq' | 'wk' | 'bp' | 'bn' |
 export type GameStatus = 'playing' | 'check' | 'checkmate' | 'stalemate';
 export type Player = 'white' | 'black';
 
-interface ChessMove {
+export interface ChessMove {
   from: { row: number; col: number };
   to: { row: number; col: number };
   piece: ChessPiece;
@@ -36,6 +36,104 @@ const defaultPosition: ChessPiece[][] = [
   ["wr", "wn", "wb", "wq", "wk", "wb", "wn", "wr"],
 ];
 
+// Simple AI move generator
+const generateAIMove = (board: ChessPiece[][], player: Player): ChessMove | null => {
+  const possibleMoves: ChessMove[] = [];
+  
+  // Find all possible moves for AI player
+  for (let row = 0; row < 8; row++) {
+    for (let col = 0; col < 8; col++) {
+      const piece = board[row][col];
+      if (piece && piece[0] === player[0]) {
+        // Generate moves for this piece (simplified)
+        for (let toRow = 0; toRow < 8; toRow++) {
+          for (let toCol = 0; toCol < 8; toCol++) {
+            if (isValidAIMove(board, { row, col }, { row: toRow, col: toCol })) {
+              possibleMoves.push({
+                from: { row, col },
+                to: { row: toRow, col: toCol },
+                piece,
+                captured: board[toRow][toCol],
+                timestamp: Date.now()
+              });
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  // Return random move for now (can be improved with minimax)
+  return possibleMoves.length > 0 ? possibleMoves[Math.floor(Math.random() * possibleMoves.length)] : null;
+};
+
+const isValidAIMove = (board: ChessPiece[][], from: { row: number; col: number }, to: { row: number; col: number }): boolean => {
+  const piece = board[from.row][from.col];
+  if (!piece) return false;
+
+  const pieceColor = piece[0] as 'w' | 'b';
+  const pieceType = piece[1];
+  const targetPiece = board[to.row][to.col];
+
+  // Can't capture own pieces
+  if (targetPiece && targetPiece[0] === pieceColor) return false;
+
+  // Can't move to same square
+  if (from.row === to.row && from.col === to.col) return false;
+
+  // Basic movement validation
+  const rowDiff = Math.abs(to.row - from.row);
+  const colDiff = Math.abs(to.col - from.col);
+
+  switch (pieceType) {
+    case 'p': // Pawn
+      const direction = pieceColor === 'w' ? -1 : 1;
+      const startRow = pieceColor === 'w' ? 6 : 1;
+      
+      if (from.col === to.col) {
+        // Forward move
+        if (to.row === from.row + direction && !targetPiece) return true;
+        if (from.row === startRow && to.row === from.row + 2 * direction && !targetPiece) return true;
+      } else if (Math.abs(from.col - to.col) === 1 && to.row === from.row + direction && targetPiece) {
+        // Diagonal capture
+        return true;
+      }
+      return false;
+
+    case 'r': // Rook
+      return (rowDiff === 0 || colDiff === 0) && isPathClearAI(board, from, to);
+
+    case 'n': // Knight
+      return (rowDiff === 2 && colDiff === 1) || (rowDiff === 1 && colDiff === 2);
+
+    case 'b': // Bishop
+      return rowDiff === colDiff && isPathClearAI(board, from, to);
+
+    case 'q': // Queen
+      return (rowDiff === 0 || colDiff === 0 || rowDiff === colDiff) && isPathClearAI(board, from, to);
+
+    case 'k': // King
+      return rowDiff <= 1 && colDiff <= 1;
+
+    default:
+      return false;
+  }
+};
+
+const isPathClearAI = (board: ChessPiece[][], from: { row: number; col: number }, to: { row: number; col: number }): boolean => {
+  const rowStep = Math.sign(to.row - from.row);
+  const colStep = Math.sign(to.col - from.col);
+  let currentRow = from.row + rowStep;
+  let currentCol = from.col + colStep;
+
+  while (currentRow !== to.row || currentCol !== to.col) {
+    if (board[currentRow][currentCol] !== null) return false;
+    currentRow += rowStep;
+    currentCol += colStep;
+  }
+  return true;
+};
+
 export const useChessGame = () => {
   const [gameState, setGameState] = useState<ChessGameState>({
     board: defaultPosition.map(row => [...row]),
@@ -50,67 +148,11 @@ export const useChessGame = () => {
   });
 
   const isValidMove = useCallback((from: { row: number; col: number }, to: { row: number; col: number }): boolean => {
-    const piece = gameState.board[from.row][from.col];
-    if (!piece) return false;
-
-    const pieceColor = piece[0] as 'w' | 'b';
-    const pieceType = piece[1];
-    const targetPiece = gameState.board[to.row][to.col];
-
-    // Can't capture own pieces
-    if (targetPiece && targetPiece[0] === pieceColor) return false;
-
-    // Basic movement validation (simplified)
-    const rowDiff = Math.abs(to.row - from.row);
-    const colDiff = Math.abs(to.col - from.col);
-
-    switch (pieceType) {
-      case 'p': // Pawn
-        const direction = pieceColor === 'w' ? -1 : 1;
-        const startRow = pieceColor === 'w' ? 6 : 1;
-        
-        if (from.col === to.col) {
-          // Forward move
-          if (to.row === from.row + direction && !targetPiece) return true;
-          if (from.row === startRow && to.row === from.row + 2 * direction && !targetPiece) return true;
-        } else if (Math.abs(from.col - to.col) === 1 && to.row === from.row + direction && targetPiece) {
-          // Diagonal capture
-          return true;
-        }
-        return false;
-
-      case 'r': // Rook
-        return (rowDiff === 0 || colDiff === 0) && isPathClear(from, to);
-
-      case 'n': // Knight
-        return (rowDiff === 2 && colDiff === 1) || (rowDiff === 1 && colDiff === 2);
-
-      case 'b': // Bishop
-        return rowDiff === colDiff && isPathClear(from, to);
-
-      case 'q': // Queen
-        return (rowDiff === 0 || colDiff === 0 || rowDiff === colDiff) && isPathClear(from, to);
-
-      case 'k': // King
-        return rowDiff <= 1 && colDiff <= 1;
-
-      default:
-        return false;
-    }
+    return isValidAIMove(gameState.board, from, to);
   }, [gameState.board]);
 
   const isPathClear = useCallback((from: { row: number; col: number }, to: { row: number; col: number }): boolean => {
-    const rowStep = Math.sign(to.row - from.row);
-    const colStep = Math.sign(to.col - from.col);
-    let currentRow = from.row + rowStep;
-    let currentCol = from.col + colStep;
-
-    while (currentRow !== to.row || currentCol !== to.col) {
-      if (gameState.board[currentRow][currentCol] !== null) return false;
-      currentRow += rowStep;
-      currentCol += colStep;
-    }
-    return true;
+    return isPathClearAI(gameState.board, from, to);
   }, [gameState.board]);
 
   const makeMove = useCallback((from: { row: number; col: number }, to: { row: number; col: number }): boolean => {
@@ -141,8 +183,28 @@ export const useChessGame = () => {
       moveCount: prev.currentPlayer === 'black' ? prev.moveCount + 1 : prev.moveCount
     }));
 
+    // AI move after player move
+    if (gameState.currentPlayer === 'white') {
+      setTimeout(() => {
+        const aiMove = generateAIMove(newBoard, 'black');
+        if (aiMove) {
+          const aiBoardCopy = newBoard.map(row => [...row]);
+          aiBoardCopy[aiMove.to.row][aiMove.to.col] = aiBoardCopy[aiMove.from.row][aiMove.from.col];
+          aiBoardCopy[aiMove.from.row][aiMove.from.col] = null;
+
+          setGameState(prev => ({
+            ...prev,
+            board: aiBoardCopy,
+            currentPlayer: 'white',
+            moveHistory: [...prev.moveHistory, aiMove],
+            lastMove: aiMove,
+          }));
+        }
+      }, 1000);
+    }
+
     return true;
-  }, [gameState.board, isValidMove]);
+  }, [gameState.board, gameState.currentPlayer, isValidMove]);
 
   const selectSquare = useCallback((row: number, col: number) => {
     const piece = gameState.board[row][col];

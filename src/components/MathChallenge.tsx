@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Clock, CheckCircle, XCircle } from "lucide-react";
+import { useLanguage } from "../contexts/LanguageContext";
 
 interface MathChallengeProps {
   onSuccess: () => void;
@@ -20,6 +21,7 @@ const MathChallenge: React.FC<MathChallengeProps> = ({
   difficulty = 'medium',
   timeLimit = 30
 }) => {
+  const { t } = useLanguage();
   const [problem, setProblem] = useState<{question: string, answer: number}>({question: '', answer: 0});
   const [userAnswer, setUserAnswer] = useState('');
   const [timeLeft, setTimeLeft] = useState(timeLimit);
@@ -125,7 +127,7 @@ const MathChallenge: React.FC<MathChallengeProps> = ({
       <Card className="w-full max-w-md animate-scale-in">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl flex items-center justify-center gap-2">
-            <span>Math Challenge</span>
+            <span>{t('math.title')}</span>
             <div className="flex items-center gap-1 text-lg">
               <Clock className="h-5 w-5" />
               <span className={timeLeft <= 10 ? 'text-red-500' : 'text-primary'}>{timeLeft}s</span>
@@ -136,7 +138,7 @@ const MathChallenge: React.FC<MathChallengeProps> = ({
         <CardContent className="space-y-6">
           {/* Problem */}
           <div className="text-center">
-            <p className="text-lg text-muted-foreground mb-4">Solve this problem to make your move:</p>
+            <p className="text-lg text-muted-foreground mb-4">{t('math.instruction')}</p>
             <div className="text-4xl font-bold text-primary bg-accent/20 py-4 px-6 rounded-lg">
               {problem.question} = ?
             </div>
@@ -146,7 +148,7 @@ const MathChallenge: React.FC<MathChallengeProps> = ({
           <div className="space-y-4">
             <Input
               type="number"
-              placeholder="Enter your answer"
+              placeholder={t('math.enterAnswer')}
               value={userAnswer}
               onChange={(e) => setUserAnswer(e.target.value)}
               onKeyPress={handleKeyPress}
@@ -165,12 +167,12 @@ const MathChallenge: React.FC<MathChallengeProps> = ({
                 {isSubmitting ? (
                   <div className="flex items-center gap-2">
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    Checking...
+                    {t('math.checking')}
                   </div>
                 ) : (
                   <>
                     <CheckCircle className="mr-2 h-5 w-5" />
-                    Submit Answer
+                    {t('math.submitAnswer')}
                   </>
                 )}
               </Button>
@@ -182,14 +184,14 @@ const MathChallenge: React.FC<MathChallengeProps> = ({
                 className="h-12"
               >
                 <XCircle className="mr-2 h-5 w-5" />
-                Cancel
+                {t('math.cancel')}
               </Button>
             </div>
           </div>
 
           {/* Difficulty Indicator */}
           <div className="text-center text-sm text-muted-foreground">
-            Difficulty: <span className="capitalize font-semibold">{difficulty}</span>
+            {t('math.difficulty')}: <span className="capitalize font-semibold">{t(`math.${difficulty}`)}</span>
           </div>
         </CardContent>
       </Card>
