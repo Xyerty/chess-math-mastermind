@@ -79,7 +79,20 @@ export const SettingsProvider = ({ children }: { children: ReactNode }) => {
         const parsedSettings = JSON.parse(storedSettings);
         const validation = settingsSchema.safeParse(parsedSettings);
         if (validation.success) {
-          return validation.data;
+          // Deep merge to ensure all properties are present, even if new ones were added.
+          const validatedData = validation.data;
+          return {
+            ...defaultSettings,
+            ...validatedData,
+            sound: {
+              ...defaultSettings.sound,
+              ...validatedData.sound,
+            },
+            timeLimits: {
+              ...defaultSettings.timeLimits,
+              ...validatedData.timeLimits,
+            },
+          };
         }
       }
       return defaultSettings;
