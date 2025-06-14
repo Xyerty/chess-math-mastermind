@@ -1,4 +1,3 @@
-
 import { useOpponent } from '../contexts/OpponentContext';
 import { GameMode } from '../features/chess/types';
 import { useGameState } from './useGameState';
@@ -55,7 +54,7 @@ export const useChessGame = (aiDifficulty: 'easy' | 'medium' | 'hard', gameMode:
     opponentType,
     playerColor,
     isAIThinking,
-    onMathChallenge: startMathChallenge,
+    onMathChallenge: (from, to) => startMathChallenge({ from, to }),
   });
 
   const {
