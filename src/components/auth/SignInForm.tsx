@@ -11,7 +11,6 @@ import { cleanupAuthState } from '@/lib/auth/utils';
 import { PasswordResetDialog } from './PasswordResetDialog';
 import { PasswordInput } from './PasswordInput';
 import { FormValidation } from './FormValidation';
-import { SignInInfoNote } from './SignInInfoNote';
 import { ForgotPasswordLink } from './ForgotPasswordLink';
 
 interface SignInFormProps {
@@ -94,7 +93,6 @@ export const SignInForm = ({ setLoading, setError, loading }: SignInFormProps) =
   
   return (
     <div className="space-y-6">
-      <SignInInfoNote />
       <FormValidation error={localError} />
 
       <form onSubmit={handleSignIn} className="space-y-5">
