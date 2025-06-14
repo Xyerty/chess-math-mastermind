@@ -1,12 +1,14 @@
 
 import { Magic } from 'magic-sdk';
 import { OAuthExtension } from '@magic-ext/oauth';
+import { NETWORKS } from './infura';
 
 // Initialize Magic instance with your publishable key
+// Using Sepolia testnet for development - switch to mainnet for production
 export const magic = new Magic('pk_live_1337BF61BAC7CF09', {
   network: {
-    rpcUrl: 'https://mainnet.infura.io/v3/YOUR_INFURA_KEY', // You'll need to replace with actual Infura key
-    chainId: 1, // Ethereum mainnet
+    rpcUrl: NETWORKS.sepolia.rpcUrl,
+    chainId: NETWORKS.sepolia.chainId,
   },
   extensions: [new OAuthExtension()],
 });

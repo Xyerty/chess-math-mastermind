@@ -2,9 +2,10 @@
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Wallet, Copy, ExternalLink, Eye, EyeOff } from 'lucide-react';
+import { Wallet, Copy, ExternalLink, Eye, EyeOff, Network } from 'lucide-react';
 import { useMagicAuth } from '@/contexts/MagicAuthContext';
 import { toast } from 'sonner';
+import { NETWORKS } from '@/lib/infura';
 
 export const WalletDisplay = () => {
   const { user, connectWallet } = useMagicAuth();
@@ -18,7 +19,9 @@ export const WalletDisplay = () => {
   };
 
   const openEtherscan = (address: string) => {
-    window.open(`https://etherscan.io/address/${address}`, '_blank');
+    // Use Sepolia explorer for testnet
+    const explorerUrl = `https://sepolia.etherscan.io/address/${address}`;
+    window.open(explorerUrl, '_blank');
   };
 
   const formatAddress = (address: string) => {
@@ -35,8 +38,9 @@ export const WalletDisplay = () => {
         <CardTitle className="text-lg font-bold text-slate-900 dark:text-white">
           Your Web3 Wallet
         </CardTitle>
-        <CardDescription className="text-slate-600 dark:text-slate-400">
-          Ethereum address • Powered by Magic
+        <CardDescription className="text-slate-600 dark:text-slate-400 flex items-center justify-center gap-1">
+          <Network className="h-3 w-3" />
+          {NETWORKS.sepolia.name} • Powered by Magic
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
