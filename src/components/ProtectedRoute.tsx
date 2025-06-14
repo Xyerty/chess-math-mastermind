@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { useMagicAuth } from '@/contexts/MagicAuthContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { Navigate } from 'react-router-dom';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -9,7 +10,11 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-  const { user, loading } = useAuth();
+  const { user: magicUser, loading: magicLoading } = useMagicAuth();
+  const { user: supabaseUser, loading: supabaseLoading } = useAuth();
+
+  const loading = magicLoading || supabaseLoading;
+  const isAuthenticated = magicUser || supabaseUser;
 
   if (loading) {
     return (
@@ -23,7 +28,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     );
   }
 
-  if (!user) {
+  if (!isAuthenticated) {
     return <Navigate to="/auth" replace />;
   }
 

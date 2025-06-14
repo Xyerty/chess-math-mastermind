@@ -1,8 +1,9 @@
 
+import { useMagicAuth } from '@/contexts/MagicAuthContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
-import { LogOut, LogIn, User as UserIcon, Settings } from 'lucide-react';
+import { LogOut, LogIn, User as UserIcon, Settings, Wallet } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from './ui/skeleton';
 import {
@@ -14,15 +15,24 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 const FloatingAuthStatus = () => {
-  const { user, profile, signOut, loading } = useAuth();
+  const { user: magicUser, signOut: magicSignOut, loading: magicLoading } = useMagicAuth();
+  const { user: supabaseUser, profile, signOut: supabaseSignOut, loading: supabaseLoading } = useAuth();
   const navigate = useNavigate();
 
+  const loading = magicLoading || supabaseLoading;
+  const user = magicUser || supabaseUser;
+  const displayName = magicUser?.email?.split('@')[0] || profile?.username || supabaseUser?.email?.split('@')[0] || 'User';
+  const displayEmail = magicUser?.email || supabaseUser?.email || '';
+
   const handleSignOut = async () => {
-    await signOut();
+    if (magicUser) {
+      await magicSignOut();
+    } else {
+      await supabaseSignOut();
+    }
   };
 
   const handleProfile = () => {
-    // Navigate to profile/settings when implemented
     navigate('/settings');
   };
 
@@ -41,31 +51,38 @@ const FloatingAuthStatus = () => {
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="flex items-center gap-2 bg-card p-2 rounded-lg shadow-lg border hover:bg-accent">
               <Avatar className="h-8 w-8">
-                <AvatarImage src={profile?.avatar_url ?? undefined} alt={profile?.username ?? 'User'} />
+                <AvatarImage src={profile?.avatar_url ?? undefined} alt={displayName} />
                 <AvatarFallback className="text-sm">
-                  {profile?.username?.[0]?.toUpperCase() ?? <UserIcon size={16} />}
+                  {displayName[0]?.toUpperCase() ?? <UserIcon size={16} />}
                 </AvatarFallback>
               </Avatar>
-              <span className="font-semibold hidden sm:inline text-sm">
-                {profile?.username ?? user.email?.split('@')[0] ?? 'User'}
+              <span className="font-semibold hidden sm:inline text-sm flex items-center gap-1">
+                {magicUser && <Wallet className="h-3 w-3 text-purple-500" />}
+                {displayName}
               </span>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">
             <div className="flex items-center gap-2 p-2">
               <Avatar className="h-8 w-8">
-                <AvatarImage src={profile?.avatar_url ?? undefined} alt={profile?.username ?? 'User'} />
+                <AvatarImage src={profile?.avatar_url ?? undefined} alt={displayName} />
                 <AvatarFallback className="text-sm">
-                  {profile?.username?.[0]?.toUpperCase() ?? <UserIcon size={16} />}
+                  {displayName[0]?.toUpperCase() ?? <UserIcon size={16} />}
                 </AvatarFallback>
               </Avatar>
               <div className="flex flex-col">
-                <span className="text-sm font-medium">
-                  {profile?.username ?? user.email?.split('@')[0] ?? 'User'}
+                <span className="text-sm font-medium flex items-center gap-1">
+                  {magicUser && <Wallet className="h-3 w-3 text-purple-500" />}
+                  {displayName}
                 </span>
                 <span className="text-xs text-muted-foreground truncate">
-                  {user.email}
+                  {displayEmail}
                 </span>
+                {magicUser && (
+                  <span className="text-xs text-purple-600 dark:text-purple-400">
+                    Web3 Enabled
+                  </span>
+                )}
               </div>
             </div>
             <DropdownMenuSeparator />

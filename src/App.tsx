@@ -13,6 +13,7 @@ import { SettingsProvider } from "./contexts/SettingsContext";
 import { GameModeProvider } from "./contexts/GameModeContext";
 import { OpponentProvider } from "./contexts/OpponentContext";
 import { AuthProvider } from "./contexts/AuthContext";
+import { MagicAuthProvider } from "./contexts/MagicAuthContext";
 import MainMenu from "./pages/MainMenu";
 import Game from "./pages/Game";
 import Tutorial from "./pages/Tutorial";
@@ -32,65 +33,67 @@ const App: React.FC = () => {
   return (
     <ThemeProvider attribute="class" defaultTheme="dark">
       <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <SettingsProvider>
-            <DifficultyProvider>
-              <LanguageProvider>
-                <GameModeProvider>
-                  <OpponentProvider>
-                    <TooltipProvider>
-                      <Toaster />
-                      <Sonner />
-                      <BrowserRouter>
-                        <FloatingAuthStatus />
-                        <SentryRoutes>
-                          {/* Public route for authentication */}
-                          <Route path="/auth" element={<AuthPage />} />
-                          
-                          {/* Protected routes - require authentication */}
-                          <Route path="/" element={
-                            <ProtectedRoute>
-                              <MainMenu />
-                            </ProtectedRoute>
-                          } />
-                          
-                          {/* Routes with the shared layout - all protected */}
-                          <Route element={<AppLayout />}>
-                            <Route path="/game" element={
+        <MagicAuthProvider>
+          <AuthProvider>
+            <SettingsProvider>
+              <DifficultyProvider>
+                <LanguageProvider>
+                  <GameModeProvider>
+                    <OpponentProvider>
+                      <TooltipProvider>
+                        <Toaster />
+                        <Sonner />
+                        <BrowserRouter>
+                          <FloatingAuthStatus />
+                          <SentryRoutes>
+                            {/* Public route for authentication */}
+                            <Route path="/auth" element={<AuthPage />} />
+                            
+                            {/* Protected routes - require authentication */}
+                            <Route path="/" element={
                               <ProtectedRoute>
-                                <Game />
+                                <MainMenu />
                               </ProtectedRoute>
                             } />
-                            <Route path="/settings" element={
-                              <ProtectedRoute>
-                                <Settings />
-                              </ProtectedRoute>
-                            } />
-                            <Route path="/statistics" element={
-                              <ProtectedRoute>
-                                <Statistics />
-                              </ProtectedRoute>
-                            } />
-                          </Route>
+                            
+                            {/* Routes with the shared layout - all protected */}
+                            <Route element={<AppLayout />}>
+                              <Route path="/game" element={
+                                <ProtectedRoute>
+                                  <Game />
+                                </ProtectedRoute>
+                              } />
+                              <Route path="/settings" element={
+                                <ProtectedRoute>
+                                  <Settings />
+                                </ProtectedRoute>
+                              } />
+                              <Route path="/statistics" element={
+                                <ProtectedRoute>
+                                  <Statistics />
+                                </ProtectedRoute>
+                              } />
+                            </Route>
 
-                          {/* Tutorial without layout but still protected */}
-                          <Route path="/tutorial" element={
-                            <ProtectedRoute>
-                              <Tutorial />
-                            </ProtectedRoute>
-                          } />
-                          
-                          {/* 404 page */}
-                          <Route path="*" element={<NotFound />} />
-                        </SentryRoutes>
-                      </BrowserRouter>
-                    </TooltipProvider>
-                  </OpponentProvider>
-                </GameModeProvider>
-              </LanguageProvider>
-            </DifficultyProvider>
-          </SettingsProvider>
-        </AuthProvider>
+                            {/* Tutorial without layout but still protected */}
+                            <Route path="/tutorial" element={
+                              <ProtectedRoute>
+                                <Tutorial />
+                              </ProtectedRoute>
+                            } />
+                            
+                            {/* 404 page */}
+                            <Route path="*" element={<NotFound />} />
+                          </SentryRoutes>
+                        </BrowserRouter>
+                      </TooltipProvider>
+                    </OpponentProvider>
+                  </GameModeProvider>
+                </LanguageProvider>
+              </DifficultyProvider>
+            </SettingsProvider>
+          </AuthProvider>
+        </MagicAuthProvider>
       </QueryClientProvider>
     </ThemeProvider>
   );
