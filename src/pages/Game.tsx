@@ -1,10 +1,11 @@
 
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import { useLanguage } from "../contexts/LanguageContext";
 import { useChessGame } from "../hooks/useChessGame";
 import ChessBoard from "../components/ChessBoard";
 import GameStatus from "../components/GameStatus";
 import BottomActionMenu from "../components/BottomActionMenu";
+import HintDisplay from "../components/HintDisplay";
 import { useDifficulty } from "../contexts/DifficultyContext";
 import { useGameMode } from "../contexts/GameModeContext";
 import MoveHistory from "../components/MoveHistory";
@@ -17,7 +18,25 @@ const Game = () => {
   const navigate = useNavigate();
   const { aiDifficulty } = useDifficulty();
   const { gameMode } = useGameMode();
-  const { gameState, handleSquareClick, makeMove, clearSelection, resetGame, resignGame, isAIThinking, usingPythonEngine } = useChessGame(aiDifficulty, gameMode);
+  const { 
+    gameState, 
+    handleSquareClick, 
+    makeMove, 
+    clearSelection, 
+    resetGame, 
+    resignGame, 
+    isAIThinking, 
+    usingPythonEngine,
+    currentHint,
+    isAnalyzing,
+    hintsUsed,
+    maxHints,
+    canRequestHint,
+    requestHint,
+    clearHint
+  } = useChessGame(aiDifficulty, gameMode);
+
+  const [showHint, setShowHint] = useState(false);
 
   const onChessBoardClick = useCallback((row: number, col: number) => {
     const result = handleSquareClick(row, col);
@@ -32,6 +51,17 @@ const Game = () => {
 
   const handleNewGame = () => {
     resetGame();
+    setShowHint(false);
+  };
+
+  const handleHintRequest = async () => {
+    await requestHint();
+    setShowHint(true);
+  };
+
+  const handleCloseHint = () => {
+    setShowHint(false);
+    clearHint();
   };
 
   const isGameOver = ['checkmate', 'stalemate', 'timeout', 'resigned'].includes(gameState.gameStatus);
@@ -52,6 +82,7 @@ const Game = () => {
             onPieceClick={onChessBoardClick}
             selectedSquare={gameState.selectedSquare}
             lastMove={gameState.lastMove}
+            hintMove={showHint && currentHint?.bestMove ? currentHint.bestMove : null}
           />
         </div>
 
@@ -68,6 +99,17 @@ const Game = () => {
                 aiDifficulty={aiDifficulty}
                 usingPythonEngine={usingPythonEngine}
               />
+              
+              {/* Hint Display */}
+              {showHint && currentHint && (
+                <div className="mt-4">
+                  <HintDisplay 
+                    hint={currentHint}
+                    onClose={handleCloseHint}
+                    hintsRemaining={maxHints - hintsUsed}
+                  />
+                </div>
+              )}
             </div>
             <div className="lg:col-span-1">
               <MoveHistory moves={gameState.moveHistory} />
@@ -79,7 +121,9 @@ const Game = () => {
       <BottomActionMenu 
         onNewGame={handleNewGame}
         onResign={resignGame}
-        onHint={() => console.log("Hint requested")}
+        onHint={handleHintRequest}
+        canRequestHint={canRequestHint}
+        isAnalyzing={isAnalyzing}
       />
 
       <GameEndModal

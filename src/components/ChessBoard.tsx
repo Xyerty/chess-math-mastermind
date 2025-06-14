@@ -1,6 +1,6 @@
-
 import React from "react";
 import { ChessMove } from "../features/chess/types";
+import HintOverlay from "./HintOverlay";
 
 // Use solid piece characters for easier styling
 const PIECE_UNICODES: Record<string, string> = {
@@ -13,13 +13,18 @@ interface ChessBoardProps {
   onPieceClick?: (row: number, col: number, piece: string | null) => void;
   selectedSquare?: { row: number; col: number } | null;
   lastMove?: ChessMove | null;
+  hintMove?: {
+    from: { row: number; col: number };
+    to: { row: number; col: number };
+  } | null;
 }
 
 const ChessBoard: React.FC<ChessBoardProps> = ({ 
   position, 
   onPieceClick,
   selectedSquare,
-  lastMove
+  lastMove,
+  hintMove
 }) => {
   const boardSizeClass = 'w-full max-w-[90vmin] sm:max-w-[700px]';
   const textSizeClass = 'text-[34px] sm:text-4xl md:text-5xl';
@@ -60,7 +65,7 @@ const ChessBoard: React.FC<ChessBoardProps> = ({
         </div>
 
         {/* Chess Board */}
-        <div className={`grid grid-cols-8 grid-rows-8 gap-0 ${boardSizeClass} aspect-square shadow-xl rounded-lg overflow-hidden border-2 sm:border-4 border-muted`}>
+        <div className={`relative grid grid-cols-8 grid-rows-8 gap-0 ${boardSizeClass} aspect-square shadow-xl rounded-lg overflow-hidden border-2 sm:border-4 border-muted`}>
           {position.map((row, rowIdx) =>
             row.map((piece, colIdx) => {
               const dark = (rowIdx + colIdx) % 2 === 1;
@@ -98,6 +103,11 @@ const ChessBoard: React.FC<ChessBoardProps> = ({
               );
             })
           )}
+          
+          {/* Hint Overlay */}
+          {hintMove && (
+            <HintOverlay bestMove={hintMove} boardSize={boardSizeClass} />
+          )}
         </div>
 
         {/* Row Labels (8-1) - Right */}
@@ -125,4 +135,3 @@ const ChessBoard: React.FC<ChessBoardProps> = ({
 };
 
 export default ChessBoard;
-
