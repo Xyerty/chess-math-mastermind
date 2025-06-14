@@ -1,9 +1,8 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { ChessGameState, ChessMove, GameStatus, ChessPiece, GameMode, Player } from '../features/chess/types';
 import { defaultPosition } from '../features/chess/constants';
-import { isKingInCheck } from '../features/chess/utils/board';
+import { isKingInCheck, hasAnyValidMoves } from '../features/chess/utils/board';
 import { isValidMoveInternal } from '../features/chess/utils/moveValidation';
-import { generateAIMove } from '../features/chess/utils/ai';
 
 type HandleSquareClickResult = 
   | { type: 'selected'; payload: { row: number; col: number } }
@@ -40,12 +39,12 @@ export const useChessGame = (aiDifficulty: 'easy' | 'medium' | 'hard', gameMode:
   });
 
   useEffect(() => {
-    if (gameState.gameStatus !== 'playing') {
+    if (gameState.gameStatus !== 'playing' && gameState.gameStatus !== 'check') {
       return;
     }
     const timer = setInterval(() => {
       setGameState(prev => {
-        if (prev.gameStatus !== 'playing') {
+        if (prev.gameStatus !== 'playing' && prev.gameStatus !== 'check') {
             clearInterval(timer);
             return prev;
         }
@@ -83,8 +82,7 @@ export const useChessGame = (aiDifficulty: 'easy' | 'medium' | 'hard', gameMode:
     const nextPlayer = gameState.currentPlayer === 'white' ? 'black' : 'white';
 
     const newIsInCheck = isKingInCheck(newBoard, nextPlayer);
-    // Use 'hard' for opponent move generation check to be accurate
-    const opponentHasMoves = generateAIMove(newBoard, nextPlayer, 'hard') !== null; 
+    const opponentHasMoves = hasAnyValidMoves(newBoard, nextPlayer); 
 
     let newGameStatus: GameStatus = 'playing';
     if (!opponentHasMoves) {

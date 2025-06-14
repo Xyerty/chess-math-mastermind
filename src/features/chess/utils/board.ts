@@ -34,3 +34,29 @@ export const isKingInCheck = (board: ChessPiece[][], playerColor: Player): boole
     const opponentColor = playerColor === 'white' ? 'black' : 'white';
     return isSquareAttacked(board, kingPos.row, kingPos.col, opponentColor);
 };
+
+export const hasAnyValidMoves = (board: ChessPiece[][], player: Player): boolean => {
+  for (let r = 0; r < 8; r++) {
+    for (let c = 0; c < 8; c++) {
+      const piece = board[r][c];
+      if (piece && piece[0] === player[0]) {
+        // This piece belongs to the player, check for any valid moves
+        for (let toRow = 0; toRow < 8; toRow++) {
+          for (let toCol = 0; toCol < 8; toCol++) {
+            if (isValidMoveInternal(board, { row: r, col: c }, { row: toRow, col: toCol })) {
+              // It's a pseudo-legal move, now check if it's a fully legal move
+              const tempBoard = board.map(row => [...row]);
+              tempBoard[toRow][toCol] = piece;
+              tempBoard[r][c] = null;
+              if (!isKingInCheck(tempBoard, player)) {
+                // Found at least one valid move
+                return true;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  return false;
+};
