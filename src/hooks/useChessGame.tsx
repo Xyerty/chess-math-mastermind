@@ -1,6 +1,5 @@
-
 import React, { useState, useCallback, useEffect } from 'react';
-import { ChessGameState, ChessMove, GameStatus, ChessPiece, GameMode } from '../features/chess/types';
+import { ChessGameState, ChessMove, GameStatus, ChessPiece, GameMode, Player } from '../features/chess/types';
 import { defaultPosition } from '../features/chess/constants';
 import { isKingInCheck } from '../features/chess/utils/board';
 import { isValidMoveInternal } from '../features/chess/utils/moveValidation';
@@ -84,7 +83,8 @@ export const useChessGame = (aiDifficulty: 'easy' | 'medium' | 'hard', gameMode:
     const nextPlayer = gameState.currentPlayer === 'white' ? 'black' : 'white';
 
     const newIsInCheck = isKingInCheck(newBoard, nextPlayer);
-    const opponentHasMoves = generateAIMove(newBoard, nextPlayer, 'hard') !== null;
+    // Use 'hard' for opponent move generation check to be accurate
+    const opponentHasMoves = generateAIMove(newBoard, nextPlayer, 'hard') !== null; 
 
     let newGameStatus: GameStatus = 'playing';
     if (!opponentHasMoves) {
@@ -112,57 +112,12 @@ export const useChessGame = (aiDifficulty: 'easy' | 'medium' | 'hard', gameMode:
         gameStatus: newGameStatus,
         moveCount: prev.currentPlayer === 'black' ? prev.moveCount + 1 : prev.moveCount,
         time: newTime,
+        aiStats: null, // AI is disabled
       }
     });
 
-    if (nextPlayer === 'black' && newGameStatus !== 'checkmate' && newGameStatus !== 'stalemate') {
-      setTimeout(() => {
-        setGameState(prev => {
-          if (prev.currentPlayer !== 'black' || (prev.gameStatus !== 'playing' && prev.gameStatus !== 'check')) return prev;
-
-          const aiMoveResult = generateAIMove(prev.board, 'black', aiDifficulty);
-          if (aiMoveResult) {
-            const { move: aiMove, score, thinkingTime } = aiMoveResult;
-
-            const aiBoardCopy = prev.board.map(row => [...row]);
-            aiBoardCopy[aiMove.to.row][aiMove.to.col] = aiBoardCopy[aiMove.from.row][aiMove.from.col];
-            aiBoardCopy[aiMove.from.row][aiMove.from.col] = null;
-
-            const playerAfterAI = 'white';
-            const isPlayerInCheckAfterAI = isKingInCheck(aiBoardCopy, playerAfterAI);
-            const playerHasMovesAfterAI = generateAIMove(aiBoardCopy, playerAfterAI, 'hard') !== null;
-            
-            let gameStatusAfterAI: GameStatus = 'playing';
-            if (!playerHasMovesAfterAI) {
-                gameStatusAfterAI = isPlayerInCheckAfterAI ? 'checkmate' : 'stalemate';
-            } else if (isPlayerInCheckAfterAI) {
-                gameStatusAfterAI = 'check';
-            }
-            
-            const newTime = { ...prev.time };
-            if (gameMode === 'speed') {
-                newTime.black += 2; // +2s increment for AI
-            }
-
-            return {
-              ...prev,
-              board: aiBoardCopy,
-              currentPlayer: playerAfterAI,
-              moveHistory: [...prev.moveHistory, aiMove],
-              lastMove: aiMove,
-              isInCheck: isPlayerInCheckAfterAI,
-              gameStatus: gameStatusAfterAI,
-              time: newTime,
-              aiStats: { score, thinkingTime },
-            };
-          }
-          return prev;
-        });
-      }, 1000);
-    }
-
     return true;
-  }, [gameState, aiDifficulty, gameMode]);
+  }, [gameState, gameMode]);
 
   const handleSquareClick = useCallback((row: number, col: number): HandleSquareClickResult | null => {
     if (gameState.gameStatus !== 'playing' && gameState.gameStatus !== 'check') {
@@ -191,6 +146,15 @@ export const useChessGame = (aiDifficulty: 'easy' | 'medium' | 'hard', gameMode:
     setGameState(prev => ({ ...prev, selectedSquare: null }));
   }, []);
   
+  const resignGame = useCallback(() => {
+    setGameState(prev => {
+        if (prev.gameStatus === 'playing' || prev.gameStatus === 'check') {
+            return { ...prev, gameStatus: 'resigned' };
+        }
+        return prev;
+    });
+  }, []);
+
   const resetGame = useCallback(() => {
     const initialTime = getInitialTime(gameMode);
     setGameState({
@@ -214,5 +178,6 @@ export const useChessGame = (aiDifficulty: 'easy' | 'medium' | 'hard', gameMode:
     makeMove,
     clearSelection,
     resetGame,
+    resignGame,
   };
 };

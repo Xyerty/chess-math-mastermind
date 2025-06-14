@@ -1,61 +1,47 @@
-import React, { useState, useCallback } from "react";
+
+import React, { useCallback } from "react";
 import { useLanguage } from "../contexts/LanguageContext";
 import { useChessGame } from "../hooks/useChessGame";
 import ChessBoard from "../components/ChessBoard";
 import GameStatus from "../components/GameStatus";
-import MathChallenge from "../components/MathChallenge";
 import BottomActionMenu from "../components/BottomActionMenu";
 import { useDifficulty } from "../contexts/DifficultyContext";
-import { useSettings } from "../contexts/SettingsContext";
 import { useGameMode } from "../contexts/GameModeContext";
 import MoveHistory from "../components/MoveHistory";
+import GameEndModal from "../components/GameEndModal";
+import { useNavigate } from "react-router-dom";
+import { Player } from "../features/chess/types";
 
 const Game = () => {
   const { t } = useLanguage();
-  const { aiDifficulty, mathDifficulty } = useDifficulty();
+  const navigate = useNavigate();
+  const { aiDifficulty } = useDifficulty();
   const { gameMode } = useGameMode();
-  const { settings } = useSettings();
-  const { gameState, handleSquareClick, makeMove, clearSelection, resetGame } = useChessGame(aiDifficulty, gameMode);
-  const [showMathChallenge, setShowMathChallenge] = useState(false);
-  const [pendingMove, setPendingMove] = useState<{ from: { row: number, col: number }, to: { row: number, col: number } } | null>(null);
-  const [mathStats, setMathStats] = useState({ correct: 0, incorrect: 0 });
-
-  const mathTimeLimit = settings.timeLimits.unlimited
-    ? Infinity
-    : settings.timeLimits[mathDifficulty];
+  const { gameState, handleSquareClick, makeMove, clearSelection, resetGame, resignGame } = useChessGame(aiDifficulty, gameMode);
 
   const onChessBoardClick = useCallback((row: number, col: number) => {
     const result = handleSquareClick(row, col);
 
     if (result?.type === 'move_attempt') {
-      clearSelection(); 
-      setPendingMove(result.payload);
-      setShowMathChallenge(true);
+      const moveSuccessful = makeMove(result.payload.from, result.payload.to);
+      if (!moveSuccessful) {
+        clearSelection();
+      }
     }
-  }, [handleSquareClick, clearSelection]);
-
-  const handleMathSuccess = () => {
-    setShowMathChallenge(false);
-    setMathStats(prev => ({ ...prev, correct: prev.correct + 1 }));
-    if (pendingMove) {
-      makeMove(pendingMove.from, pendingMove.to);
-      setPendingMove(null);
-    }
-  };
-
-  const handleMathFailure = () => {
-    setShowMathChallenge(false);
-    setMathStats(prev => ({ ...prev, incorrect: prev.incorrect + 1 }));
-    setPendingMove(null);
-    console.log("Math challenge failed! No move allowed.");
-  };
+  }, [handleSquareClick, makeMove, clearSelection]);
 
   const handleNewGame = () => {
     resetGame();
-    setMathStats({ correct: 0, incorrect: 0 });
   };
+
+  const isGameOver = ['checkmate', 'stalemate', 'timeout', 'resigned'].includes(gameState.gameStatus);
   
-  const mathAccuracy = mathStats.correct + mathStats.incorrect === 0 ? 0 : Math.round((mathStats.correct / (mathStats.correct + mathStats.incorrect)) * 100);
+  let winner: Player | null = null;
+  if (gameState.gameStatus === 'checkmate' || gameState.gameStatus === 'timeout') {
+    winner = gameState.currentPlayer === 'white' ? 'black' : 'white';
+  } else if (gameState.gameStatus === 'resigned') {
+    winner = gameState.currentPlayer === 'white' ? 'black' : 'white';
+  }
 
   return (
     <>
@@ -77,8 +63,6 @@ const Game = () => {
                 gameStatus={gameState.gameStatus}
                 moveCount={gameState.moveCount}
                 time={gameState.time}
-                mathAccuracy={mathAccuracy}
-                aiStats={gameState.aiStats}
               />
             </div>
             <div className="lg:col-span-1">
@@ -90,22 +74,17 @@ const Game = () => {
 
       <BottomActionMenu 
         onNewGame={handleNewGame}
-        onResign={() => console.log("Resign")}
+        onResign={resignGame}
         onHint={() => console.log("Hint requested")}
       />
 
-      {showMathChallenge && (
-        <MathChallenge
-          difficulty={gameMode === 'math-master' ? 'hard' : mathDifficulty}
-          timeLimit={mathTimeLimit}
-          onSuccess={handleMathSuccess}
-          onFailure={handleMathFailure}
-          onClose={() => {
-            setShowMathChallenge(false);
-            setPendingMove(null);
-          }}
-        />
-      )}
+      <GameEndModal
+        isOpen={isGameOver}
+        status={gameState.gameStatus}
+        winner={winner}
+        onNewGame={handleNewGame}
+        onGoHome={() => navigate('/')}
+      />
     </>
   );
 };

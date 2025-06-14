@@ -24,25 +24,29 @@ const MainMenu = () => {
   const menuItems = [
     {
       title: t('mainMenu.playGame'),
+      emoji: '♟️',
       icon: <Play className="h-8 w-8 text-primary" />,
       path: "/game",
-      description: "Sharpen your mind with a game of chess and math.",
+      description: "Challenge a friend in a classic game of chess.",
       primary: true,
     },
     {
       title: t('mainMenu.howToPlay'),
+      emoji: '📖',
       icon: <BookOpen className="h-8 w-8" />,
       path: "/tutorial",
       description: "Learn the rules and master the strategies.",
     },
     {
       title: t('mainMenu.settings'),
+      emoji: '⚙️',
       icon: <Settings className="h-8 w-8" />,
       path: "/settings",
       description: "Customize your game experience.",
     },
     {
       title: t('mainMenu.statistics'),
+      emoji: '📊',
       icon: <BarChart3 className="h-8 w-8" />,
       path: "/statistics",
       description: "Track your progress and performance.",
@@ -82,7 +86,7 @@ const MainMenu = () => {
         
         {/* Subtitle */}
         <p className="text-lg sm:text-xl lg:text-2xl text-muted-foreground mb-8 sm:mb-12 max-w-3xl mx-auto animate-fade-in delay-500">
-          {t('mainMenu.description')}
+          A modern chess experience where strategy meets quick thinking.
         </p>
 
         {/* Menu Cards */}
@@ -111,7 +115,7 @@ const MainMenu = () => {
                 `}>
                   {item.icon}
                 </div>
-                <CardTitle className="text-xl font-semibold text-primary">{item.title}</CardTitle>
+                <CardTitle className="text-xl font-semibold text-primary">{item.title} <span role="img" aria-label="emoji">{item.emoji}</span></CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground">{item.description}</p>

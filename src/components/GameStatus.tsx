@@ -1,17 +1,14 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Clock, User, Trophy, Target, BrainCircuit } from "lucide-react";
+import { Clock, User, Trophy } from "lucide-react";
 import { useLanguage } from "../contexts/LanguageContext";
-import { AIStats } from "../features/chess/types";
-import { Progress } from "@/components/ui/progress";
+import { GameStatus } from "../features/chess/types";
 
 interface GameStatusProps {
   currentPlayer: 'white' | 'black';
-  gameStatus: 'playing' | 'check' | 'checkmate' | 'stalemate' | 'timeout';
+  gameStatus: GameStatus;
   moveCount: number;
   time: { white: number, black: number };
-  mathAccuracy?: number;
-  aiStats?: AIStats | null;
 }
 
 const GameStatus: React.FC<GameStatusProps> = ({
@@ -19,8 +16,6 @@ const GameStatus: React.FC<GameStatusProps> = ({
   gameStatus,
   moveCount,
   time,
-  mathAccuracy = 100,
-  aiStats = null
 }) => {
   const { t } = useLanguage();
 
@@ -36,6 +31,7 @@ const GameStatus: React.FC<GameStatusProps> = ({
       case 'check': return 'text-yellow-500';
       case 'checkmate': return 'text-destructive';
       case 'timeout': return 'text-destructive';
+      case 'resigned': return 'text-destructive';
       case 'stalemate': return 'text-muted-foreground';
       default: return 'text-green-600 dark:text-green-500';
     }
@@ -48,6 +44,7 @@ const GameStatus: React.FC<GameStatusProps> = ({
       case 'checkmate': return `${winner} wins by Checkmate!`;
       case 'stalemate': return t('game.stalemate');
       case 'timeout': return `${winner} wins on time!`;
+      case 'resigned': return `${winner} wins by resignation.`;
       default: return t('game.gameActive');
     }
   };
@@ -55,7 +52,7 @@ const GameStatus: React.FC<GameStatusProps> = ({
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 animate-fade-in [animation-delay:200ms]">
       {/* Game Status */}
-      <Card className="animate-fade-in [animation-delay:300ms]">
+      <Card className="sm:col-span-2 animate-fade-in [animation-delay:300ms]">
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-lg">
             <Trophy className="h-5 w-5" />
@@ -77,44 +74,6 @@ const GameStatus: React.FC<GameStatusProps> = ({
           </div>
         </CardContent>
       </Card>
-
-      {/* Math Accuracy */}
-      <Card className="animate-fade-in [animation-delay:400ms]">
-        <CardHeader className="pb-3">
-          <CardTitle className="flex items-center gap-2 text-lg">
-            <Target className="h-5 w-5" />
-            {t('game.mathAccuracy')}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center gap-3">
-            <Progress value={mathAccuracy} className="h-3" />
-            <span className="font-semibold text-lg">{mathAccuracy}%</span>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* AI Stats Card */}
-      {aiStats && (
-        <Card className="sm:col-span-2 animate-fade-in [animation-delay:500ms]">
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <BrainCircuit className="h-5 w-5" />
-              {t('game.aiStats')}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="grid grid-cols-2 gap-4 text-sm">
-            <div>
-              <p className="text-muted-foreground">{t('game.aiThinkingTime')}</p>
-              <p className="font-semibold">{(aiStats.thinkingTime / 1000).toFixed(2)}s</p>
-            </div>
-            <div>
-              <p className="text-muted-foreground">{t('game.aiEvaluation')}</p>
-              <p className="font-semibold">{aiStats.score.toFixed(2)}</p>
-            </div>
-          </CardContent>
-        </Card>
-      )}
 
       {/* White Player Clock */}
       <Card className={`${currentPlayer === 'white' && gameStatus === 'playing' ? 'ring-2 ring-primary' : ''} animate-fade-in [animation-delay:600ms]`}>
