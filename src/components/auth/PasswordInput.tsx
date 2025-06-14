@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, Lock } from 'lucide-react';
 
 interface PasswordInputProps {
   id: string;
@@ -24,13 +24,15 @@ export const PasswordInput = ({
   const [showPassword, setShowPassword] = useState(false);
 
   return (
-    <div className="relative">
+    <div className="relative group">
+      <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 group-focus-within:text-blue-500 transition-colors z-10" />
       <Input
         id={id}
         type={showPassword ? 'text' : 'password'}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
+        className="pl-11 pr-12 h-12 bg-white/50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-blue-500/20 dark:focus:ring-blue-400/20 transition-all duration-200"
         required={required}
         disabled={disabled}
       />
@@ -38,7 +40,7 @@ export const PasswordInput = ({
         type="button"
         variant="ghost"
         size="icon"
-        className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8"
+        className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
         onClick={() => setShowPassword(!showPassword)}
         disabled={disabled}
       >
