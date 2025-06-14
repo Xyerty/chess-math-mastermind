@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -113,13 +114,13 @@ const Settings = () => {
       {/* Coming Soon Features */}
       <Card>
         <CardHeader>
-          <CardTitle>{t('settings.comingSoon')}</CardTitle>
+          <CardTitle>Settings panel coming soon!</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-muted-foreground mb-4">{t('settings.features')}</p>
-          <ul className="space-y-2 text-sm text-muted-foreground">
-            <li>{t('settings.soundPrefs')}</li>
-            <li>{t('settings.timeLimits')}</li>
+          <p className="text-muted-foreground mb-4">Here you'll be able to configure:</p>
+          <ul className="space-y-2 text-sm text-muted-foreground list-disc list-inside">
+            <li>Sound preferences</li>
+            <li>Time limits</li>
           </ul>
         </CardContent>
       </Card>
@@ -128,3 +129,4 @@ const Settings = () => {
 };
 
 export default Settings;
+
