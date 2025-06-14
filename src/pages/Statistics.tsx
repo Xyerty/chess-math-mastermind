@@ -1,33 +1,58 @@
 
 import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { BarChart3 } from "lucide-react";
 import { useLanguage } from "../contexts/LanguageContext";
+import { useStatisticsData } from "../hooks/useStatisticsData";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { BarChart3, Clock, Target, Trophy } from "lucide-react";
+import StatCard from "../components/statistics/StatCard";
+import WinLossPieChart from "../components/statistics/WinLossPieChart";
+import AccuracyBarChart from "../components/statistics/AccuracyBarChart";
+import ProgressChart from "../components/statistics/ProgressChart";
+import FavoriteOpenings from "../components/statistics/FavoriteOpenings";
 
 const Statistics = () => {
   const { t } = useLanguage();
+  const statsData = useStatisticsData();
+
+  if (!statsData) {
+    return (
+      <div className="max-w-2xl mx-auto p-4 sm:p-6 lg:p-8">
+        <Alert>
+          <BarChart3 className="h-4 w-4" />
+          <AlertTitle>{t('stats.title')}</AlertTitle>
+          <AlertDescription>{t('stats.noData')}</AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
+
+  const { summary, winLossData, accuracyByDifficulty, progress, openings } = statsData;
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6 p-4">
-      {/* Coming Soon */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <BarChart3 className="h-5 w-5" />
-            {t('stats.comingSoon')}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground mb-4">{t('stats.features')}</p>
-          <ul className="space-y-2 text-sm text-muted-foreground">
-            <li>{t('stats.gamesWonLost')}</li>
-            <li>{t('stats.mathAccuracy')}</li>
-            <li>{t('stats.averageTime')}</li>
-            <li>{t('stats.chessOpenings')}</li>
-            <li>{t('stats.progressTime')}</li>
-          </ul>
-        </CardContent>
-      </Card>
+    <div className="p-4 sm:p-6 lg:p-8">
+        <h1 className="text-3xl font-bold tracking-tight mb-6 animate-fade-in">{t('stats.dashboardTitle')}</h1>
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+            <StatCard title={t('stats.totalGames')} icon={Trophy}>
+                <div className="text-4xl font-bold">{summary.totalGames}</div>
+                <p className="text-xs text-muted-foreground">{summary.winRate.toFixed(1)}% {t('stats.winrate')}</p>
+            </StatCard>
+            <StatCard title={t('stats.mathAccuracy')} icon={Target}>
+                <div className="text-4xl font-bold">{summary.mathAccuracy.toFixed(1)}%</div>
+                <p className="text-xs text-muted-foreground">{summary.mathCorrect} {t('stats.correct')} / {summary.mathIncorrect} {t('stats.incorrect')}</p>
+            </StatCard>
+            <StatCard title={t('stats.avgSolveTime')} icon={Clock}>
+                <div className="text-4xl font-bold">{summary.avgSolveTime}s</div>
+                <p className="text-xs text-muted-foreground">{t('stats.personalBest')}: {summary.bestSolveTime}s</p>
+            </StatCard>
+            <WinLossPieChart data={winLossData} />
+        </div>
+        <div className="grid gap-6 mt-6 md:grid-cols-1 lg:grid-cols-2">
+            <ProgressChart data={progress} />
+            <div className="space-y-6">
+                <AccuracyBarChart data={accuracyByDifficulty} />
+                <FavoriteOpenings openings={openings} />
+            </div>
+        </div>
     </div>
   );
 };
