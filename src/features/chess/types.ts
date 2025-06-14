@@ -1,7 +1,8 @@
 
 export type ChessPiece = 'wp' | 'wn' | 'wb' | 'wr' | 'wq' | 'wk' | 'bp' | 'bn' | 'bb' | 'br' | 'bq' | 'bk' | null;
-export type GameStatus = 'playing' | 'check' | 'checkmate' | 'stalemate';
+export type GameStatus = 'playing' | 'check' | 'checkmate' | 'stalemate' | 'timeout';
 export type Player = 'white' | 'black';
+export type GameMode = 'classic' | 'speed' | 'math-master';
 
 export interface ChessMove {
   from: { row: number; col: number };
@@ -21,4 +22,5 @@ export interface ChessGameState {
   isInCheck: boolean;
   gameStartTime: number;
   moveCount: number;
+  time: { white: number; black: number };
 }

@@ -74,28 +74,40 @@ export const generateAIMove = (board: ChessPiece[][], player: Player, difficulty
   for (const move of possibleMoves) {
     let score = 0;
     const capturedValue = move.captured ? pieceValues[move.captured[1] as keyof typeof pieceValues] : 0;
+    const movingPieceValue = pieceValues[move.piece![1] as keyof typeof pieceValues];
+    
+    const tempBoard = board.map(r => [...r]);
+    tempBoard[move.to.row][move.to.col] = move.piece;
+    tempBoard[move.from.row][move.from.col] = null;
     
     if (difficulty === 'medium') {
-      // Medium: Prefers captures. A simple material evaluation.
-      score = capturedValue;
-    } else { // 'hard'
-      const movingPieceValue = pieceValues[move.piece![1] as keyof typeof pieceValues];
-      
-      const tempBoard = board.map(r => [...r]);
-      tempBoard[move.to.row][move.to.col] = move.piece;
-      tempBoard[move.from.row][move.from.col] = null;
-      
-      // The score is the value of the piece captured.
-      // We heavily penalize the move if the moved piece can be recaptured for less value.
+      // Medium: Prefers captures, avoids simple blunders.
       score = capturedValue * 10;
+      // Check if the move is a blunder (losing a valuable piece for a less valuable or no piece)
+      if (isSquareAttacked(tempBoard, move.to, opponent)) {
+          score -= movingPieceValue * 5;
+      }
+    } else { // 'hard'
+      // Material advantage
+      score += capturedValue * 10;
+      
+      // Piece safety: penalize moving to an attacked square
       if (isSquareAttacked(tempBoard, move.to, opponent)) {
         score -= movingPieceValue;
       }
 
-      // Add a small bonus for moving towards the center of the board.
-      const isCenterMove = (move.to.row >= 3 && move.to.row <= 4) && (move.to.col >= 3 && move.to.col <= 4);
-      if(isCenterMove) {
-          score += 0.5;
+      // Center control: bonus for moving pawns or knights/bishops to central squares
+      const isCenterSquare = (r: number, c: number) => (r >= 2 && r <= 5) && (c >= 2 && c <= 5);
+      if (isCenterSquare(move.to.row, move.to.col)) {
+        if (move.piece![1] === 'p' || move.piece![1] === 'n' || move.piece![1] === 'b') {
+            score += 1;
+        }
+      }
+
+      // Development bonus: moving pieces out of their starting positions (not pawns or king)
+      const startRow = player === 'white' ? 7 : 0;
+      if ((move.from.row === startRow) && (move.piece![1] !== 'p' && move.piece![1] !== 'k')) {
+          score += 1.5;
       }
     }
     
@@ -107,7 +119,7 @@ export const generateAIMove = (board: ChessPiece[][], player: Player, difficulty
     }
   }
   
-  // For medium difficulty, if no move has a positive score (i.e. no captures), pick a random move.
+  // For medium difficulty, if no move has a positive score (e.g. no captures or good moves), pick a random one.
   if (difficulty === 'medium' && bestScore <= 0) {
       return possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
   }

@@ -10,6 +10,7 @@ import { ThemeProvider } from "next-themes";
 import { LanguageProvider } from "./contexts/LanguageContext";
 import { DifficultyProvider } from "./contexts/DifficultyContext";
 import { SettingsProvider } from "./contexts/SettingsContext";
+import { GameModeProvider } from "./contexts/GameModeContext";
 import MainMenu from "./pages/MainMenu";
 import Game from "./pages/Game";
 import Tutorial from "./pages/Tutorial";
@@ -29,26 +30,28 @@ const App: React.FC = () => {
         <SettingsProvider>
           <DifficultyProvider>
             <LanguageProvider>
-              <TooltipProvider>
-                <Toaster />
-                <Sonner />
-                <BrowserRouter>
-                  <SentryRoutes>
-                    <Route path="/" element={<MainMenu />} />
-                    
-                    {/* Routes with the new shared layout */}
-                    <Route element={<AppLayout />}>
-                      <Route path="/game" element={<Game />} />
-                      <Route path="/settings" element={<Settings />} />
-                      <Route path="/statistics" element={<Statistics />} />
-                    </Route>
+              <GameModeProvider>
+                <TooltipProvider>
+                  <Toaster />
+                  <Sonner />
+                  <BrowserRouter>
+                    <SentryRoutes>
+                      <Route path="/" element={<MainMenu />} />
+                      
+                      {/* Routes with the new shared layout */}
+                      <Route element={<AppLayout />}>
+                        <Route path="/game" element={<Game />} />
+                        <Route path="/settings" element={<Settings />} />
+                        <Route path="/statistics" element={<Statistics />} />
+                      </Route>
 
-                    {/* Routes without the new layout (due to file restrictions) */}
-                    <Route path="/tutorial" element={<Tutorial />} />
-                    <Route path="*" element={<NotFound />} />
-                  </SentryRoutes>
-                </BrowserRouter>
-              </TooltipProvider>
+                      {/* Routes without the new layout (due to file restrictions) */}
+                      <Route path="/tutorial" element={<Tutorial />} />
+                      <Route path="*" element={<NotFound />} />
+                    </SentryRoutes>
+                  </BrowserRouter>
+                </TooltipProvider>
+              </GameModeProvider>
             </LanguageProvider>
           </DifficultyProvider>
         </SettingsProvider>

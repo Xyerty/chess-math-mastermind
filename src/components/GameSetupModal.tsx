@@ -5,7 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useLanguage } from '../contexts/LanguageContext';
 import { useDifficulty, Difficulty } from '../contexts/DifficultyContext';
-import { BrainCircuit, Calculator, Play } from 'lucide-react';
+import { useGameMode } from '../contexts/GameModeContext';
+import { GameMode } from '../features/chess/types';
+import { BrainCircuit, Calculator, Play, Clock } from 'lucide-react';
 
 interface GameSetupModalProps {
   isOpen: boolean;
@@ -16,11 +18,14 @@ interface GameSetupModalProps {
 const GameSetupModal: React.FC<GameSetupModalProps> = ({ isOpen, onClose, onStartGame }) => {
   const { t } = useLanguage();
   const { mathDifficulty: currentMathDifficulty, aiDifficulty: currentAiDifficulty } = useDifficulty();
+  const { gameMode: currentGameMode, setGameMode } = useGameMode();
   
   const [mathDifficulty, setMathDifficulty] = useState<Difficulty>(currentMathDifficulty);
   const [aiDifficulty, setAiDifficulty] = useState<Difficulty>(currentAiDifficulty);
+  const [localGameMode, setLocalGameMode] = useState<GameMode>(currentGameMode);
 
   const handleStart = () => {
+    setGameMode(localGameMode);
     onStartGame(mathDifficulty, aiDifficulty);
     onClose();
   };
@@ -34,11 +39,29 @@ const GameSetupModal: React.FC<GameSetupModalProps> = ({ isOpen, onClose, onStar
             Game Setup
           </DialogTitle>
           <DialogDescription className="text-center text-muted-foreground pt-2">
-            Configure difficulty before you start the game.
+            Configure difficulty and game mode before you start the game.
           </DialogDescription>
         </DialogHeader>
         
         <div className="grid gap-6 py-6">
+          {/* Game Mode */}
+          <div className="grid grid-cols-4 items-center gap-4">
+            <label htmlFor="game-mode" className="text-right col-span-1 flex items-center justify-end gap-2 text-sm font-medium">
+              <Clock className="h-4 w-4 text-muted-foreground" />
+              Game Mode
+            </label>
+            <Select value={localGameMode} onValueChange={(value: GameMode) => setLocalGameMode(value)}>
+              <SelectTrigger id="game-mode" className="col-span-3">
+                <SelectValue placeholder="Select game mode" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="classic">Classic (10m)</SelectItem>
+                <SelectItem value="speed">Speed Chess (3m+2s)</SelectItem>
+                <SelectItem value="math-master">Math Master (10m)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
           {/* Math Difficulty */}
           <div className="grid grid-cols-4 items-center gap-4">
             <label htmlFor="math-difficulty" className="text-right col-span-1 flex items-center justify-end gap-2 text-sm font-medium">

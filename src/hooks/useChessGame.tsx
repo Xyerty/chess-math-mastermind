@@ -1,5 +1,5 @@
-import React, { useState, useCallback } from 'react';
-import { ChessGameState, ChessMove, GameStatus, ChessPiece } from '../features/chess/types';
+import React, { useState, useCallback, useEffect } from 'react';
+import { ChessGameState, ChessMove, GameStatus, ChessPiece, GameMode } from '../features/chess/types';
 import { defaultPosition } from '../features/chess/constants';
 import { isKingInCheck } from '../features/chess/utils/board';
 import { isValidMoveInternal } from '../features/chess/utils/moveValidation';
@@ -10,20 +10,60 @@ type HandleSquareClickResult =
   | { type: 'deselected' }
   | { type: 'move_attempt'; payload: { from: { row: number; col: number }; to: { row: number; col: number } } };
 
-export const useChessGame = (aiDifficulty: 'easy' | 'medium' | 'hard') => {
-  const [gameState, setGameState] = useState<ChessGameState>({
-    board: defaultPosition.map(row => [...row]),
-    currentPlayer: 'white',
-    gameStatus: 'playing',
-    moveHistory: [],
-    selectedSquare: null,
-    lastMove: null,
-    isInCheck: false,
-    gameStartTime: Date.now(),
-    moveCount: 1
+const getInitialTime = (gameMode: GameMode) => {
+  switch (gameMode) {
+    case 'speed':
+      return 180; // 3 minutes
+    case 'classic':
+    case 'math-master':
+    default:
+      return 600; // 10 minutes
+  }
+};
+
+export const useChessGame = (aiDifficulty: 'easy' | 'medium' | 'hard', gameMode: GameMode) => {
+  const [gameState, setGameState] = useState<ChessGameState>(() => {
+    const initialTime = getInitialTime(gameMode);
+    return {
+      board: defaultPosition.map(row => [...row]),
+      currentPlayer: 'white',
+      gameStatus: 'playing',
+      moveHistory: [],
+      selectedSquare: null,
+      lastMove: null,
+      isInCheck: false,
+      gameStartTime: Date.now(),
+      moveCount: 1,
+      time: { white: initialTime, black: initialTime },
+    };
   });
 
+  useEffect(() => {
+    if (gameState.gameStatus !== 'playing') {
+      return;
+    }
+    const timer = setInterval(() => {
+      setGameState(prev => {
+        if (prev.gameStatus !== 'playing') {
+            clearInterval(timer);
+            return prev;
+        }
+        const newTime = { ...prev.time };
+        const newCurrentPlayerTime = newTime[prev.currentPlayer] - 1;
+
+        if (newCurrentPlayerTime <= 0) {
+          clearInterval(timer);
+          return { ...prev, time: { ...newTime, [prev.currentPlayer]: 0 }, gameStatus: 'timeout' };
+        }
+        return { ...prev, time: { ...newTime, [prev.currentPlayer]: newCurrentPlayerTime } };
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [gameState.gameStatus, gameState.currentPlayer]);
+
   const makeMove = useCallback((from: { row: number; col: number }, to: { row: number; col: number }): boolean => {
+    if (gameState.gameStatus !== 'playing' && gameState.gameStatus !== 'check') return false;
     if (!isValidMoveInternal(gameState.board, from, to)) return false;
 
     const tempBoard = gameState.board.map(row => [...row]);
@@ -53,22 +93,30 @@ export const useChessGame = (aiDifficulty: 'easy' | 'medium' | 'hard') => {
 
     const move: ChessMove = { from, to, piece, captured, timestamp: Date.now() };
 
-    setGameState(prev => ({
-      ...prev,
-      board: newBoard,
-      currentPlayer: nextPlayer,
-      moveHistory: [...prev.moveHistory, move],
-      selectedSquare: null,
-      lastMove: move,
-      isInCheck: newIsInCheck,
-      gameStatus: newGameStatus,
-      moveCount: prev.currentPlayer === 'black' ? prev.moveCount + 1 : prev.moveCount
-    }));
+    setGameState(prev => {
+      const newTime = { ...prev.time };
+      if (gameMode === 'speed') {
+        newTime[prev.currentPlayer] += 2; // +2s increment
+      }
+
+      return {
+        ...prev,
+        board: newBoard,
+        currentPlayer: nextPlayer,
+        moveHistory: [...prev.moveHistory, move],
+        selectedSquare: null,
+        lastMove: move,
+        isInCheck: newIsInCheck,
+        gameStatus: newGameStatus,
+        moveCount: prev.currentPlayer === 'black' ? prev.moveCount + 1 : prev.moveCount,
+        time: newTime,
+      }
+    });
 
     if (nextPlayer === 'black' && newGameStatus !== 'checkmate' && newGameStatus !== 'stalemate') {
       setTimeout(() => {
         setGameState(prev => {
-          if (prev.currentPlayer !== 'black') return prev;
+          if (prev.currentPlayer !== 'black' || (prev.gameStatus !== 'playing' && prev.gameStatus !== 'check')) return prev;
 
           const aiMove = generateAIMove(prev.board, 'black', aiDifficulty);
           if (aiMove) {
@@ -86,6 +134,11 @@ export const useChessGame = (aiDifficulty: 'easy' | 'medium' | 'hard') => {
             } else if (isPlayerInCheckAfterAI) {
                 gameStatusAfterAI = 'check';
             }
+            
+            const newTime = { ...prev.time };
+            if (gameMode === 'speed') {
+                newTime.black += 2; // +2s increment for AI
+            }
 
             return {
               ...prev,
@@ -95,9 +148,8 @@ export const useChessGame = (aiDifficulty: 'easy' | 'medium' | 'hard') => {
               lastMove: aiMove,
               isInCheck: isPlayerInCheckAfterAI,
               gameStatus: gameStatusAfterAI,
+              time: newTime,
             };
-          } else {
-             // This case is handled by the check at the start of the AI turn.
           }
           return prev;
         });
@@ -105,10 +157,10 @@ export const useChessGame = (aiDifficulty: 'easy' | 'medium' | 'hard') => {
     }
 
     return true;
-  }, [gameState.board, gameState.currentPlayer, aiDifficulty]);
+  }, [gameState, aiDifficulty, gameMode]);
 
   const handleSquareClick = useCallback((row: number, col: number): HandleSquareClickResult | null => {
-    if (gameState.gameStatus === 'checkmate' || gameState.gameStatus === 'stalemate') {
+    if (gameState.gameStatus !== 'playing' && gameState.gameStatus !== 'check') {
         return null;
     }
 
@@ -135,6 +187,7 @@ export const useChessGame = (aiDifficulty: 'easy' | 'medium' | 'hard') => {
   }, []);
   
   const resetGame = useCallback(() => {
+    const initialTime = getInitialTime(gameMode);
     setGameState({
       board: defaultPosition.map(row => [...row]),
       currentPlayer: 'white',
@@ -144,9 +197,10 @@ export const useChessGame = (aiDifficulty: 'easy' | 'medium' | 'hard') => {
       lastMove: null,
       isInCheck: false,
       gameStartTime: Date.now(),
-      moveCount: 1
+      moveCount: 1,
+      time: { white: initialTime, black: initialTime },
     });
-  }, []);
+  }, [gameMode]);
 
   return {
     gameState,
