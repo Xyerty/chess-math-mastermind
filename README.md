@@ -28,6 +28,7 @@ This project is built with a modern, powerful stack:
 -   **TypeScript**: Strong typing for robust and maintainable code.
 -   **Tailwind CSS**: A utility-first CSS framework for rapid UI development.
 -   **shadcn/ui**: Beautifully designed, accessible components.
+-   **pnpm**: Fast, disk space-efficient package manager.
 
 ## 🌐 Get Started Locally
 
@@ -41,10 +42,10 @@ git clone <YOUR_GIT_URL>
 cd <YOUR_PROJECT_NAME>
 
 # 3. Install dependencies
-npm install
+pnpm install
 
 # 4. Start the development server
-npm run dev
+pnpm dev
 ```
 
 Now you're all set to play and contribute! 🎉
@@ -55,23 +56,22 @@ This project uses [Snyk](https://snyk.io/) to continuously find and fix vulnerab
 
 ```sh
 # 1. Authenticate with your Snyk account (first time only)
-npx snyk auth
+pnpm snyk auth
 
 # 2. Test your project for vulnerabilities
-npx snyk test
+pnpm snyk test
 
 # 3. Monitor your project to get notified about new vulnerabilities
-npx snyk monitor
+pnpm snyk monitor
 ```
 
 ## 📊 Performance Auditing with Lighthouse
 
-This project uses [Lighthouse](https://developer.chrome.com/docs/lighthouse/) to audit performance, accessibility, and SEO. To run an audit locally, first make sure the development server is running (`npm run dev`), then execute the following command in a separate terminal:
+This project uses [Lighthouse](https://developer.chrome.com/docs/lighthouse/) to audit performance, accessibility, and SEO. To run an audit locally, first make sure the development server is running (`pnpm dev`), then execute the following command in a separate terminal:
 
 ```sh
 # Create a reports directory and run the audit
-npx lighthouse http://localhost:8080 --output html --output-path ./reports/lighthouse.html --view
+pnpm lighthouse http://localhost:8080 --output html --output-path ./reports/lighthouse.html --view
 ```
 
 This will generate an HTML report and automatically open it in your browser.
-
