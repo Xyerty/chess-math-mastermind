@@ -1,4 +1,3 @@
-
 import React from "react";
 import * as Sentry from "@sentry/react";
 import { Toaster } from "@/components/ui/toaster";
@@ -14,11 +13,13 @@ import { SettingsProvider } from "./contexts/SettingsContext";
 import { GameModeProvider } from "./contexts/GameModeContext";
 import { OpponentProvider } from "./contexts/OpponentContext";
 import { AuthProvider } from "./contexts/AuthContext";
+import { PlayFabProvider } from "./contexts/PlayFabContext";
 import MainMenu from "./pages/MainMenu";
 import Game from "./pages/Game";
 import Tutorial from "./pages/Tutorial";
 import Settings from "./pages/Settings";
 import Statistics from "./pages/Statistics";
+import Leaderboards from "./pages/Leaderboards";
 import NotFound from "./pages/NotFound";
 import AppLayout from "./components/AppLayout";
 import AuthPage from "./pages/Auth";
@@ -42,63 +43,70 @@ const App: React.FC = () => {
       <ThemeProvider attribute="class" defaultTheme="dark">
         <QueryClientProvider client={queryClient}>
           <AuthProvider>
-            <SettingsProvider>
-              <DifficultyProvider>
-                <LanguageProvider>
-                  <GameModeProvider>
-                    <OpponentProvider>
-                      <TooltipProvider>
-                        <Toaster />
-                        <Sonner />
-                        <BrowserRouter>
-                          <FloatingAuthStatus />
-                          <SentryRoutes>
-                            {/* Public route for authentication */}
-                            <Route path="/auth" element={<AuthPage />} />
-                            
-                            {/* Protected routes - require authentication */}
-                            <Route path="/" element={
-                              <ProtectedRoute>
-                                <MainMenu />
-                              </ProtectedRoute>
-                            } />
-                            
-                            {/* Routes with the shared layout - all protected */}
-                            <Route element={<AppLayout />}>
-                              <Route path="/game" element={
+            <PlayFabProvider>
+              <SettingsProvider>
+                <DifficultyProvider>
+                  <LanguageProvider>
+                    <GameModeProvider>
+                      <OpponentProvider>
+                        <TooltipProvider>
+                          <Toaster />
+                          <Sonner />
+                          <BrowserRouter>
+                            <FloatingAuthStatus />
+                            <SentryRoutes>
+                              {/* Public route for authentication */}
+                              <Route path="/auth" element={<AuthPage />} />
+                              
+                              {/* Protected routes - require authentication */}
+                              <Route path="/" element={
                                 <ProtectedRoute>
-                                  <Game />
+                                  <MainMenu />
                                 </ProtectedRoute>
                               } />
-                              <Route path="/settings" element={
-                                <ProtectedRoute>
-                                  <Settings />
-                                </ProtectedRoute>
-                              } />
-                              <Route path="/statistics" element={
-                                <ProtectedRoute>
-                                  <Statistics />
-                                </ProtectedRoute>
-                              } />
-                            </Route>
+                              
+                              {/* Routes with the shared layout - all protected */}
+                              <Route element={<AppLayout />}>
+                                <Route path="/game" element={
+                                  <ProtectedRoute>
+                                    <Game />
+                                  </ProtectedRoute>
+                                } />
+                                <Route path="/settings" element={
+                                  <ProtectedRoute>
+                                    <Settings />
+                                  </ProtectedRoute>
+                                } />
+                                <Route path="/statistics" element={
+                                  <ProtectedRoute>
+                                    <Statistics />
+                                  </ProtectedRoute>
+                                } />
+                                <Route path="/leaderboards" element={
+                                  <ProtectedRoute>
+                                    <Leaderboards />
+                                  </ProtectedRoute>
+                                } />
+                              </Route>
 
-                            {/* Tutorial without layout but still protected */}
-                            <Route path="/tutorial" element={
-                              <ProtectedRoute>
-                                <Tutorial />
-                              </ProtectedRoute>
-                            } />
-                            
-                            {/* 404 page */}
-                            <Route path="*" element={<NotFound />} />
-                          </SentryRoutes>
-                        </BrowserRouter>
-                      </TooltipProvider>
-                    </OpponentProvider>
-                  </GameModeProvider>
-                </LanguageProvider>
-              </DifficultyProvider>
-            </SettingsProvider>
+                              {/* Tutorial without layout but still protected */}
+                              <Route path="/tutorial" element={
+                                <ProtectedRoute>
+                                  <Tutorial />
+                                </ProtectedRoute>
+                              } />
+                              
+                              {/* 404 page */}
+                              <Route path="*" element={<NotFound />} />
+                            </SentryRoutes>
+                          </BrowserRouter>
+                        </TooltipProvider>
+                      </OpponentProvider>
+                    </GameModeProvider>
+                  </LanguageProvider>
+                </DifficultyProvider>
+              </SettingsProvider>
+            </PlayFabProvider>
           </AuthProvider>
         </QueryClientProvider>
       </ThemeProvider>
