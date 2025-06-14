@@ -86,45 +86,15 @@ export const SignInForm = ({ setLoading, setError, loading }: SignInFormProps) =
       setLoading(false);
     }
   };
-
-  const handleMagicLinkSignIn = async () => {
-    setError('');
-    if (!validateEmail(email)) {
-      setError('Please enter a valid email to receive a login link.');
-      return;
-    }
-
-    try {
-      setLoading(true);
-      cleanupAuthState();
-
-      const { error } = await supabase.auth.signInWithOtp({
-        email: email.trim(),
-        options: {
-          emailRedirectTo: `${window.location.origin}/`,
-        },
-      });
-
-      if (error) {
-        console.error('Magic link error:', error);
-        setError(error.message || 'Failed to send magic link.');
-        toast.error(error.message || 'Failed to send magic link.');
-      } else {
-        setPassword('');
-        setError('');
-        toast.success('Login link sent! Please check your email.');
-      }
-    } catch (err: any) {
-      console.error('Unexpected magic link error:', err);
-      setError('An unexpected error occurred. Please try again.');
-      toast.error('An unexpected error occurred. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
   
   return (
     <>
+      <div className="mb-4 p-3 bg-muted/50 rounded-lg">
+        <p className="text-sm text-muted-foreground">
+          <strong>Note:</strong> If you don't have a password, use the magic link option above instead.
+        </p>
+      </div>
+
       <form onSubmit={handleSignIn} className="space-y-4">
         <div>
           <Label htmlFor="signin-email">Email</Label>
@@ -176,30 +146,9 @@ export const SignInForm = ({ setLoading, setError, loading }: SignInFormProps) =
         </div>
         
         <Button type="submit" className="w-full" disabled={loading}>
-          {loading ? 'Signing in...' : 'Sign In'}
+          {loading ? 'Signing in...' : 'Sign in with password'}
         </Button>
       </form>
-
-      <div className="relative my-4">
-        <div className="absolute inset-0 flex items-center">
-          <span className="w-full border-t" />
-        </div>
-        <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-background px-2 text-muted-foreground">
-            Or
-          </span>
-        </div>
-      </div>
-
-      <Button
-        type="button"
-        variant="outline"
-        className="w-full"
-        onClick={handleMagicLinkSignIn}
-        disabled={loading || !email}
-      >
-        {loading ? 'Sending link...' : 'Email me a login link'}
-      </Button>
 
       <PasswordResetDialog open={isResetDialogOpen} onOpenChange={setIsResetDialogOpen} />
     </>
