@@ -1,73 +1,50 @@
-# Welcome to your Lovable project
 
-## Project info
+# 👑 Chess & Math: The Ultimate Brain Workout 👑
 
-**URL**: https://lovable.dev/projects/3dc53f4d-be83-4f16-abe1-d56671c9f22b
+Welcome to Chess & Math, where strategy meets calculation! 🧠 This isn't just a game; it's a fun and engaging way to sharpen your mind. Challenge yourself with a unique blend of classic chess and stimulating math problems.
 
-## How can I edit this code?
+## 🚀 How to Play
 
-There are several ways of editing your application.
+1.  **Start a Game**: Navigate to the "Play Game" section from the main menu.
+2.  **Select a Piece**: Click on one of your pieces to move it.
+3.  **Solve the Math Challenge**: Before you can move, a math problem will appear. Solve it correctly to proceed!
+4.  **Make Your Move**: After solving the problem, click on a valid square to move your piece.
+5.  **Checkmate!**: Outsmart your opponent on the board and with your math skills to win the game.
 
-**Use Lovable**
+## ✨ Features
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/3dc53f4d-be83-4f16-abe1-d56671c9f22b) and start prompting.
+-   **Responsive Design**: Play seamlessly on your desktop, tablet, or mobile phone. 📱
+-   **Interactive Gameplay**: A dynamic experience that combines two classic brain exercises.
+-   **Multiple Languages**: Available in English and Spanish. 🌍
+-   **Game Statistics**: Track your progress and see how you improve over time (coming soon!).
+-   **Customizable Settings**: Adjust the game to your liking.
 
-Changes made via Lovable will be committed automatically to this repo.
+## 🛠️ Technologies Used
 
-**Use your preferred IDE**
+This project is built with a modern, powerful stack:
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+-   **Vite**: Blazing fast frontend tooling.
+-   **React**: A JavaScript library for building user interfaces.
+-   **TypeScript**: Strong typing for robust and maintainable code.
+-   **Tailwind CSS**: A utility-first CSS framework for rapid UI development.
+-   **shadcn/ui**: Beautifully designed, accessible components.
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+## 🌐 Get Started Locally
 
-Follow these steps:
+Want to run the project on your own machine? Follow these simple steps:
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
+# 1. Clone the repository
 git clone <YOUR_GIT_URL>
 
-# Step 2: Navigate to the project directory.
+# 2. Navigate to the project directory
 cd <YOUR_PROJECT_NAME>
 
-# Step 3: Install the necessary dependencies.
-npm i
+# 3. Install dependencies
+npm install
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# 4. Start the development server
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/3dc53f4d-be83-4f16-abe1-d56671c9f22b) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+Now you're all set to play and contribute! 🎉

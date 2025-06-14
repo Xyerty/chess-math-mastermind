@@ -10,7 +10,6 @@ const PIECE_UNICODES: Record<string, string> = {
 
 interface ChessBoardProps {
   position: Array<Array<string | null>>;
-  size?: 'normal' | 'large';
   onPieceClick?: (row: number, col: number, piece: string | null) => void;
   selectedSquare?: { row: number; col: number } | null;
   lastMove?: ChessMove | null;
@@ -18,22 +17,13 @@ interface ChessBoardProps {
 
 const ChessBoard: React.FC<ChessBoardProps> = ({ 
   position, 
-  size = 'normal',
   onPieceClick,
   selectedSquare,
   lastMove
 }) => {
-  const boardSizeClass = size === 'large' 
-    ? 'w-full max-w-[600px] lg:max-w-[720px]' 
-    : 'w-full max-w-[320px] sm:max-w-[480px]';
-  
-  const textSizeClass = size === 'large' 
-    ? 'text-3xl sm:text-4xl lg:text-5xl' 
-    : 'text-2xl sm:text-3xl';
-  
-  const squareSizeClass = size === 'large'
-    ? 'h-12 sm:h-16 lg:h-20'
-    : 'h-10 sm:h-12';
+  const boardSizeClass = 'w-full max-w-[320px] sm:max-w-md md:max-w-lg lg:max-w-xl';
+  const squareSizeClass = 'h-10 sm:h-12 md:h-14 lg:h-16';
+  const textSizeClass = 'text-2xl sm:text-3xl md:text-4xl';
 
   const handleSquareClick = (row: number, col: number, piece: string | null) => {
     onPieceClick?.(row, col, piece);

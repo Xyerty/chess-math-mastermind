@@ -8,7 +8,7 @@ const Statistics = () => {
   const { t } = useLanguage();
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
+    <div className="max-w-2xl mx-auto space-y-6 p-4">
       {/* Coming Soon */}
       <Card>
         <CardHeader>
