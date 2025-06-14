@@ -1,7 +1,6 @@
-
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Clock, User, Trophy, BrainCircuit } from "lucide-react";
+import { Clock, User, Trophy, BrainCircuit, Cpu } from "lucide-react";
 import { useLanguage } from "../contexts/LanguageContext";
 import { useOpponent } from "../contexts/OpponentContext";
 import type { GameStatus } from "../features/chess/types";
@@ -15,6 +14,7 @@ interface GameStatusProps {
   aiStats?: { score: number; thinkingTime: number } | null;
   isAIThinking?: boolean;
   aiDifficulty?: string;
+  usingPythonEngine?: boolean;
 }
 
 const GameStatus: React.FC<GameStatusProps> = ({
@@ -25,6 +25,7 @@ const GameStatus: React.FC<GameStatusProps> = ({
   aiStats,
   isAIThinking = false,
   aiDifficulty = 'medium',
+  usingPythonEngine = false,
 }) => {
   const { t } = useLanguage();
   const { opponentType, playerColor } = useOpponent();
@@ -63,7 +64,8 @@ const GameStatus: React.FC<GameStatusProps> = ({
     if (opponentType === 'ai') {
       const aiPlayer = playerColor === 'white' ? 'black' : 'white';
       if (color === aiPlayer) {
-        return `AI (${aiDifficulty.charAt(0).toUpperCase() + aiDifficulty.slice(1)})`;
+        const engineType = usingPythonEngine ? 'Python AI' : 'JS AI';
+        return `${engineType} (${aiDifficulty.charAt(0).toUpperCase() + aiDifficulty.slice(1)})`;
       }
       return 'You';
     }
@@ -80,6 +82,28 @@ const GameStatus: React.FC<GameStatusProps> = ({
             difficulty={aiDifficulty}
             thinkingTime={aiStats?.thinkingTime}
           />
+        </div>
+      )}
+
+      {/* Engine Status for AI games */}
+      {opponentType === 'ai' && (
+        <div className="sm:col-span-2">
+          <Card className="border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950/30">
+            <CardContent className="flex items-center gap-3 p-3">
+              <div className="flex items-center gap-2">
+                <Cpu className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                {usingPythonEngine ? (
+                  <span className="text-sm font-medium text-blue-700 dark:text-blue-300">
+                    Enhanced Python Engine Active
+                  </span>
+                ) : (
+                  <span className="text-sm font-medium text-orange-700 dark:text-orange-300">
+                    JavaScript Engine (Fallback)
+                  </span>
+                )}
+              </div>
+            </CardContent>
+          </Card>
         </div>
       )}
 

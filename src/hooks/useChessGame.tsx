@@ -5,6 +5,8 @@ import { isKingInCheck, hasAnyValidMoves } from '../features/chess/utils/board';
 import { isValidMoveInternal } from '../features/chess/utils/moveValidation';
 import { generateAIMove } from '../features/chess/utils/ai';
 import { useOpponent } from '../contexts/OpponentContext';
+import { pythonEngine } from '../services/pythonEngine';
+import { boardToFen } from '../utils/fenConverter';
 
 type HandleSquareClickResult = 
   | { type: 'selected'; payload: { row: number; col: number } }
@@ -25,6 +27,7 @@ const getInitialTime = (gameMode: GameMode) => {
 export const useChessGame = (aiDifficulty: 'easy' | 'medium' | 'hard', gameMode: GameMode) => {
   const { opponentType, playerColor } = useOpponent();
   const [isAIThinking, setIsAIThinking] = useState(false);
+  const [usingPythonEngine, setUsingPythonEngine] = useState(false);
   
   const [gameState, setGameState] = useState<ChessGameState>(() => {
     const initialTime = getInitialTime(gameMode);
@@ -43,7 +46,21 @@ export const useChessGame = (aiDifficulty: 'easy' | 'medium' | 'hard', gameMode:
     };
   });
 
-  // AI move logic
+  // Check Python engine availability on mount
+  useEffect(() => {
+    const checkPythonEngine = async () => {
+      const available = await pythonEngine.checkAvailability();
+      setUsingPythonEngine(available);
+      if (available) {
+        console.log('Python chess engine is available - using enhanced AI');
+      } else {
+        console.log('Python chess engine not available - using JavaScript fallback');
+      }
+    };
+    checkPythonEngine();
+  }, []);
+
+  // AI move logic with Python engine integration
   const makeAIMove = useCallback(async () => {
     if (opponentType !== 'ai' || gameState.gameStatus !== 'playing' && gameState.gameStatus !== 'check') {
       return;
@@ -56,15 +73,45 @@ export const useChessGame = (aiDifficulty: 'easy' | 'medium' | 'hard', gameMode:
 
     setIsAIThinking(true);
     
-    // Add a small delay to make AI moves feel more natural
-    const minThinkingTime = aiDifficulty === 'easy' ? 500 : aiDifficulty === 'medium' ? 1000 : 1500;
-    
-    setTimeout(() => {
-      const aiMoveResult = generateAIMove(gameState.board, aiPlayer, aiDifficulty, gameState.lastMove);
+    try {
+      let aiMoveResult = null;
+      
+      // Try Python engine first
+      if (usingPythonEngine) {
+        const fen = boardToFen(gameState.board, gameState.currentPlayer);
+        const timeLimit = aiDifficulty === 'easy' ? 1.0 : aiDifficulty === 'medium' ? 2.0 : 3.0;
+        
+        const pythonResult = await pythonEngine.getMove(fen, aiDifficulty, timeLimit);
+        
+        if (pythonResult) {
+          console.log(`Python AI (${aiDifficulty}) move:`, pythonResult);
+          aiMoveResult = {
+            move: {
+              from: pythonResult.move.from,
+              to: pythonResult.move.to,
+              piece: gameState.board[pythonResult.move.from.row][pythonResult.move.from.col],
+              timestamp: Date.now()
+            },
+            score: pythonResult.score,
+            thinkingTime: pythonResult.thinking_time
+          };
+        } else {
+          console.log('Python engine failed, falling back to JavaScript AI');
+          setUsingPythonEngine(false);
+        }
+      }
+      
+      // Fallback to JavaScript AI
+      if (!aiMoveResult) {
+        const jsResult = generateAIMove(gameState.board, aiPlayer, aiDifficulty, gameState.lastMove);
+        if (jsResult) {
+          aiMoveResult = jsResult;
+          console.log(`JavaScript AI (${aiDifficulty}) move:`, jsResult);
+        }
+      }
       
       if (aiMoveResult) {
         const { move, score, thinkingTime } = aiMoveResult;
-        console.log(`AI (${aiDifficulty}) move:`, move, `Score: ${score}, Time: ${thinkingTime}ms`);
         
         // Execute the AI move
         const tempBoard = gameState.board.map(row => [...row]);
@@ -115,10 +162,13 @@ export const useChessGame = (aiDifficulty: 'easy' | 'medium' | 'hard', gameMode:
           };
         });
       }
-      
+    } catch (error) {
+      console.error('Error in AI move generation:', error);
+      setUsingPythonEngine(false);
+    } finally {
       setIsAIThinking(false);
-    }, minThinkingTime);
-  }, [gameState, aiDifficulty, opponentType, playerColor, gameMode]);
+    }
+  }, [gameState, aiDifficulty, opponentType, playerColor, gameMode, usingPythonEngine]);
 
   // Trigger AI move when it's AI's turn
   useEffect(() => {
@@ -306,5 +356,6 @@ export const useChessGame = (aiDifficulty: 'easy' | 'medium' | 'hard', gameMode:
     resetGame,
     resignGame,
     isAIThinking,
+    usingPythonEngine,
   };
 };
