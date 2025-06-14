@@ -1,16 +1,15 @@
-
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RotateCcw, Flag, Lightbulb, Pause, Settings } from "lucide-react";
 import { useLanguage } from "../contexts/LanguageContext";
+import { useNavigate } from "react-router-dom";
 
 interface GameControlsProps {
   onNewGame: () => void;
   onResign: () => void;
   onHint: () => void;
   onPause?: () => void;
-  onSettings?: () => void;
 }
 
 const GameControls: React.FC<GameControlsProps> = ({
@@ -18,9 +17,9 @@ const GameControls: React.FC<GameControlsProps> = ({
   onResign,
   onHint,
   onPause,
-  onSettings
 }) => {
   const { t } = useLanguage();
+  const navigate = useNavigate();
 
   return (
     <div className="space-y-4">
@@ -75,7 +74,7 @@ const GameControls: React.FC<GameControlsProps> = ({
         </CardHeader>
         <CardContent className="space-y-3">
           <Button 
-            onClick={onSettings}
+            onClick={() => navigate("/settings")}
             className="w-full justify-start"
             variant="outline"
           >

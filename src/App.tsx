@@ -12,6 +12,7 @@ import Tutorial from "./pages/Tutorial";
 import Settings from "./pages/Settings";
 import Statistics from "./pages/Statistics";
 import NotFound from "./pages/NotFound";
+import AppLayout from "./components/AppLayout";
 
 const queryClient = new QueryClient();
 
@@ -25,10 +26,16 @@ const App: React.FC = () => {
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<MainMenu />} />
-              <Route path="/game" element={<Game />} />
+              
+              {/* Routes with the new shared layout */}
+              <Route element={<AppLayout />}>
+                <Route path="/game" element={<Game />} />
+                <Route path="/settings" element={<Settings />} />
+                <Route path="/statistics" element={<Statistics />} />
+              </Route>
+
+              {/* Routes without the new layout (due to file restrictions) */}
               <Route path="/tutorial" element={<Tutorial />} />
-              <Route path="/settings" element={<Settings />} />
-              <Route path="/statistics" element={<Statistics />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

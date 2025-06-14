@@ -1,8 +1,4 @@
-
 import React, { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
-import { ArrowLeft, RotateCcw } from "lucide-react";
 import { useLanguage } from "../contexts/LanguageContext";
 import { useChessGame } from "../hooks/useChessGame";
 import ChessBoard from "../components/ChessBoard";
@@ -11,7 +7,6 @@ import GameControls from "../components/GameControls";
 import MathChallenge from "../components/MathChallenge";
 
 const Game = () => {
-  const navigate = useNavigate();
   const { t } = useLanguage();
   const { gameState, selectSquare, resetGame } = useChessGame();
   const [showMathChallenge, setShowMathChallenge] = useState(false);
@@ -44,32 +39,7 @@ const Game = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 p-2 sm:p-4">
-      {/* Header */}
-      <header className="flex flex-col sm:flex-row items-center justify-between mb-4 sm:mb-6 gap-4">
-        <Button 
-          variant="outline" 
-          onClick={() => navigate("/")}
-          className="flex items-center gap-2 w-full sm:w-auto"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          {t('nav.backToMenu')}
-        </Button>
-        
-        <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-primary text-center">
-          {t('game.title')}
-        </h1>
-        
-        <Button 
-          variant="outline" 
-          className="flex items-center gap-2 w-full sm:w-auto"
-          onClick={handleNewGame}
-        >
-          <RotateCcw className="h-4 w-4" />
-          {t('nav.newGame')}
-        </Button>
-      </header>
-
+    <>
       {/* Main Game Layout - Responsive Grid */}
       <div className="max-w-7xl mx-auto">
         {/* Mobile Layout */}
@@ -144,7 +114,7 @@ const Game = () => {
           }}
         />
       )}
-    </div>
+    </>
   );
 };
 

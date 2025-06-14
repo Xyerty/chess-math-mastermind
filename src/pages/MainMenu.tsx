@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { Play, Settings, BookOpen, BarChart3 } from "lucide-react";
 import { useLanguage } from "../contexts/LanguageContext";
@@ -8,6 +8,34 @@ import { useLanguage } from "../contexts/LanguageContext";
 const MainMenu = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
+
+  const menuItems = [
+    {
+      title: t('mainMenu.playGame'),
+      icon: <Play className="h-8 w-8 text-primary" />,
+      path: "/game",
+      description: "Sharpen your mind with a game of chess and math.",
+      primary: true,
+    },
+    {
+      title: t('mainMenu.howToPlay'),
+      icon: <BookOpen className="h-8 w-8" />,
+      path: "/tutorial",
+      description: "Learn the rules and master the strategies.",
+    },
+    {
+      title: t('mainMenu.settings'),
+      icon: <Settings className="h-8 w-8" />,
+      path: "/settings",
+      description: "Customize your game experience.",
+    },
+    {
+      title: t('mainMenu.statistics'),
+      icon: <BarChart3 className="h-8 w-8" />,
+      path: "/statistics",
+      description: "Track your progress and performance.",
+    },
+  ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-100 via-white to-green-100 flex flex-col items-center justify-center p-4">
@@ -33,46 +61,33 @@ const MainMenu = () => {
           {t('mainMenu.description')}
         </p>
 
-        {/* Menu Buttons */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 max-w-2xl mx-auto animate-scale-in delay-700">
-          <Button 
-            onClick={() => navigate("/game")}
-            className="h-14 sm:h-16 text-lg sm:text-xl font-semibold bg-primary hover:bg-primary/90 shadow-lg hover:shadow-xl transition-all duration-300"
-            size="lg"
-          >
-            <Play className="mr-2 sm:mr-3 h-5 w-5 sm:h-6 sm:w-6" />
-            {t('mainMenu.playGame')}
-          </Button>
-          
-          <Button 
-            onClick={() => navigate("/tutorial")}
-            variant="outline"
-            className="h-14 sm:h-16 text-lg sm:text-xl font-semibold border-2 hover:bg-accent shadow-lg hover:shadow-xl transition-all duration-300"
-            size="lg"
-          >
-            <BookOpen className="mr-2 sm:mr-3 h-5 w-5 sm:h-6 sm:w-6" />
-            {t('mainMenu.howToPlay')}
-          </Button>
-          
-          <Button 
-            onClick={() => navigate("/settings")}
-            variant="outline"
-            className="h-14 sm:h-16 text-lg sm:text-xl font-semibold border-2 hover:bg-accent shadow-lg hover:shadow-xl transition-all duration-300"
-            size="lg"
-          >
-            <Settings className="mr-2 sm:mr-3 h-5 w-5 sm:h-6 sm:w-6" />
-            {t('mainMenu.settings')}
-          </Button>
-          
-          <Button 
-            onClick={() => navigate("/statistics")}
-            variant="outline"
-            className="h-14 sm:h-16 text-lg sm:text-xl font-semibold border-2 hover:bg-accent shadow-lg hover:shadow-xl transition-all duration-300"
-            size="lg"
-          >
-            <BarChart3 className="mr-2 sm:mr-3 h-5 w-5 sm:h-6 sm:w-6" />
-            {t('mainMenu.statistics')}
-          </Button>
+        {/* Menu Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto animate-scale-in delay-700">
+          {menuItems.map((item) => (
+            <Card 
+              key={item.title}
+              onClick={() => navigate(item.path)}
+              className={`
+                group cursor-pointer overflow-hidden text-left
+                transition-all duration-300 hover:shadow-2xl hover:-translate-y-2
+                ${item.primary ? 'bg-primary/5 border-primary/20' : 'bg-card'}
+              `}
+            >
+              <CardHeader className="flex flex-row items-center gap-4 pb-4">
+                <div className={`
+                  p-3 rounded-lg
+                  ${item.primary ? 'bg-primary/10 group-hover:bg-primary/20' : 'bg-accent group-hover:bg-accent/80'}
+                  transition-all duration-300 group-hover:scale-110
+                `}>
+                  {item.icon}
+                </div>
+                <CardTitle className="text-xl font-semibold text-primary">{item.title}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">{item.description}</p>
+              </CardContent>
+            </Card>
+          ))}
         </div>
 
         {/* Footer */}
