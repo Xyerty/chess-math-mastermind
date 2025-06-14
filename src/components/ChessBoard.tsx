@@ -1,6 +1,6 @@
 
 import React from "react";
-import { ChessMove } from "../hooks/useChessGame";
+import { ChessMove } from "../features/chess/types";
 
 // Use solid piece characters for easier styling
 const PIECE_UNICODES: Record<string, string> = {

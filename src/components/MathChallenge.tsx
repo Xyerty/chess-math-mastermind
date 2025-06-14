@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,6 +26,7 @@ const MathChallenge: React.FC<MathChallengeProps> = ({
   const [userAnswer, setUserAnswer] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const isMounted = useRef(true);
+  const [timeLeft, setTimeLeft] = useState(timeLimit);
 
   // Generate math problem based on difficulty
   const generateProblem = () => {
