@@ -7,19 +7,19 @@ import GameStatus from "../components/GameStatus";
 import MathChallenge from "../components/MathChallenge";
 import BottomActionMenu from "../components/BottomActionMenu";
 import { useDifficulty } from "../contexts/DifficultyContext";
+import { useSettings } from "../contexts/SettingsContext";
 
 const Game = () => {
   const { t } = useLanguage();
   const { aiDifficulty, mathDifficulty } = useDifficulty();
+  const { settings } = useSettings();
   const { gameState, selectSquare, resetGame } = useChessGame(aiDifficulty);
   const [showMathChallenge, setShowMathChallenge] = useState(false);
   const [pendingMove, setPendingMove] = useState<{row: number, col: number} | null>(null);
 
-  const mathTimeLimit = {
-    easy: 45,
-    medium: 30,
-    hard: 20
-  }[mathDifficulty];
+  const mathTimeLimit = settings.timeLimits.unlimited
+    ? Infinity
+    : settings.timeLimits[mathDifficulty];
 
   const handlePieceClick = (row: number, col: number, piece: string | null) => {
     if (piece && piece[0] === gameState.currentPlayer[0]) {

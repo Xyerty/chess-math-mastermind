@@ -8,6 +8,8 @@ import { useDifficulty, Difficulty } from "../contexts/DifficultyContext";
 import { useTheme } from "next-themes";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import SoundSettings from "../components/settings/SoundSettings";
+import TimeLimitSettings from "../components/settings/TimeLimitSettings";
 
 const Settings = () => {
   const { t, language, setLanguage } = useLanguage();
@@ -81,6 +83,12 @@ const Settings = () => {
         </CardContent>
       </Card>
 
+      {/* Sound Settings */}
+      <SoundSettings />
+
+      {/* Time Limit Settings */}
+      <TimeLimitSettings />
+
       {/* Visual Theme Settings */}
       <Card>
         <CardHeader>
@@ -110,23 +118,8 @@ const Settings = () => {
           </div>
         </CardContent>
       </Card>
-
-      {/* Coming Soon Features */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Settings panel coming soon!</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground mb-4">Here you'll be able to configure:</p>
-          <ul className="space-y-2 text-sm text-muted-foreground list-disc list-inside">
-            <li>Sound preferences</li>
-            <li>Time limits</li>
-          </ul>
-        </CardContent>
-      </Card>
     </div>
   );
 };
 
 export default Settings;
-

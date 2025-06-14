@@ -88,9 +88,12 @@ const MathChallenge: React.FC<MathChallengeProps> = ({
   useEffect(() => {
     generateProblem();
     
+    if (timeLimit === Infinity) return;
+
     const timer = setInterval(() => {
       setTimeLeft(prev => {
         if (prev <= 1) {
+          clearInterval(timer);
           onFailure();
           return 0;
         }
@@ -128,10 +131,12 @@ const MathChallenge: React.FC<MathChallengeProps> = ({
         <CardHeader className="text-center">
           <CardTitle className="text-2xl flex items-center justify-center gap-2">
             <span>{t('math.title')}</span>
-            <div className="flex items-center gap-1 text-lg">
-              <Clock className="h-5 w-5" />
-              <span className={timeLeft <= 10 ? 'text-red-500' : 'text-primary'}>{timeLeft}s</span>
-            </div>
+            {timeLimit !== Infinity && (
+              <div className="flex items-center gap-1 text-lg">
+                <Clock className="h-5 w-5" />
+                <span className={timeLeft <= 10 ? 'text-red-500' : 'text-primary'}>{timeLeft}s</span>
+              </div>
+            )}
           </CardTitle>
         </CardHeader>
         
