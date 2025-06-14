@@ -1,13 +1,23 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { Play, Settings, BookOpen, BarChart3 } from "lucide-react";
 import { useLanguage } from "../contexts/LanguageContext";
+import GameSetupModal from "../components/GameSetupModal";
+import { useDifficulty, Difficulty } from "../contexts/DifficultyContext";
 
 const MainMenu = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
+  const [isSetupModalOpen, setIsSetupModalOpen] = useState(false);
+  const { setMathDifficulty, setAiDifficulty } = useDifficulty();
+
+  const handleStartGame = (mathDifficulty: Difficulty, aiDifficulty: Difficulty) => {
+    setMathDifficulty(mathDifficulty);
+    setAiDifficulty(aiDifficulty);
+    navigate("/game");
+  };
 
   const menuItems = [
     {
@@ -66,7 +76,13 @@ const MainMenu = () => {
           {menuItems.map((item) => (
             <Card 
               key={item.title}
-              onClick={() => navigate(item.path)}
+              onClick={() => {
+                if (item.path === '/game') {
+                  setIsSetupModalOpen(true);
+                } else {
+                  navigate(item.path);
+                }
+              }}
               className={`
                 group cursor-pointer overflow-hidden text-left
                 transition-all duration-300 hover:shadow-2xl hover:-translate-y-2
@@ -95,6 +111,12 @@ const MainMenu = () => {
           <p>{t('mainMenu.footer')}</p>
         </div>
       </div>
+
+      <GameSetupModal
+        isOpen={isSetupModalOpen}
+        onClose={() => setIsSetupModalOpen(false)}
+        onStartGame={handleStartGame}
+      />
     </div>
   );
 };
