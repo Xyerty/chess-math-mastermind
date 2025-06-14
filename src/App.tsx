@@ -1,5 +1,6 @@
 
 import React from "react";
+import * as Sentry from "@sentry/react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -17,6 +18,8 @@ import AppLayout from "./components/AppLayout";
 
 const queryClient = new QueryClient();
 
+const SentryRoutes = Sentry.withSentryReactRouterV6Routing(Routes);
+
 const App: React.FC = () => {
   return (
     <QueryClientProvider client={queryClient}>
@@ -26,7 +29,7 @@ const App: React.FC = () => {
             <Toaster />
             <Sonner />
             <BrowserRouter>
-              <Routes>
+              <SentryRoutes>
                 <Route path="/" element={<MainMenu />} />
                 
                 {/* Routes with the new shared layout */}
@@ -39,7 +42,7 @@ const App: React.FC = () => {
                 {/* Routes without the new layout (due to file restrictions) */}
                 <Route path="/tutorial" element={<Tutorial />} />
                 <Route path="*" element={<NotFound />} />
-              </Routes>
+              </SentryRoutes>
             </BrowserRouter>
           </TooltipProvider>
         </LanguageProvider>
