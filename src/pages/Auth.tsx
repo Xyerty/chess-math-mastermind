@@ -1,381 +1,34 @@
-import { supabase } from '@/integrations/supabase/client';
-import { useTheme } from 'next-themes';
+
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { LogIn, Eye, EyeOff, AlertCircle } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { LogIn, AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { toast } from 'sonner';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog"
-
-// Enhanced auth state cleanup utility
-const cleanupAuthState = () => {
-  Object.keys(localStorage).forEach((key) => {
-    if (key.startsWith('supabase.auth.') || key.includes('sb-')) {
-      localStorage.removeItem(key);
-    }
-  });
-  
-  Object.keys(sessionStorage || {}).forEach((key) => {
-    if (key.startsWith('supabase.auth.') || key.includes('sb-')) {
-      sessionStorage.removeItem(key);
-    }
-  });
-};
+import { PasswordUpdateForm } from '@/components/auth/PasswordUpdateForm';
+import { SignInForm } from '@/components/auth/SignInForm';
+import { SignUpForm } from '@/components/auth/SignUpForm';
+import { GoogleAuthButton } from '@/components/auth/GoogleAuthButton';
 
 const AuthPage = () => {
-  const { theme } = useTheme();
   const navigate = useNavigate();
   const { session } = useAuth();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [username, setUsername] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-
-  // State for password recovery flow
   const [view, setView] = useState<'auth' | 'update_password'>('auth');
-  const [isResetDialogOpen, setIsResetDialogOpen] = useState(false);
-  const [resetEmail, setResetEmail] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmNewPassword, setConfirmNewPassword] = useState('');
 
   useEffect(() => {
-    // Check for password recovery flow from URL hash
     const hash = window.location.hash;
     if (hash.includes('type=recovery')) {
       setView('update_password');
     } else if (session) {
-      // If not in recovery mode and session exists, redirect
       navigate('/');
     }
   }, [session, navigate]);
 
-  const validateEmail = (email: string) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
-
-  const validatePassword = (password: string) => {
-    return password.length >= 6;
-  };
-
-  const handleSignIn = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    
-    if (!validateEmail(email)) {
-      setError('Please enter a valid email address');
-      return;
-    }
-    
-    if (!validatePassword(password)) {
-      setError('Password must be at least 6 characters long');
-      return;
-    }
-
-    try {
-      setLoading(true);
-      console.log('Attempting sign in...');
-      
-      // Clean up existing state
-      cleanupAuthState();
-      
-      // Attempt global sign out first
-      try {
-        await supabase.auth.signOut({ scope: 'global' });
-      } catch (err) {
-        console.log('No existing session to sign out');
-      }
-      
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: email.trim(),
-        password,
-      });
-      
-      if (error) {
-        console.error('Sign in error:', error);
-        
-        switch (error.message) {
-          case 'Invalid login credentials':
-            setError('Invalid email or password. Please check your credentials.');
-            break;
-          case 'Email not confirmed':
-            setError('Please check your email and click the confirmation link before signing in.');
-            break;
-          case 'Too many requests':
-            setError('Too many login attempts. Please wait a few minutes before trying again.');
-            break;
-          default:
-            setError(error.message || 'An error occurred during sign in');
-        }
-        return;
-      }
-      
-      if (data.user) {
-        console.log('Sign in successful:', data.user.id);
-        toast.success('Successfully signed in!');
-        
-        // Force page reload for clean state
-        setTimeout(() => {
-          window.location.href = '/';
-        }, 100);
-      }
-      
-    } catch (error) {
-      console.error('Unexpected sign in error:', error);
-      setError('An unexpected error occurred. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleSignUp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    
-    if (!validateEmail(email)) {
-      setError('Please enter a valid email address');
-      return;
-    }
-    
-    if (!validatePassword(password)) {
-      setError('Password must be at least 6 characters long');
-      return;
-    }
-    
-    if (password !== confirmPassword) {
-      setError('Passwords do not match');
-      return;
-    }
-    
-    if (username.trim().length < 2) {
-      setError('Username must be at least 2 characters long');
-      return;
-    }
-
-    try {
-      setLoading(true);
-      console.log('Attempting sign up...');
-      
-      // Clean up existing state
-      cleanupAuthState();
-      
-      const redirectUrl = `${window.location.origin}/`;
-      
-      const { data, error } = await supabase.auth.signUp({
-        email: email.trim(),
-        password,
-        options: {
-          emailRedirectTo: redirectUrl,
-          data: {
-            username: username.trim(),
-          }
-        }
-      });
-      
-      if (error) {
-        console.error('Sign up error:', error);
-        
-        switch (error.message) {
-          case 'User already registered':
-            setError('An account with this email already exists. Please sign in instead.');
-            break;
-          case 'Password should be at least 6 characters':
-            setError('Password must be at least 6 characters long');
-            break;
-          default:
-            setError(error.message || 'An error occurred during sign up');
-        }
-        return;
-      }
-      
-      if (data.user && !data.session) {
-        toast.success('Please check your email for a confirmation link!');
-        setError('');
-      } else if (data.session) {
-        console.log('Sign up successful with immediate session:', data.user?.id);
-        toast.success('Account created successfully!');
-        
-        // Force page reload for clean state
-        setTimeout(() => {
-          window.location.href = '/';
-        }, 100);
-      }
-      
-    } catch (error) {
-      console.error('Unexpected sign up error:', error);
-      setError('An unexpected error occurred. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handlePasswordResetRequest = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    
-    if (!validateEmail(resetEmail)) {
-      setError('Please enter a valid email address');
-      return;
-    }
-
-    try {
-      setLoading(true);
-      const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
-        redirectTo: `${window.location.origin}/auth`,
-      });
-      
-      if (error) {
-        setError(error.message);
-        toast.error(error.message);
-      } else {
-        toast.success('Password reset link sent! Please check your email.');
-        setIsResetDialogOpen(false);
-      }
-    } catch (err: any) {
-      setError(err.message);
-      toast.error(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handlePasswordUpdate = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-
-    if (!validatePassword(newPassword)) {
-      setError('Password must be at least 6 characters long');
-      return;
-    }
-
-    if (newPassword !== confirmNewPassword) {
-      setError('Passwords do not match');
-      return;
-    }
-
-    try {
-      setLoading(true);
-      const { error } = await supabase.auth.updateUser({ password: newPassword });
-
-      if (error) {
-        setError(error.message);
-        toast.error(error.message);
-      } else {
-        toast.success('Password updated successfully! You can now sign in.');
-        // Sign out to force re-login with new password
-        await supabase.auth.signOut(); 
-        setView('auth');
-        navigate('/auth', { replace: true });
-        // Clear password fields
-        setNewPassword('');
-        setConfirmNewPassword('');
-      }
-    } catch (err: any) {
-      setError(err.message);
-      toast.error(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleGoogleSignIn = async () => {
-    setError('');
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${window.location.origin}/`,
-        queryParams: {
-          access_type: 'offline',
-          prompt: 'consent',
-        },
-      },
-    });
-
-    if (error) {
-      console.error('Google Sign In error:', error);
-      setError(error.message);
-      toast.error(error.message || 'Failed to start Google sign-in process.');
-    }
-  };
-
   if (view === 'update_password') {
-    return (
-      <div className="flex justify-center items-center min-h-screen bg-background p-4">
-        <Card className="w-full max-w-md">
-          <CardHeader className="text-center">
-            <CardTitle className="text-2xl">Update Password</CardTitle>
-            <CardDescription>
-              Enter a new password for your account.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {error && (
-              <Alert variant="destructive" className="mb-4">
-                <AlertCircle className="h-4 w-4" />
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
-            <form onSubmit={handlePasswordUpdate} className="space-y-4">
-              <div>
-                <Label htmlFor="new-password">New Password</Label>
-                <div className="relative">
-                    <Input
-                      id="new-password"
-                      type={showPassword ? 'text' : 'password'}
-                      value={newPassword}
-                      onChange={(e) => setNewPassword(e.target.value)}
-                      placeholder="Enter your new password"
-                      required
-                      disabled={loading}
-                    />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8"
-                      onClick={() => setShowPassword(!showPassword)}
-                      disabled={loading}
-                    >
-                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                    </Button>
-                  </div>
-              </div>
-              <div>
-                <Label htmlFor="confirm-new-password">Confirm New Password</Label>
-                <Input
-                  id="confirm-new-password"
-                  type={showPassword ? 'text' : 'password'}
-                  value={confirmNewPassword}
-                  onChange={(e) => setConfirmNewPassword(e.target.value)}
-                  placeholder="Confirm your new password"
-                  required
-                  disabled={loading}
-                />
-              </div>
-              <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? 'Updating...' : 'Update Password'}
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
-      </div>
-    );
+    return <PasswordUpdateForm />;
   }
 
   return (
@@ -389,7 +42,7 @@ const AuthPage = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Tabs defaultValue="signin" className="w-full">
+          <Tabs defaultValue="signin" className="w-full" onValueChange={() => setError('')}>
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="signin">Sign In</TabsTrigger>
               <TabsTrigger value="signup">Sign Up</TabsTrigger>
@@ -402,132 +55,12 @@ const AuthPage = () => {
               </Alert>
             )}
             
-            <TabsContent value="signin">
-              <form onSubmit={handleSignIn} className="space-y-4">
-                <div>
-                  <Label htmlFor="signin-email">Email</Label>
-                  <Input
-                    id="signin-email"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Enter your email"
-                    required
-                    disabled={loading}
-                  />
-                </div>
-                
-                <div>
-                  <Label htmlFor="signin-password">Password</Label>
-                  <div className="relative">
-                    <Input
-                      id="signin-password"
-                      type={showPassword ? 'text' : 'password'}
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      placeholder="Enter your password"
-                      required
-                      disabled={loading}
-                    />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8"
-                      onClick={() => setShowPassword(!showPassword)}
-                      disabled={loading}
-                    >
-                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                    </Button>
-                  </div>
-                  <div className="mt-2 text-right">
-                    <Button 
-                      type="button"
-                      variant="link"
-                      className="p-0 h-auto text-sm"
-                      onClick={() => setIsResetDialogOpen(true)}
-                    >
-                      Forgot your password?
-                    </Button>
-                  </div>
-                </div>
-                
-                <Button type="submit" className="w-full" disabled={loading}>
-                  {loading ? 'Signing in...' : 'Sign In'}
-                </Button>
-              </form>
+            <TabsContent value="signin" className="pt-4">
+              <SignInForm setLoading={setLoading} setError={setError} loading={loading} />
             </TabsContent>
             
-            <TabsContent value="signup">
-              <form onSubmit={handleSignUp} className="space-y-4">
-                <div>
-                  <Label htmlFor="signup-username">Username</Label>
-                  <Input
-                    id="signup-username"
-                    type="text"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    placeholder="Choose a username"
-                    required
-                    disabled={loading}
-                  />
-                </div>
-                
-                <div>
-                  <Label htmlFor="signup-email">Email</Label>
-                  <Input
-                    id="signup-email"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Enter your email"
-                    required
-                    disabled={loading}
-                  />
-                </div>
-                
-                <div>
-                  <Label htmlFor="signup-password">Password</Label>
-                  <div className="relative">
-                    <Input
-                      id="signup-password"
-                      type={showPassword ? 'text' : 'password'}
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      placeholder="Create a password (min 6 characters)"
-                      required
-                      disabled={loading}
-                    />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8"
-                      onClick={() => setShowPassword(!showPassword)}
-                      disabled={loading}
-                    >
-                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                    </Button>
-                  </div>
-                </div>
-                
-                <div>
-                  <Label htmlFor="confirm-password">Confirm Password</Label>
-                  <Input
-                    id="confirm-password"
-                    type={showPassword ? 'text' : 'password'}
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder="Confirm your password"
-                    required
-                    disabled={loading}
-                  />
-                </div>
-                
-                <Button type="submit" className="w-full" disabled={loading}>
-                  {loading ? 'Creating account...' : 'Create Account'}
-                </Button>
-              </form>
+            <TabsContent value="signup" className="pt-4">
+              <SignUpForm setLoading={setLoading} setError={setError} loading={loading} />
             </TabsContent>
           </Tabs>
           
@@ -544,48 +77,11 @@ const AuthPage = () => {
             </div>
             
             <div className="mt-4">
-              <Button variant="outline" className="w-full" onClick={handleGoogleSignIn} disabled={loading}>
-                Continue with Google
-              </Button>
+              <GoogleAuthButton loading={loading} setError={setError} />
             </div>
           </div>
         </CardContent>
       </Card>
-
-      <Dialog open={isResetDialogOpen} onOpenChange={setIsResetDialogOpen}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Reset Password</DialogTitle>
-            <DialogDescription>
-              Enter your email address and we'll send you a link to reset your password.
-            </DialogDescription>
-          </DialogHeader>
-          <form onSubmit={handlePasswordResetRequest}>
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="reset-email" className="text-right">
-                  Email
-                </Label>
-                <Input
-                  id="reset-email"
-                  type="email"
-                  value={resetEmail}
-                  onChange={(e) => setResetEmail(e.target.value)}
-                  className="col-span-3"
-                  placeholder="you@example.com"
-                  required
-                  disabled={loading}
-                />
-              </div>
-            </div>
-            <DialogFooter>
-              <Button type="submit" disabled={loading}>
-                {loading ? 'Sending...' : 'Send Reset Link'}
-              </Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };
