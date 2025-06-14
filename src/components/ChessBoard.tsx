@@ -1,109 +1,102 @@
 
-import React, { useState } from "react";
+import React from "react";
+import { ChessMove } from "../hooks/useChessGame";
 
-// Unicode chess pieces for easy visualization (can be replaced by SVGs later)
+// Unicode chess pieces for easy visualization
 const PIECE_UNICODES: Record<string, string> = {
-  wp: "♙",
-  wn: "♘",
-  wb: "♗",
-  wr: "♖",
-  wq: "♕",
-  wk: "♔",
-  bp: "♟",
-  bn: "♞",
-  bb: "♝",
-  br: "♜",
-  bq: "♛",
-  bk: "♚",
+  wp: "♙", wn: "♘", wb: "♗", wr: "♖", wq: "♕", wk: "♔",
+  bp: "♟", bn: "♞", bb: "♝", br: "♜", bq: "♛", bk: "♚",
 };
 
-// Standard chess starting position
-export const defaultPosition: Array<Array<string | null>> = [
-  ["br", "bn", "bb", "bq", "bk", "bb", "bn", "br"],
-  ["bp", "bp", "bp", "bp", "bp", "bp", "bp", "bp"],
-  [null, null, null, null, null, null, null, null],
-  [null, null, null, null, null, null, null, null],
-  [null, null, null, null, null, null, null, null],
-  [null, null, null, null, null, null, null, null],
-  ["wp", "wp", "wp", "wp", "wp", "wp", "wp", "wp"],
-  ["wr", "wn", "wb", "wq", "wk", "wb", "wn", "wr"],
-];
-
 interface ChessBoardProps {
-  position?: Array<Array<string | null>>;
+  position: Array<Array<string | null>>;
   size?: 'normal' | 'large';
   onPieceClick?: (row: number, col: number, piece: string | null) => void;
+  selectedSquare?: { row: number; col: number } | null;
+  lastMove?: ChessMove | null;
 }
 
 const ChessBoard: React.FC<ChessBoardProps> = ({ 
-  position = defaultPosition, 
+  position, 
   size = 'normal',
-  onPieceClick 
+  onPieceClick,
+  selectedSquare,
+  lastMove
 }) => {
-  const [selectedSquare, setSelectedSquare] = useState<{row: number, col: number} | null>(null);
+  const boardSizeClass = size === 'large' 
+    ? 'w-full max-w-[600px] lg:max-w-[720px]' 
+    : 'w-full max-w-[320px] sm:max-w-[480px]';
   
-  const boardSize = size === 'large' ? 'max-w-[720px]' : 'max-w-[520px]';
-  const textSize = size === 'large' ? 'text-5xl' : 'text-3xl';
+  const textSizeClass = size === 'large' 
+    ? 'text-3xl sm:text-4xl lg:text-5xl' 
+    : 'text-2xl sm:text-3xl';
   
+  const squareSizeClass = size === 'large'
+    ? 'h-12 sm:h-16 lg:h-20'
+    : 'h-10 sm:h-12';
+
   const handleSquareClick = (row: number, col: number, piece: string | null) => {
-    if (piece) {
-      setSelectedSquare({row, col});
-      onPieceClick?.(row, col, piece);
-    } else {
-      setSelectedSquare(null);
-    }
+    onPieceClick?.(row, col, piece);
+  };
+
+  const isLastMoveSquare = (row: number, col: number): boolean => {
+    if (!lastMove) return false;
+    return (lastMove.from.row === row && lastMove.from.col === col) ||
+           (lastMove.to.row === row && lastMove.to.col === col);
   };
 
   return (
     <div className="relative">
-      {/* Column Labels (a-h) */}
-      <div className="flex justify-center mb-2">
-        <div className={`grid grid-cols-8 ${boardSize} px-4`}>
+      {/* Column Labels (a-h) - Top */}
+      <div className="flex justify-center mb-1 sm:mb-2">
+        <div className={`grid grid-cols-8 ${boardSizeClass} px-2 sm:px-4`}>
           {['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'].map(letter => (
-            <div key={letter} className="text-center text-muted-foreground font-semibold">
+            <div key={letter} className="text-center text-muted-foreground font-semibold text-xs sm:text-sm">
               {letter}
             </div>
           ))}
         </div>
       </div>
 
-      <div className="flex items-center">
-        {/* Row Labels (8-1) */}
-        <div className="flex flex-col mr-2">
+      <div className="flex items-center justify-center">
+        {/* Row Labels (8-1) - Left */}
+        <div className="flex flex-col mr-1 sm:mr-2">
           {[8, 7, 6, 5, 4, 3, 2, 1].map(number => (
-            <div key={number} className={`flex items-center justify-center ${size === 'large' ? 'h-[90px]' : 'h-[65px]'} text-muted-foreground font-semibold`}>
+            <div key={number} className={`flex items-center justify-center ${squareSizeClass} text-muted-foreground font-semibold text-xs sm:text-sm`}>
               {number}
             </div>
           ))}
         </div>
 
         {/* Chess Board */}
-        <div className={`grid grid-cols-8 grid-rows-8 gap-0 w-full ${boardSize} aspect-square shadow-2xl rounded-lg overflow-hidden border-4 border-muted`}>
+        <div className={`grid grid-cols-8 grid-rows-8 gap-0 ${boardSizeClass} aspect-square shadow-xl rounded-lg overflow-hidden border-2 sm:border-4 border-muted`}>
           {position.map((row, rowIdx) =>
             row.map((piece, colIdx) => {
               const dark = (rowIdx + colIdx) % 2 === 1;
               const isSelected = selectedSquare?.row === rowIdx && selectedSquare?.col === colIdx;
+              const isLastMove = isLastMoveSquare(rowIdx, colIdx);
               
               return (
                 <div
                   key={`${rowIdx}-${colIdx}`}
                   className={`
-                    relative w-full h-full aspect-square flex items-center justify-center ${textSize} font-bold 
-                    transition-all duration-200 cursor-pointer hover:brightness-110
+                    relative w-full aspect-square flex items-center justify-center ${textSizeClass} font-bold 
+                    transition-all duration-200 cursor-pointer hover:brightness-110 active:scale-95
                     ${dark ? "bg-[#779556]" : "bg-[#eeeed2]"}
-                    ${isSelected ? "ring-4 ring-blue-500 ring-inset" : ""}
-                    ${piece && !isSelected ? "hover:ring-2 hover:ring-yellow-400 hover:ring-inset" : ""}
+                    ${isSelected ? "ring-2 sm:ring-4 ring-blue-500 ring-inset" : ""}
+                    ${isLastMove ? "ring-2 ring-yellow-400 ring-inset" : ""}
+                    ${piece && !isSelected && !isLastMove ? "hover:ring-1 sm:hover:ring-2 hover:ring-yellow-400 hover:ring-inset" : ""}
                   `}
                   style={{ userSelect: "none" }}
                   onClick={() => handleSquareClick(rowIdx, colIdx, piece)}
                 >
                   {piece ? (
                     <span
-                      className="select-none transition-transform duration-200 hover:scale-110"
+                      className="select-none transition-transform duration-200 hover:scale-110 active:scale-95"
                       style={{
                         filter: dark
-                          ? "drop-shadow(0 2px 2px #222)"
-                          : "drop-shadow(0 2px 2px #ccc)",
+                          ? "drop-shadow(0 1px 2px #222)"
+                          : "drop-shadow(0 1px 2px #ccc)",
                       }}
                     >
                       {PIECE_UNICODES[piece]}
@@ -115,10 +108,10 @@ const ChessBoard: React.FC<ChessBoardProps> = ({
           )}
         </div>
 
-        {/* Row Labels (8-1) - Right side */}
-        <div className="flex flex-col ml-2">
+        {/* Row Labels (8-1) - Right */}
+        <div className="flex flex-col ml-1 sm:ml-2">
           {[8, 7, 6, 5, 4, 3, 2, 1].map(number => (
-            <div key={number} className={`flex items-center justify-center ${size === 'large' ? 'h-[90px]' : 'h-[65px]'} text-muted-foreground font-semibold`}>
+            <div key={number} className={`flex items-center justify-center ${squareSizeClass} text-muted-foreground font-semibold text-xs sm:text-sm`}>
               {number}
             </div>
           ))}
@@ -126,10 +119,10 @@ const ChessBoard: React.FC<ChessBoardProps> = ({
       </div>
 
       {/* Column Labels (a-h) - Bottom */}
-      <div className="flex justify-center mt-2">
-        <div className={`grid grid-cols-8 ${boardSize} px-4`}>
+      <div className="flex justify-center mt-1 sm:mt-2">
+        <div className={`grid grid-cols-8 ${boardSizeClass} px-2 sm:px-4`}>
           {['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'].map(letter => (
-            <div key={letter} className="text-center text-muted-foreground font-semibold">
+            <div key={letter} className="text-center text-muted-foreground font-semibold text-xs sm:text-sm">
               {letter}
             </div>
           ))}

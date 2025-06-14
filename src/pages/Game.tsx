@@ -3,6 +3,8 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, RotateCcw } from "lucide-react";
+import { useLanguage } from "../contexts/LanguageContext";
+import { useChessGame } from "../hooks/useChessGame";
 import ChessBoard from "../components/ChessBoard";
 import GameStatus from "../components/GameStatus";
 import GameControls from "../components/GameControls";
@@ -10,71 +12,124 @@ import MathChallenge from "../components/MathChallenge";
 
 const Game = () => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
+  const { gameState, selectSquare, resetGame } = useChessGame();
   const [showMathChallenge, setShowMathChallenge] = useState(false);
-  const [currentPlayer, setCurrentPlayer] = useState<'white' | 'black'>('white');
-  const [gameStatus, setGameStatus] = useState<'playing' | 'check' | 'checkmate' | 'stalemate'>('playing');
+  const [pendingMove, setPendingMove] = useState<{row: number, col: number} | null>(null);
 
-  const handlePieceClick = () => {
-    // Show math challenge before allowing move
-    setShowMathChallenge(true);
+  const handlePieceClick = (row: number, col: number, piece: string | null) => {
+    if (piece && piece[0] === gameState.currentPlayer[0]) {
+      // Show math challenge before allowing piece selection
+      setPendingMove({ row, col });
+      setShowMathChallenge(true);
+    }
   };
 
   const handleMathSuccess = () => {
     setShowMathChallenge(false);
-    // Here we would allow the chess move
-    console.log("Math challenge solved! Move allowed.");
+    if (pendingMove) {
+      selectSquare(pendingMove.row, pendingMove.col);
+      setPendingMove(null);
+    }
   };
 
   const handleMathFailure = () => {
     setShowMathChallenge(false);
-    // Player loses turn or gets penalty
+    setPendingMove(null);
     console.log("Math challenge failed! No move allowed.");
   };
 
+  const handleNewGame = () => {
+    resetGame();
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 p-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 p-2 sm:p-4">
       {/* Header */}
-      <header className="flex items-center justify-between mb-6">
+      <header className="flex flex-col sm:flex-row items-center justify-between mb-4 sm:mb-6 gap-4">
         <Button 
           variant="outline" 
           onClick={() => navigate("/")}
-          className="flex items-center gap-2"
+          className="flex items-center gap-2 w-full sm:w-auto"
         >
           <ArrowLeft className="h-4 w-4" />
-          Back to Menu
+          {t('nav.backToMenu')}
         </Button>
         
-        <h1 className="text-3xl font-bold text-primary">Chess Math Mastermind</h1>
+        <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-primary text-center">
+          {t('game.title')}
+        </h1>
         
-        <Button variant="outline" className="flex items-center gap-2">
+        <Button 
+          variant="outline" 
+          className="flex items-center gap-2 w-full sm:w-auto"
+          onClick={handleNewGame}
+        >
           <RotateCcw className="h-4 w-4" />
-          New Game
+          {t('nav.newGame')}
         </Button>
       </header>
 
-      {/* Main Game Layout */}
-      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-4 gap-6">
-        {/* Left Sidebar - Game Status */}
-        <div className="lg:col-span-1 order-2 lg:order-1">
+      {/* Main Game Layout - Responsive Grid */}
+      <div className="max-w-7xl mx-auto">
+        {/* Mobile Layout */}
+        <div className="block lg:hidden space-y-4">
+          {/* Game Status - Top on Mobile */}
           <GameStatus 
-            currentPlayer={currentPlayer}
-            gameStatus={gameStatus}
-            moveCount={1}
+            currentPlayer={gameState.currentPlayer}
+            gameStatus={gameState.gameStatus}
+            moveCount={gameState.moveCount}
           />
-        </div>
-
-        {/* Center - Chess Board */}
-        <div className="lg:col-span-2 order-1 lg:order-2 flex justify-center">
-          <ChessBoard onPieceClick={handlePieceClick} size="large" />
-        </div>
-
-        {/* Right Sidebar - Game Controls */}
-        <div className="lg:col-span-1 order-3">
+          
+          {/* Chess Board - Center on Mobile */}
+          <div className="flex justify-center">
+            <ChessBoard 
+              position={gameState.board}
+              onPieceClick={handlePieceClick}
+              size="normal"
+              selectedSquare={gameState.selectedSquare}
+              lastMove={gameState.lastMove}
+            />
+          </div>
+          
+          {/* Game Controls - Bottom on Mobile */}
           <GameControls 
-            onNewGame={() => console.log("New game")}
+            onNewGame={handleNewGame}
             onResign={() => console.log("Resign")}
             onHint={() => console.log("Hint requested")}
           />
+        </div>
+
+        {/* Desktop Layout */}
+        <div className="hidden lg:grid lg:grid-cols-4 gap-6">
+          {/* Left Sidebar - Game Status */}
+          <div className="lg:col-span-1">
+            <GameStatus 
+              currentPlayer={gameState.currentPlayer}
+              gameStatus={gameState.gameStatus}
+              moveCount={gameState.moveCount}
+            />
+          </div>
+
+          {/* Center - Chess Board */}
+          <div className="lg:col-span-2 flex justify-center">
+            <ChessBoard 
+              position={gameState.board}
+              onPieceClick={handlePieceClick}
+              size="large"
+              selectedSquare={gameState.selectedSquare}
+              lastMove={gameState.lastMove}
+            />
+          </div>
+
+          {/* Right Sidebar - Game Controls */}
+          <div className="lg:col-span-1">
+            <GameControls 
+              onNewGame={handleNewGame}
+              onResign={() => console.log("Resign")}
+              onHint={() => console.log("Hint requested")}
+            />
+          </div>
         </div>
       </div>
 
@@ -83,7 +138,10 @@ const Game = () => {
         <MathChallenge
           onSuccess={handleMathSuccess}
           onFailure={handleMathFailure}
-          onClose={() => setShowMathChallenge(false)}
+          onClose={() => {
+            setShowMathChallenge(false);
+            setPendingMove(null);
+          }}
         />
       )}
     </div>
