@@ -121,17 +121,19 @@ const MainMenu = () => {
         </div>
 
         {/* Sentry Test Button */}
-        <div className="my-8 bg-yellow-100/70 border-l-4 border-yellow-500 text-yellow-800 dark:bg-yellow-900/30 dark:border-yellow-600 dark:text-yellow-200 p-4 rounded-md shadow-sm" role="alert">
-          <p className="font-bold">Developer Test Panel</p>
-          <p className="text-sm">Click the button below to test Sentry error tracking. This will throw a harmless error that should appear in your Sentry dashboard.</p>
-          <Button
-            variant="destructive"
-            className="mt-3"
-            onClick={() => { throw new Error("Sentry test error from Main Menu! This is a test."); }}
-          >
-            Trigger Sentry Error
-          </Button>
-        </div>
+        {process.env.NODE_ENV === 'development' && (
+          <div className="my-8 bg-yellow-100/70 border-l-4 border-yellow-500 text-yellow-800 dark:bg-yellow-900/30 dark:border-yellow-600 dark:text-yellow-200 p-4 rounded-md shadow-sm" role="alert">
+            <p className="font-bold">Developer Test Panel</p>
+            <p className="text-sm">Click the button below to test Sentry error tracking. This will throw a harmless error that should appear in your Sentry dashboard.</p>
+            <Button
+              variant="destructive"
+              className="mt-3"
+              onClick={() => { throw new Error("Sentry test error from Main Menu! This is a test."); }}
+            >
+              Trigger Sentry Error
+            </Button>
+          </div>
+        )}
 
         {/* Footer */}
         <div className="mt-12 sm:mt-16 text-muted-foreground/60 text-sm sm:text-base">

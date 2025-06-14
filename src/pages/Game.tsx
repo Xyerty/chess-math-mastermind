@@ -49,7 +49,7 @@ const Game = () => {
   return (
     <>
       <div className="flex flex-col h-full" style={{ paddingBottom: '70px' }}>
-        <div className="flex justify-center items-start p-2 sm:p-4 bg-gradient-to-b from-slate-50 to-transparent">
+        <div className="flex justify-center items-start p-2 sm:p-4 bg-gradient-to-b from-slate-50 to-slate-50/0 dark:from-slate-900/50 dark:to-slate-900/0">
           <ChessBoard 
             position={gameState.board}
             onPieceClick={handlePieceClick}
