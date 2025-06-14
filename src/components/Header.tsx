@@ -29,29 +29,29 @@ const Header = () => {
             case '/tutorial':
                  return t('mainMenu.howToPlay');
             default:
-                return 'Chess & Math';
+                return 'Mathematical Chess';
         }
     };
 
     const menuItems = [
-      { title: t('mainMenu.title'), path: "/", icon: Home },
+      { title: "Home", path: "/", icon: Home },
       { title: t('mainMenu.playGame'), path: "/game", icon: Sword },
       { title: t('mainMenu.howToPlay'), path: "/tutorial", icon: BookOpen },
-      { title:t('mainMenu.statistics'), path: "/statistics", icon: BarChart3 },
+      { title: t('mainMenu.statistics'), path: "/statistics", icon: BarChart3 },
       { title: t('mainMenu.settings'), path: "/settings", icon: Settings },
     ];
 
     return (
-        <header className="flex items-center justify-between p-2 sm:p-4 border-b bg-card shadow-sm sticky top-0 z-40 h-[65px]">
+        <header className="flex items-center justify-between p-4 border-b bg-card/95 backdrop-blur-sm shadow-sm sticky top-0 z-40 h-[65px]">
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                     <Button variant="outline" size="icon" aria-label="Open navigation menu">
                         <Menu className="h-5 w-5" />
                     </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="start">
+                <DropdownMenuContent align="start" className="w-56">
                     {menuItems.map(item => (
-                       <DropdownMenuItem key={item.path} onClick={() => navigate(item.path)} className="flex items-center gap-2 cursor-pointer">
+                       <DropdownMenuItem key={item.path} onClick={() => navigate(item.path)} className="flex items-center gap-3 cursor-pointer py-3">
                            <item.icon className="h-4 w-4 text-muted-foreground" />
                            <span>{item.title}</span>
                        </DropdownMenuItem>

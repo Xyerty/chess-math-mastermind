@@ -21,6 +21,7 @@ import Statistics from "./pages/Statistics";
 import NotFound from "./pages/NotFound";
 import AppLayout from "./components/AppLayout";
 import AuthPage from "./pages/Auth";
+import ProtectedRoute from "./components/ProtectedRoute";
 import FloatingAuthStatus from "./components/FloatingAuthStatus";
 
 const queryClient = new QueryClient();
@@ -43,18 +44,43 @@ const App: React.FC = () => {
                       <BrowserRouter>
                         <FloatingAuthStatus />
                         <SentryRoutes>
-                          <Route path="/" element={<MainMenu />} />
+                          {/* Public route for authentication */}
                           <Route path="/auth" element={<AuthPage />} />
                           
-                          {/* Routes with the new shared layout */}
+                          {/* Protected routes - require authentication */}
+                          <Route path="/" element={
+                            <ProtectedRoute>
+                              <MainMenu />
+                            </ProtectedRoute>
+                          } />
+                          
+                          {/* Routes with the shared layout - all protected */}
                           <Route element={<AppLayout />}>
-                            <Route path="/game" element={<Game />} />
-                            <Route path="/settings" element={<Settings />} />
-                            <Route path="/statistics" element={<Statistics />} />
+                            <Route path="/game" element={
+                              <ProtectedRoute>
+                                <Game />
+                              </ProtectedRoute>
+                            } />
+                            <Route path="/settings" element={
+                              <ProtectedRoute>
+                                <Settings />
+                              </ProtectedRoute>
+                            } />
+                            <Route path="/statistics" element={
+                              <ProtectedRoute>
+                                <Statistics />
+                              </ProtectedRoute>
+                            } />
                           </Route>
 
-                          {/* Routes without the new layout (due to file restrictions) */}
-                          <Route path="/tutorial" element={<Tutorial />} />
+                          {/* Tutorial without layout but still protected */}
+                          <Route path="/tutorial" element={
+                            <ProtectedRoute>
+                              <Tutorial />
+                            </ProtectedRoute>
+                          } />
+                          
+                          {/* 404 page */}
                           <Route path="*" element={<NotFound />} />
                         </SentryRoutes>
                       </BrowserRouter>
