@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Clock, User, Trophy, Target } from "lucide-react";
@@ -46,7 +45,7 @@ const GameStatus: React.FC<GameStatusProps> = ({
   };
 
   return (
-    <div className="space-y-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
       {/* Current Turn */}
       <Card>
         <CardHeader className="pb-3">

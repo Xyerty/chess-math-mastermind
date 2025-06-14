@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -30,56 +29,52 @@ const MathChallenge: React.FC<MathChallengeProps> = ({
 
   // Generate math problem based on difficulty
   const generateProblem = () => {
-    let a, b, operation, question, answer;
-    
+    let question = '';
+    let answer = 0;
+
     switch (difficulty) {
-      case 'easy':
-        a = Math.floor(Math.random() * 10) + 1;
-        b = Math.floor(Math.random() * 10) + 1;
-        operation = Math.random() > 0.5 ? '+' : '-';
-        if (operation === '+') {
+      case 'easy': {
+        const a = Math.floor(Math.random() * 20) + 1;
+        const b = Math.floor(Math.random() * 20) + 1;
+        const op = Math.random() > 0.5 ? '+' : '-';
+        if (op === '+') {
           question = `${a} + ${b}`;
           answer = a + b;
         } else {
-          // Ensure positive result for subtraction
-          if (a < b) [a, b] = [b, a];
-          question = `${a} - ${b}`;
-          answer = a - b;
+          question = `${Math.max(a, b)} - ${Math.min(a, b)}`;
+          answer = Math.max(a, b) - Math.min(a, b);
         }
         break;
-        
-      case 'medium':
-        a = Math.floor(Math.random() * 12) + 1;
-        b = Math.floor(Math.random() * 12) + 1;
-        operation = ['×', '÷'][Math.floor(Math.random() * 2)];
-        if (operation === '×') {
-          question = `${a} × ${b}`;
-          answer = a * b;
+      }
+      case 'medium': {
+        const a = Math.floor(Math.random() * 15) + 1;
+        const b = Math.floor(Math.random() * 10) + 2;
+        const c = Math.floor(Math.random() * 10) + 1;
+        const op = ['×', '÷'][Math.floor(Math.random() * 2)];
+        if (op === '×') {
+          question = `${a} × ${b} + ${c}`;
+          answer = a * b + c;
         } else {
-          // Ensure clean division
-          answer = Math.floor(Math.random() * 12) + 1;
-          a = answer * b;
-          question = `${a} ÷ ${b}`;
+          const product = (Math.floor(Math.random() * 10) + 2) * b; // Ensure clean division
+          question = `${product} ÷ ${b} - ${c}`;
+          answer = product / b - c;
         }
         break;
-        
-      case 'hard':
-        a = Math.floor(Math.random() * 15) + 5;
-        b = Math.floor(Math.random() * 15) + 5;
-        const operations = ['+', '-', '×'];
-        operation = operations[Math.floor(Math.random() * operations.length)];
-        if (operation === '+') {
-          question = `${a} + ${b}`;
-          answer = a + b;
-        } else if (operation === '-') {
-          if (a < b) [a, b] = [b, a];
-          question = `${a} - ${b}`;
-          answer = a - b;
+      }
+      case 'hard': {
+        const a = Math.floor(Math.random() * 10) + 2;
+        const b = Math.floor(Math.random() * 10) + 2;
+        const c = Math.floor(Math.random() * 5) + 2;
+        const op = Math.random();
+        if (op < 0.5) {
+          question = `(${a} + ${b}) × ${c}`;
+          answer = (a + b) * c;
         } else {
-          question = `${a} × ${b}`;
-          answer = a * b;
+          question = `${a} × ${b} - ${c}`;
+          answer = a * b - c;
         }
         break;
+      }
     }
     
     setProblem({ question, answer });

@@ -7,6 +7,7 @@ import MathChallenge from "../components/MathChallenge";
 import BottomActionMenu from "../components/BottomActionMenu";
 import { useDifficulty } from "../contexts/DifficultyContext";
 import { useSettings } from "../contexts/SettingsContext";
+import MoveHistory from "../components/MoveHistory";
 
 const Game = () => {
   const { t } = useLanguage();
@@ -62,13 +63,18 @@ const Game = () => {
           />
         </div>
 
-        <div className="p-4">
-          <div className="max-w-2xl mx-auto w-full">
-            <GameStatus 
-              currentPlayer={gameState.currentPlayer}
-              gameStatus={gameState.gameStatus}
-              moveCount={gameState.moveCount}
-            />
+        <div className="p-4 flex-grow overflow-y-auto">
+          <div className="max-w-6xl mx-auto w-full grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2">
+              <GameStatus 
+                currentPlayer={gameState.currentPlayer}
+                gameStatus={gameState.gameStatus}
+                moveCount={gameState.moveCount}
+              />
+            </div>
+            <div className="lg:col-span-1">
+              <MoveHistory moves={gameState.moveHistory} />
+            </div>
           </div>
         </div>
       </div>
