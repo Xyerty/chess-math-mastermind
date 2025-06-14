@@ -1,6 +1,7 @@
 
 import React from 'react';
-import * as testingLibrary from '@testing-library/react';
+import { render } from '@testing-library/react';
+import { screen, fireEvent } from '@testing-library/dom';
 import '@testing-library/jest-dom';
 import BottomActionMenu from './BottomActionMenu';
 
@@ -20,7 +21,7 @@ jest.mock('../contexts/LanguageContext', () => ({
 
 describe('BottomActionMenu', () => {
   it('renders all buttons', () => {
-    testingLibrary.render(
+    render(
       <BottomActionMenu
         onNewGame={() => {}}
         onResign={() => {}}
@@ -28,9 +29,9 @@ describe('BottomActionMenu', () => {
       />
     );
 
-    expect(testingLibrary.screen.getByText('New Game')).toBeInTheDocument();
-    expect(testingLibrary.screen.getByText('Get Hint')).toBeInTheDocument();
-    expect(testingLibrary.screen.getByText('Resign')).toBeInTheDocument();
+    expect(screen.getByText('New Game')).toBeInTheDocument();
+    expect(screen.getByText('Get Hint')).toBeInTheDocument();
+    expect(screen.getByText('Resign')).toBeInTheDocument();
   });
 
   it('calls the correct handlers on click', () => {
@@ -38,7 +39,7 @@ describe('BottomActionMenu', () => {
     const handleResign = jest.fn();
     const handleHint = jest.fn();
 
-    testingLibrary.render(
+    render(
       <BottomActionMenu
         onNewGame={handleNewGame}
         onResign={handleResign}
@@ -46,13 +47,13 @@ describe('BottomActionMenu', () => {
       />
     );
 
-    testingLibrary.fireEvent.click(testingLibrary.screen.getByText('New Game'));
+    fireEvent.click(screen.getByText('New Game'));
     expect(handleNewGame).toHaveBeenCalledTimes(1);
 
-    testingLibrary.fireEvent.click(testingLibrary.screen.getByText('Get Hint'));
+    fireEvent.click(screen.getByText('Get Hint'));
     expect(handleHint).toHaveBeenCalledTimes(1);
     
-    testingLibrary.fireEvent.click(testingLibrary.screen.getByText('Resign'));
+    fireEvent.click(screen.getByText('Resign'));
     expect(handleResign).toHaveBeenCalledTimes(1);
   });
 });
