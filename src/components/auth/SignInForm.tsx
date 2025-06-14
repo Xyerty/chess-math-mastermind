@@ -86,6 +86,42 @@ export const SignInForm = ({ setLoading, setError, loading }: SignInFormProps) =
       setLoading(false);
     }
   };
+
+  const handleMagicLinkSignIn = async () => {
+    setError('');
+    if (!validateEmail(email)) {
+      setError('Please enter a valid email to receive a login link.');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      cleanupAuthState();
+
+      const { error } = await supabase.auth.signInWithOtp({
+        email: email.trim(),
+        options: {
+          emailRedirectTo: `${window.location.origin}/`,
+        },
+      });
+
+      if (error) {
+        console.error('Magic link error:', error);
+        setError(error.message || 'Failed to send magic link.');
+        toast.error(error.message || 'Failed to send magic link.');
+      } else {
+        setPassword('');
+        setError('');
+        toast.success('Login link sent! Please check your email.');
+      }
+    } catch (err: any) {
+      console.error('Unexpected magic link error:', err);
+      setError('An unexpected error occurred. Please try again.');
+      toast.error('An unexpected error occurred. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
   
   return (
     <>
@@ -132,6 +168,7 @@ export const SignInForm = ({ setLoading, setError, loading }: SignInFormProps) =
               variant="link"
               className="p-0 h-auto text-sm"
               onClick={() => setIsResetDialogOpen(true)}
+              disabled={loading}
             >
               Forgot your password?
             </Button>
@@ -142,6 +179,28 @@ export const SignInForm = ({ setLoading, setError, loading }: SignInFormProps) =
           {loading ? 'Signing in...' : 'Sign In'}
         </Button>
       </form>
+
+      <div className="relative my-4">
+        <div className="absolute inset-0 flex items-center">
+          <span className="w-full border-t" />
+        </div>
+        <div className="relative flex justify-center text-xs uppercase">
+          <span className="bg-background px-2 text-muted-foreground">
+            Or
+          </span>
+        </div>
+      </div>
+
+      <Button
+        type="button"
+        variant="outline"
+        className="w-full"
+        onClick={handleMagicLinkSignIn}
+        disabled={loading || !email}
+      >
+        {loading ? 'Sending link...' : 'Email me a login link'}
+      </Button>
+
       <PasswordResetDialog open={isResetDialogOpen} onOpenChange={setIsResetDialogOpen} />
     </>
   );

@@ -1,4 +1,3 @@
-
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
@@ -9,7 +8,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PasswordUpdateForm } from '@/components/auth/PasswordUpdateForm';
 import { SignInForm } from '@/components/auth/SignInForm';
 import { SignUpForm } from '@/components/auth/SignUpForm';
-import { GoogleAuthButton } from '@/components/auth/GoogleAuthButton';
 
 const AuthPage = () => {
   const navigate = useNavigate();
@@ -63,23 +61,6 @@ const AuthPage = () => {
               <SignUpForm setLoading={setLoading} setError={setError} loading={loading} />
             </TabsContent>
           </Tabs>
-          
-          <div className="mt-6">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t" />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-background px-2 text-muted-foreground">
-                  Or continue with
-                </span>
-              </div>
-            </div>
-            
-            <div className="mt-4">
-              <GoogleAuthButton loading={loading} setError={setError} />
-            </div>
-          </div>
         </CardContent>
       </Card>
     </div>
