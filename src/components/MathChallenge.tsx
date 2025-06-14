@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,7 +23,6 @@ const MathChallenge: React.FC<MathChallengeProps> = ({
   const { t } = useLanguage();
   const [problem, setProblem] = useState<{question: string, answer: number}>({question: '', answer: 0});
   const [userAnswer, setUserAnswer] = useState('');
-  const [timeLeft, setTimeLeft] = useState(timeLimit);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const isMounted = useRef(true);
 
@@ -159,10 +157,12 @@ const MathChallenge: React.FC<MathChallengeProps> = ({
           {/* Answer Input */}
           <div className="space-y-4">
             <Input
-              type="number"
+              type="text"
+              inputMode="numeric"
+              pattern="[0-9]*"
               placeholder={t('math.enterAnswer')}
               value={userAnswer}
-              onChange={(e) => setUserAnswer(e.target.value)}
+              onChange={(e) => setUserAnswer(e.target.value.replace(/[^0-9-]/g, ''))}
               onKeyPress={handleKeyPress}
               className="text-center text-xl font-semibold h-12"
               autoFocus
