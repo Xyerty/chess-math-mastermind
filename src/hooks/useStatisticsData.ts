@@ -1,4 +1,3 @@
-
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -32,6 +31,21 @@ const MOCK_DATA = {
   ],
 };
 
+interface GameStatistics {
+    user_id: string;
+    total_games: number;
+    wins: number;
+    losses: number;
+    draws: number;
+    win_rate: number;
+    total_math_problems: number;
+    correct_math_problems: number;
+    math_accuracy: number;
+    avg_solve_time_s: number | null;
+    best_solve_time_s: number | null;
+    updated_at: string | null;
+}
+
 export const useStatisticsData = () => {
   const { user } = useAuth();
 
@@ -40,25 +54,27 @@ export const useStatisticsData = () => {
       .from('game_statistics')
       .select('*')
       .eq('user_id', userId)
-      .single();
+      .single<GameStatistics>();
 
     if (error) {
       console.error("Error fetching statistics:", error.message);
-      throw new Error(error.message);
+      // Let's not throw here, but return null so the UI can handle it gracefully.
+      return null;
     }
 
     if (!stats) return null;
     
     const totalGames = stats.total_games ?? 0;
     const totalMathProblems = stats.total_math_problems ?? 0;
+    const correctMathProblems = stats.correct_math_problems ?? 0;
 
     return {
       summary: {
         wins: stats.wins ?? 0,
         losses: stats.losses ?? 0,
         draws: stats.draws ?? 0,
-        mathCorrect: stats.correct_math_problems ?? 0,
-        mathIncorrect: totalMathProblems - (stats.correct_math_problems ?? 0),
+        mathCorrect: correctMathProblems,
+        mathIncorrect: totalMathProblems - correctMathProblems,
         avgSolveTime: stats.avg_solve_time_s ?? 0,
         bestSolveTime: stats.best_solve_time_s ?? 0,
         totalGames,
@@ -86,9 +102,11 @@ export const useStatisticsData = () => {
     enabled: !!user,
   });
 
-  if (isLoading || !data) {
+  if (isLoading) {
+    // Return a loading state or null to be handled by the component
     return null;
   }
-
+  
+  // The useQuery will return data as null if fetching failed or user is not logged in.
   return data;
 };

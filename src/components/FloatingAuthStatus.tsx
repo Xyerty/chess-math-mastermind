@@ -26,7 +26,7 @@ const FloatingAuthStatus = () => {
             <AvatarImage src={profile?.avatar_url ?? undefined} alt={profile?.username ?? 'User'} />
             <AvatarFallback>{profile?.username?.[0].toUpperCase() ?? <UserIcon size={20} />}</AvatarFallback>
           </Avatar>
-          <span className="font-semibold hidden sm:inline">{profile?.username}</span>
+          <span className="font-semibold hidden sm:inline">{profile?.username ?? 'User'}</span>
           <Button variant="ghost" size="icon" onClick={signOut} aria-label="Sign out">
             <LogOut className="h-5 w-5" />
           </Button>
