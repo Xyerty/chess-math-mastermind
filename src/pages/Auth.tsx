@@ -1,6 +1,4 @@
 import { supabase } from '@/integrations/supabase/client';
-import { Auth } from '@supabase/auth-ui-react';
-import { ThemeSupa } from '@supabase/auth-ui-shared';
 import { useTheme } from 'next-themes';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
@@ -296,6 +294,26 @@ const AuthPage = () => {
     }
   };
 
+  const handleGoogleSignIn = async () => {
+    setError('');
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${window.location.origin}/`,
+        queryParams: {
+          access_type: 'offline',
+          prompt: 'consent',
+        },
+      },
+    });
+
+    if (error) {
+      console.error('Google Sign In error:', error);
+      setError(error.message);
+      toast.error(error.message || 'Failed to start Google sign-in process.');
+    }
+  };
+
   if (view === 'update_password') {
     return (
       <div className="flex justify-center items-center min-h-screen bg-background p-4">
@@ -526,15 +544,9 @@ const AuthPage = () => {
             </div>
             
             <div className="mt-4">
-              <Auth
-                supabaseClient={supabase}
-                appearance={{ theme: ThemeSupa }}
-                theme={theme === 'dark' ? 'dark' : 'default'}
-                providers={['google']}
-                redirectTo={`${window.location.origin}/`}
-                onlyThirdPartyProviders
-                showLinks={false}
-              />
+              <Button variant="outline" className="w-full" onClick={handleGoogleSignIn} disabled={loading}>
+                Continue with Google
+              </Button>
             </div>
           </div>
         </CardContent>
