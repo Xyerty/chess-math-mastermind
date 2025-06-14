@@ -11,6 +11,7 @@ import { useDifficulty } from "../contexts/DifficultyContext";
 import { useGameMode } from "../contexts/GameModeContext";
 import MoveHistory from "../components/MoveHistory";
 import GameEndModal from "../components/GameEndModal";
+import MathChallenge from "../components/MathChallenge";
 import { useNavigate } from "react-router-dom";
 import { Player } from "../features/chess/types";
 
@@ -34,7 +35,13 @@ const Game = () => {
     maxHints,
     canRequestHint,
     requestHint,
-    clearHint
+    clearHint,
+    // Math challenge properties
+    mathState,
+    completeMathChallenge,
+    cancelMathChallenge,
+    executePendingMove,
+    mathAccuracy
   } = useChessGame(aiDifficulty, gameMode);
 
   const [showHint, setShowHint] = useState(false);
@@ -48,6 +55,9 @@ const Game = () => {
         if (!moveSuccessful) {
           clearSelection();
         }
+      } else if (result?.type === 'math_challenge') {
+        // Math challenge is automatically started by the move handler
+        console.log('Math challenge triggered for move:', result.payload);
       }
     } catch (error) {
       console.error('Error handling chess board click:', error);
@@ -76,6 +86,37 @@ const Game = () => {
   const handleCloseHint = () => {
     setShowHint(false);
     clearHint();
+  };
+
+  const handleMathSuccess = () => {
+    try {
+      const moveExecuted = executePendingMove();
+      completeMathChallenge(true);
+      if (!moveExecuted) {
+        console.error('Failed to execute pending move after math success');
+      }
+    } catch (error) {
+      console.error('Error executing move after math success:', error);
+      completeMathChallenge(false);
+    }
+  };
+
+  const handleMathFailure = () => {
+    try {
+      completeMathChallenge(false);
+      clearSelection(); // Clear selection since move failed
+    } catch (error) {
+      console.error('Error handling math failure:', error);
+    }
+  };
+
+  const handleMathCancel = () => {
+    try {
+      cancelMathChallenge();
+      clearSelection();
+    } catch (error) {
+      console.error('Error canceling math challenge:', error);
+    }
   };
 
   const handleGoHome = () => {
@@ -117,6 +158,27 @@ const Game = () => {
                 aiDifficulty={aiDifficulty}
                 usingPythonEngine={usingPythonEngine}
               />
+
+              {/* Math Master Mode Stats */}
+              {gameMode === 'math-master' && (
+                <div className="mt-4 p-4 bg-muted/50 rounded-lg">
+                  <h3 className="text-sm font-semibold mb-2">Math Challenge Stats</h3>
+                  <div className="grid grid-cols-3 gap-4 text-sm">
+                    <div>
+                      <div className="text-muted-foreground">Accuracy</div>
+                      <div className="font-semibold">{mathAccuracy}%</div>
+                    </div>
+                    <div>
+                      <div className="text-muted-foreground">Correct</div>
+                      <div className="font-semibold">{mathState.correctAnswers}</div>
+                    </div>
+                    <div>
+                      <div className="text-muted-foreground">Streak</div>
+                      <div className="font-semibold">{mathState.streak}</div>
+                    </div>
+                  </div>
+                </div>
+              )}
               
               {/* Hint Display */}
               {showHint && currentHint && (
@@ -151,6 +213,17 @@ const Game = () => {
         onNewGame={handleNewGame}
         onGoHome={handleGoHome}
       />
+
+      {/* Math Challenge Modal */}
+      {mathState.isActive && (
+        <MathChallenge
+          onSuccess={handleMathSuccess}
+          onFailure={handleMathFailure}
+          onClose={handleMathCancel}
+          difficulty={mathState.difficulty}
+          timeLimit={gameMode === 'speed' ? 15 : 30}
+        />
+      )}
     </GameErrorBoundary>
   );
 };

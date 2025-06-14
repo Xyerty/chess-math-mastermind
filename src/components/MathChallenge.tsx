@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Clock, CheckCircle, XCircle } from "lucide-react";
+import { Clock, CheckCircle, XCircle, Calculator } from "lucide-react";
 import { useLanguage } from "../contexts/LanguageContext";
 
 interface MathChallengeProps {
@@ -14,6 +14,15 @@ interface MathChallengeProps {
   timeLimit?: number;
 }
 
+type ProblemType = 'arithmetic' | 'algebraic' | 'mixed';
+
+interface MathProblem {
+  question: string;
+  answer: number;
+  type: ProblemType;
+  explanation?: string;
+}
+
 const MathChallenge: React.FC<MathChallengeProps> = ({
   onSuccess,
   onFailure,
@@ -22,69 +31,126 @@ const MathChallenge: React.FC<MathChallengeProps> = ({
   timeLimit = 30
 }) => {
   const { t } = useLanguage();
-  const [problem, setProblem] = useState<{question: string, answer: number}>({question: '', answer: 0});
+  const [problem, setProblem] = useState<MathProblem>({ question: '', answer: 0, type: 'arithmetic' });
   const [userAnswer, setUserAnswer] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const isMounted = useRef(true);
   const [timeLeft, setTimeLeft] = useState(timeLimit);
 
-  // Generate math problem based on difficulty
-  const generateProblem = () => {
-    let question = '';
-    let answer = 0;
+  // Generate math problem based on difficulty with improved variety
+  const generateProblem = (): MathProblem => {
+    const problemTypes: ProblemType[] = difficulty === 'easy' ? ['arithmetic'] : ['arithmetic', 'algebraic', 'mixed'];
+    const selectedType = problemTypes[Math.floor(Math.random() * problemTypes.length)];
 
     switch (difficulty) {
       case 'easy': {
-        const a = Math.floor(Math.random() * 20) + 1;
-        const b = Math.floor(Math.random() * 20) + 1;
-        const op = Math.random() > 0.5 ? '+' : '-';
+        const operations = ['+', '-', '×'];
+        const op = operations[Math.floor(Math.random() * operations.length)];
+        const a = Math.floor(Math.random() * 15) + 1;
+        const b = Math.floor(Math.random() * 15) + 1;
+        
+        let question = '';
+        let answer = 0;
+        
         if (op === '+') {
           question = `${a} + ${b}`;
           answer = a + b;
+        } else if (op === '-') {
+          const [larger, smaller] = [Math.max(a, b), Math.min(a, b)];
+          question = `${larger} - ${smaller}`;
+          answer = larger - smaller;
         } else {
-          question = `${Math.max(a, b)} - ${Math.min(a, b)}`;
-          answer = Math.max(a, b) - Math.min(a, b);
+          question = `${a} × ${b}`;
+          answer = a * b;
         }
-        break;
+        
+        return { question, answer, type: 'arithmetic' };
       }
+
       case 'medium': {
-        const a = Math.floor(Math.random() * 15) + 1;
-        const b = Math.floor(Math.random() * 10) + 2;
-        const c = Math.floor(Math.random() * 10) + 1;
-        const op = ['×', '÷'][Math.floor(Math.random() * 2)];
-        if (op === '×') {
-          question = `${a} × ${b} + ${c}`;
-          answer = a * b + c;
+        if (selectedType === 'algebraic') {
+          // Simple algebraic problems: x + a = b, solve for x
+          const a = Math.floor(Math.random() * 20) + 1;
+          const x = Math.floor(Math.random() * 15) + 1;
+          const b = x + a;
+          return {
+            question: `x + ${a} = ${b}`,
+            answer: x,
+            type: 'algebraic',
+            explanation: `x = ${b} - ${a} = ${x}`
+          };
         } else {
-          const product = (Math.floor(Math.random() * 10) + 2) * b; // Ensure clean division
-          question = `${product} ÷ ${b} - ${c}`;
-          answer = product / b - c;
+          // Mixed operations
+          const a = Math.floor(Math.random() * 12) + 2;
+          const b = Math.floor(Math.random() * 8) + 2;
+          const c = Math.floor(Math.random() * 10) + 1;
+          const operations = ['×+', '×-', '÷+', '÷-'];
+          const op = operations[Math.floor(Math.random() * operations.length)];
+          
+          let question = '';
+          let answer = 0;
+          
+          if (op === '×+') {
+            question = `${a} × ${b} + ${c}`;
+            answer = a * b + c;
+          } else if (op === '×-') {
+            question = `${a} × ${b} - ${c}`;
+            answer = a * b - c;
+          } else if (op === '÷+') {
+            const dividend = a * b; // Ensure clean division
+            question = `${dividend} ÷ ${b} + ${c}`;
+            answer = dividend / b + c;
+          } else {
+            const dividend = a * b;
+            question = `${dividend} ÷ ${b} - ${c}`;
+            answer = dividend / b - c;
+          }
+          
+          return { question, answer, type: 'mixed' };
         }
-        break;
       }
+
       case 'hard': {
-        const a = Math.floor(Math.random() * 10) + 2;
-        const b = Math.floor(Math.random() * 10) + 2;
-        const c = Math.floor(Math.random() * 5) + 2;
-        const op = Math.random();
-        if (op < 0.5) {
-          question = `(${a} + ${b}) × ${c}`;
-          answer = (a + b) * c;
+        if (selectedType === 'algebraic') {
+          // More complex algebra: ax + b = c, solve for x
+          const a = Math.floor(Math.random() * 8) + 2;
+          const x = Math.floor(Math.random() * 10) + 1;
+          const b = Math.floor(Math.random() * 15) + 1;
+          const c = a * x + b;
+          return {
+            question: `${a}x + ${b} = ${c}`,
+            answer: x,
+            type: 'algebraic',
+            explanation: `x = (${c} - ${b}) ÷ ${a} = ${x}`
+          };
         } else {
-          question = `${a} × ${b} - ${c}`;
-          answer = a * b - c;
+          // Complex mixed operations with parentheses
+          const a = Math.floor(Math.random() * 8) + 2;
+          const b = Math.floor(Math.random() * 8) + 2;
+          const c = Math.floor(Math.random() * 6) + 2;
+          const d = Math.floor(Math.random() * 5) + 1;
+          
+          const patterns = [
+            { q: `(${a} + ${b}) × ${c} - ${d}`, a: (a + b) * c - d },
+            { q: `${a} × (${b} + ${c}) - ${d}`, a: a * (b + c) - d },
+            { q: `(${a} × ${b}) ÷ ${c} + ${d}`, a: Math.floor((a * b) / c) + d },
+            { q: `${a}² - ${b}`, a: a * a - b }
+          ];
+          
+          const selected = patterns[Math.floor(Math.random() * patterns.length)];
+          return { question: selected.q, answer: selected.a, type: 'mixed' };
         }
-        break;
       }
+
+      default:
+        return { question: '2 + 2', answer: 4, type: 'arithmetic' };
     }
-    
-    setProblem({ question, answer });
   };
 
   // Timer countdown
   useEffect(() => {
     isMounted.current = true;
-    generateProblem();
+    setProblem(generateProblem());
     
     if (timeLimit === Infinity) return;
 
@@ -105,13 +171,13 @@ const MathChallenge: React.FC<MathChallengeProps> = ({
       isMounted.current = false;
       clearInterval(timer);
     };
-  }, []);
+  }, [timeLimit, onFailure]);
 
   const handleSubmit = () => {
     if (isSubmitting) return;
     
     setIsSubmitting(true);
-    const numericAnswer = parseInt(userAnswer);
+    const numericAnswer = parseInt(userAnswer.trim());
     
     setTimeout(() => {
       if (numericAnswer === problem.answer) {
@@ -128,11 +194,21 @@ const MathChallenge: React.FC<MathChallengeProps> = ({
     }
   };
 
+  const getDifficultyColor = () => {
+    switch (difficulty) {
+      case 'easy': return 'text-green-600';
+      case 'medium': return 'text-yellow-600';
+      case 'hard': return 'text-red-600';
+      default: return 'text-primary';
+    }
+  };
+
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <Card className="w-full max-w-sm animate-scale-in">
+      <Card className="w-full max-w-md animate-scale-in">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl flex items-center justify-center gap-2">
+            <Calculator className="h-6 w-6" />
             <span>{t('math.title')}</span>
             {timeLimit !== Infinity && (
               <div className="flex items-center gap-1 text-lg">
@@ -147,9 +223,12 @@ const MathChallenge: React.FC<MathChallengeProps> = ({
           {/* Problem */}
           <div className="text-center">
             <p className="text-lg text-muted-foreground mb-4">{t('math.instruction')}</p>
-            <div className="text-4xl font-bold text-primary bg-accent/20 py-4 px-6 rounded-lg">
+            <div className="text-4xl font-bold text-primary bg-accent/20 py-6 px-6 rounded-lg border-2 border-accent/30">
               {problem.question} = ?
             </div>
+            {problem.type === 'algebraic' && (
+              <p className="text-sm text-muted-foreground mt-2">Solve for x (enter number only)</p>
+            )}
           </div>
 
           {/* Answer Input */}
@@ -157,7 +236,7 @@ const MathChallenge: React.FC<MathChallengeProps> = ({
             <Input
               type="text"
               inputMode="numeric"
-              pattern="[0-9]*"
+              pattern="[0-9-]*"
               placeholder={t('math.enterAnswer')}
               value={userAnswer}
               onChange={(e) => setUserAnswer(e.target.value.replace(/[^0-9-]/g, ''))}
@@ -199,9 +278,14 @@ const MathChallenge: React.FC<MathChallengeProps> = ({
             </div>
           </div>
 
-          {/* Difficulty Indicator */}
-          <div className="text-center text-sm text-muted-foreground">
-            {t('math.difficulty')}: <span className="capitalize font-semibold">{t(`math.${difficulty}`)}</span>
+          {/* Difficulty and Type Indicator */}
+          <div className="text-center text-sm space-y-1">
+            <div className="text-muted-foreground">
+              {t('math.difficulty')}: <span className={`capitalize font-semibold ${getDifficultyColor()}`}>{t(`math.${difficulty}`)}</span>
+            </div>
+            <div className="text-muted-foreground">
+              Type: <span className="capitalize font-medium">{problem.type}</span>
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -210,4 +294,3 @@ const MathChallenge: React.FC<MathChallengeProps> = ({
 };
 
 export default MathChallenge;
-

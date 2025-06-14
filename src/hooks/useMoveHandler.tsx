@@ -7,7 +7,8 @@ import { isKingInCheck, hasAnyValidMoves } from '../features/chess/utils/board';
 type HandleSquareClickResult = 
   | { type: 'selected'; payload: { row: number; col: number } }
   | { type: 'deselected' }
-  | { type: 'move_attempt'; payload: { from: { row: number; col: number }; to: { row: number; col: number } } };
+  | { type: 'move_attempt'; payload: { from: { row: number; col: number }; to: { row: number; col: number } } }
+  | { type: 'math_challenge'; payload: { from: { row: number; col: number }; to: { row: number; col: number } } };
 
 interface UseMoveHandlerProps {
   gameState: ChessGameState;
@@ -16,6 +17,7 @@ interface UseMoveHandlerProps {
   opponentType: 'ai' | 'human';
   playerColor: 'white' | 'black';
   isAIThinking: boolean;
+  onMathChallenge?: (from: { row: number; col: number }, to: { row: number; col: number }) => boolean;
 }
 
 export const useMoveHandler = ({
@@ -24,7 +26,8 @@ export const useMoveHandler = ({
   gameMode,
   opponentType,
   playerColor,
-  isAIThinking
+  isAIThinking,
+  onMathChallenge
 }: UseMoveHandlerProps) => {
   const makeMove = useCallback((from: { row: number; col: number }, to: { row: number; col: number }): boolean => {
     if (gameState.gameStatus !== 'playing' && gameState.gameStatus !== 'check') return false;
@@ -116,6 +119,13 @@ export const useMoveHandler = ({
         setGameState(prev => ({ ...prev, selectedSquare: null }));
         return { type: 'deselected' };
       } else {
+        // Check if this is math-master mode and should trigger math challenge
+        if (gameMode === 'math-master' && onMathChallenge) {
+          const mathTriggered = onMathChallenge(gameState.selectedSquare, { row, col });
+          if (mathTriggered) {
+            return { type: 'math_challenge', payload: { from: gameState.selectedSquare, to: { row, col } } };
+          }
+        }
         return { type: 'move_attempt', payload: { from: gameState.selectedSquare, to: { row, col } } };
       }
     } else {
@@ -125,7 +135,7 @@ export const useMoveHandler = ({
       }
     }
     return null;
-  }, [gameState.board, gameState.selectedSquare, gameState.currentPlayer, gameState.gameStatus, opponentType, playerColor, isAIThinking, setGameState]);
+  }, [gameState.board, gameState.selectedSquare, gameState.currentPlayer, gameState.gameStatus, gameMode, opponentType, playerColor, isAIThinking, setGameState, onMathChallenge]);
 
   return {
     makeMove,

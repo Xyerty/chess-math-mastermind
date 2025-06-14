@@ -6,6 +6,7 @@ import { useGameTimer } from './useGameTimer';
 import { useAIEngine } from './useAIEngine';
 import { useMoveHandler } from './useMoveHandler';
 import { useHint } from './useHint';
+import { useMathChallenge } from './useMathChallenge';
 
 export const useChessGame = (aiDifficulty: 'easy' | 'medium' | 'hard', gameMode: GameMode) => {
   const { opponentType, playerColor } = useOpponent();
@@ -33,6 +34,18 @@ export const useChessGame = (aiDifficulty: 'easy' | 'medium' | 'hard', gameMode:
   });
 
   const {
+    mathState,
+    startMathChallenge,
+    completeMathChallenge,
+    cancelMathChallenge,
+    resetMathStats,
+    accuracy,
+  } = useMathChallenge({
+    gameMode,
+    moveCount: gameState.moveCount,
+  });
+
+  const {
     makeMove,
     handleSquareClick,
   } = useMoveHandler({
@@ -41,7 +54,8 @@ export const useChessGame = (aiDifficulty: 'easy' | 'medium' | 'hard', gameMode:
     gameMode,
     opponentType,
     playerColor,
-    isAIThinking
+    isAIThinking,
+    onMathChallenge: startMathChallenge,
   });
 
   const {
@@ -63,6 +77,15 @@ export const useChessGame = (aiDifficulty: 'easy' | 'medium' | 'hard', gameMode:
   const handleResetGame = () => {
     resetGame();
     resetHints();
+    resetMathStats();
+  };
+
+  const executePendingMove = () => {
+    if (mathState.pendingMove) {
+      const success = makeMove(mathState.pendingMove.from, mathState.pendingMove.to);
+      return success;
+    }
+    return false;
   };
 
   return {
@@ -82,5 +105,11 @@ export const useChessGame = (aiDifficulty: 'easy' | 'medium' | 'hard', gameMode:
     canRequestHint,
     requestHint,
     clearHint,
+    // Math challenge functionality
+    mathState,
+    completeMathChallenge,
+    cancelMathChallenge,
+    executePendingMove,
+    mathAccuracy: accuracy,
   };
 };
