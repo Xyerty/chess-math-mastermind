@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -94,96 +95,21 @@
 }
 
 @layer utilities {
-  /* Enhanced Animations */
-  @keyframes fade-in {
-    0% {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    100% {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  @keyframes scale-in {
-    0% {
-      opacity: 0;
-      transform: scale(0.95);
-    }
-    100% {
-      opacity: 1;
-      transform: scale(1);
-    }
-  }
-
-  @keyframes slide-up {
-    0% {
-      opacity: 0;
-      transform: translateY(30px);
-    }
-    100% {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  @keyframes bounce-in {
-    0% {
-      opacity: 0;
-      transform: scale(0.3);
-    }
-    50% {
-      transform: scale(1.05);
-    }
-    70% {
-      transform: scale(0.9);
-    }
-    100% {
-      opacity: 1;
-      transform: scale(1);
-    }
-  }
-
-  .animate-fade-in {
-    animation: fade-in 0.6s ease-out;
-  }
-
-  .animate-scale-in {
-    animation: scale-in 0.4s ease-out;
-  }
-
-  .animate-slide-up {
-    animation: slide-up 0.5s ease-out;
-  }
-
-  .animate-bounce-in {
-    animation: bounce-in 0.6s ease-out;
-  }
-
   /* Responsive Touch Enhancements */
   .touch-target {
     @apply min-h-[44px] min-w-[44px];
   }
 
-  /* Mobile Optimizations */
-  @media (max-width: 640px) {
-    .animate-fade-in {
-      animation-duration: 0.4s;
-    }
-    
-    .animate-scale-in {
-      animation-duration: 0.3s;
-    }
-  }
-
   /* Reduced Motion Support */
   @media (prefers-reduced-motion: reduce) {
-    .animate-fade-in,
-    .animate-scale-in,
-    .animate-slide-up,
-    .animate-bounce-in {
-      animation: none;
+    *,
+    *::before,
+    *::after {
+      animation-duration: 1ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 1ms !important;
+      scroll-behavior: auto !important;
     }
   }
 }
+

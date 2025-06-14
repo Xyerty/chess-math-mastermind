@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -128,15 +129,15 @@ const MathChallenge: React.FC<MathChallengeProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <Card className="w-full max-w-md animate-scale-in">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <Card className="w-full max-w-sm animate-scale-in">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl flex items-center justify-center gap-2">
             <span>{t('math.title')}</span>
             {timeLimit !== Infinity && (
               <div className="flex items-center gap-1 text-lg">
                 <Clock className="h-5 w-5" />
-                <span className={timeLeft <= 10 ? 'text-red-500' : 'text-primary'}>{timeLeft}s</span>
+                <span className={timeLeft <= 10 ? 'text-destructive font-bold' : 'text-primary'}>{timeLeft}s</span>
               </div>
             )}
           </CardTitle>
@@ -209,3 +210,4 @@ const MathChallenge: React.FC<MathChallengeProps> = ({
 };
 
 export default MathChallenge;
+

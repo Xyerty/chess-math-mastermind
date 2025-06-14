@@ -22,9 +22,9 @@ const ChessBoard: React.FC<ChessBoardProps> = ({
   lastMove
 }) => {
   const boardSizeClass = 'w-full max-w-[90vmin] sm:max-w-[700px]';
-  const textSizeClass = 'text-3xl sm:text-4xl md:text-5xl';
-  const labelSizeClass = 'text-xs sm:text-base';
-  const labelHeightClass = 'h-10 sm:h-12 md:h-14 lg:h-16';
+  const textSizeClass = 'text-[34px] sm:text-4xl md:text-5xl';
+  const labelSizeClass = 'text-[10px] sm:text-xs md:text-sm';
+  const labelHeightClass = 'h-6 sm:h-8';
 
   const handleSquareClick = (row: number, col: number, piece: string | null) => {
     onPieceClick?.(row, col, piece);
@@ -37,10 +37,10 @@ const ChessBoard: React.FC<ChessBoardProps> = ({
   };
 
   return (
-    <div className="relative">
+    <div className="relative animate-fade-in">
       {/* Column Labels (a-h) - Top */}
-      <div className="flex justify-center mb-1 sm:mb-2">
-        <div className={`grid grid-cols-8 ${boardSizeClass} px-2 sm:px-4`}>
+      <div className="flex justify-center mb-1">
+        <div className={`grid grid-cols-8 ${boardSizeClass} px-1 sm:px-2`}>
           {['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'].map(letter => (
             <div key={letter} className={`text-center text-muted-foreground font-semibold ${labelSizeClass}`}>
               {letter}
@@ -53,7 +53,7 @@ const ChessBoard: React.FC<ChessBoardProps> = ({
         {/* Row Labels (8-1) - Left */}
         <div className="flex flex-col mr-1 sm:mr-2">
           {[8, 7, 6, 5, 4, 3, 2, 1].map(number => (
-            <div key={number} className={`flex items-center justify-center ${labelHeightClass} text-muted-foreground font-semibold ${labelSizeClass}`}>
+            <div key={number} className={`flex items-center justify-center ${labelHeightClass} text-muted-foreground font-semibold ${labelSizeClass} w-4 sm:w-6`}>
               {number}
             </div>
           ))}
@@ -103,7 +103,7 @@ const ChessBoard: React.FC<ChessBoardProps> = ({
         {/* Row Labels (8-1) - Right */}
         <div className="flex flex-col ml-1 sm:ml-2">
           {[8, 7, 6, 5, 4, 3, 2, 1].map(number => (
-            <div key={number} className={`flex items-center justify-center ${labelHeightClass} text-muted-foreground font-semibold ${labelSizeClass}`}>
+            <div key={number} className={`flex items-center justify-center ${labelHeightClass} text-muted-foreground font-semibold ${labelSizeClass} w-4 sm:w-6`}>
               {number}
             </div>
           ))}
@@ -111,8 +111,8 @@ const ChessBoard: React.FC<ChessBoardProps> = ({
       </div>
 
       {/* Column Labels (a-h) - Bottom */}
-      <div className="flex justify-center mt-1 sm:mt-2">
-        <div className={`grid grid-cols-8 ${boardSizeClass} px-2 sm:px-4`}>
+      <div className="flex justify-center mt-1">
+        <div className={`grid grid-cols-8 ${boardSizeClass} px-1 sm:px-2`}>
           {['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'].map(letter => (
             <div key={letter} className={`text-center text-muted-foreground font-semibold ${labelSizeClass}`}>
               {letter}
@@ -125,3 +125,4 @@ const ChessBoard: React.FC<ChessBoardProps> = ({
 };
 
 export default ChessBoard;
+

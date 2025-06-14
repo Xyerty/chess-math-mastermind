@@ -55,7 +55,7 @@ const Game = () => {
     setMathStats({ correct: 0, incorrect: 0 });
   };
   
-  const mathAccuracy = mathStats.correct + mathStats.incorrect === 0 ? 100 : Math.round((mathStats.correct / (mathStats.correct + mathStats.incorrect)) * 100);
+  const mathAccuracy = mathStats.correct + mathStats.incorrect === 0 ? 0 : Math.round((mathStats.correct / (mathStats.correct + mathStats.incorrect)) * 100);
 
   return (
     <>

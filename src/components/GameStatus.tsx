@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Clock, User, Trophy, Target, BrainCircuit } from "lucide-react";
 import { useLanguage } from "../contexts/LanguageContext";
 import { AIStats } from "../features/chess/types";
+import { Progress } from "@/components/ui/progress";
 
 interface GameStatusProps {
   currentPlayer: 'white' | 'black';
@@ -33,10 +34,10 @@ const GameStatus: React.FC<GameStatusProps> = ({
   const getStatusColor = () => {
     switch (gameStatus) {
       case 'check': return 'text-yellow-500';
-      case 'checkmate': return 'text-red-500';
-      case 'timeout': return 'text-red-500';
-      case 'stalemate': return 'text-gray-500';
-      default: return 'text-green-500';
+      case 'checkmate': return 'text-destructive';
+      case 'timeout': return 'text-destructive';
+      case 'stalemate': return 'text-muted-foreground';
+      default: return 'text-green-600 dark:text-green-500';
     }
   };
 
@@ -52,9 +53,9 @@ const GameStatus: React.FC<GameStatusProps> = ({
   };
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 animate-fade-in [animation-delay:200ms]">
       {/* Game Status */}
-      <Card>
+      <Card className="animate-fade-in [animation-delay:300ms]">
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-lg">
             <Trophy className="h-5 w-5" />
@@ -78,7 +79,7 @@ const GameStatus: React.FC<GameStatusProps> = ({
       </Card>
 
       {/* Math Accuracy */}
-      <Card>
+      <Card className="animate-fade-in [animation-delay:400ms]">
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-lg">
             <Target className="h-5 w-5" />
@@ -86,13 +87,8 @@ const GameStatus: React.FC<GameStatusProps> = ({
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center gap-2">
-            <div className="flex-1 bg-slate-200 dark:bg-slate-700 rounded-full h-3">
-              <div 
-                className="bg-green-500 h-3 rounded-full transition-all duration-500"
-                style={{ width: `${mathAccuracy}%` }}
-              />
-            </div>
+          <div className="flex items-center gap-3">
+            <Progress value={mathAccuracy} className="h-3" />
             <span className="font-semibold text-lg">{mathAccuracy}%</span>
           </div>
         </CardContent>
@@ -100,7 +96,7 @@ const GameStatus: React.FC<GameStatusProps> = ({
 
       {/* AI Stats Card */}
       {aiStats && (
-        <Card className="sm:col-span-2">
+        <Card className="sm:col-span-2 animate-fade-in [animation-delay:500ms]">
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2 text-lg">
               <BrainCircuit className="h-5 w-5" />
@@ -121,7 +117,7 @@ const GameStatus: React.FC<GameStatusProps> = ({
       )}
 
       {/* White Player Clock */}
-      <Card className={currentPlayer === 'white' && gameStatus === 'playing' ? 'ring-2 ring-primary' : ''}>
+      <Card className={`${currentPlayer === 'white' && gameStatus === 'playing' ? 'ring-2 ring-primary' : ''} animate-fade-in [animation-delay:600ms]`}>
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-lg">
             <User className="h-5 w-5" />
@@ -136,7 +132,7 @@ const GameStatus: React.FC<GameStatusProps> = ({
       </Card>
 
       {/* Black Player Clock */}
-      <Card className={currentPlayer === 'black' && gameStatus === 'playing' ? 'ring-2 ring-primary' : ''}>
+      <Card className={`${currentPlayer === 'black' && gameStatus === 'playing' ? 'ring-2 ring-primary' : ''} animate-fade-in [animation-delay:700ms]`}>
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-lg">
             <User className="h-5 w-5" />
