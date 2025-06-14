@@ -4,11 +4,14 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Eye, EyeOff } from 'lucide-react';
 import { toast } from 'sonner';
 import { validateEmail, validatePassword } from '@/lib/auth/validation';
 import { cleanupAuthState } from '@/lib/auth/utils';
 import { PasswordResetDialog } from './PasswordResetDialog';
+import { PasswordInput } from './PasswordInput';
+import { FormValidation } from './FormValidation';
+import { SignInInfoNote } from './SignInInfoNote';
+import { ForgotPasswordLink } from './ForgotPasswordLink';
 
 interface SignInFormProps {
   setLoading: (loading: boolean) => void;
@@ -19,7 +22,6 @@ interface SignInFormProps {
 export const SignInForm = ({ setLoading, setError, loading }: SignInFormProps) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
   const [isResetDialogOpen, setIsResetDialogOpen] = useState(false);
 
   const handleSignIn = async (e: React.FormEvent) => {
@@ -89,11 +91,8 @@ export const SignInForm = ({ setLoading, setError, loading }: SignInFormProps) =
   
   return (
     <>
-      <div className="mb-4 p-3 bg-muted/50 rounded-lg">
-        <p className="text-sm text-muted-foreground">
-          <strong>Note:</strong> If you don't have a password, use the magic link option above instead.
-        </p>
-      </div>
+      <SignInInfoNote />
+      <FormValidation error="" />
 
       <form onSubmit={handleSignIn} className="space-y-4">
         <div>
@@ -111,38 +110,18 @@ export const SignInForm = ({ setLoading, setError, loading }: SignInFormProps) =
         
         <div>
           <Label htmlFor="signin-password">Password</Label>
-          <div className="relative">
-            <Input
-              id="signin-password"
-              type={showPassword ? 'text' : 'password'}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter your password"
-              required
-              disabled={loading}
-            />
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8"
-              onClick={() => setShowPassword(!showPassword)}
-              disabled={loading}
-            >
-              {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-            </Button>
-          </div>
-          <div className="mt-2 text-right">
-            <Button 
-              type="button"
-              variant="link"
-              className="p-0 h-auto text-sm"
-              onClick={() => setIsResetDialogOpen(true)}
-              disabled={loading}
-            >
-              Forgot your password?
-            </Button>
-          </div>
+          <PasswordInput
+            id="signin-password"
+            value={password}
+            onChange={setPassword}
+            placeholder="Enter your password"
+            required
+            disabled={loading}
+          />
+          <ForgotPasswordLink 
+            onClick={() => setIsResetDialogOpen(true)}
+            disabled={loading}
+          />
         </div>
         
         <Button type="submit" className="w-full" disabled={loading}>
