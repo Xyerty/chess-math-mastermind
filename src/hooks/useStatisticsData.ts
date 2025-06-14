@@ -1,5 +1,7 @@
 
-import { useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 
 // In a real app, this would come from an API or local storage.
 const MOCK_DATA = {
@@ -31,31 +33,62 @@ const MOCK_DATA = {
 };
 
 export const useStatisticsData = () => {
-  const data = useMemo(() => {
-    const totalGames = MOCK_DATA.summary.wins + MOCK_DATA.summary.losses + MOCK_DATA.summary.draws;
-    const totalMathProblems = MOCK_DATA.summary.mathCorrect + MOCK_DATA.summary.mathIncorrect;
+  const { user } = useAuth();
 
-    if (totalGames === 0) {
-      return null;
+  const fetchStatistics = async (userId: string) => {
+    const { data: stats, error } = await supabase
+      .from('game_statistics')
+      .select('*')
+      .eq('user_id', userId)
+      .single();
+
+    if (error) {
+      console.error("Error fetching statistics:", error.message);
+      throw new Error(error.message);
     }
+
+    if (!stats) return null;
+    
+    const totalGames = stats.total_games ?? 0;
+    const totalMathProblems = stats.total_math_problems ?? 0;
 
     return {
       summary: {
-        ...MOCK_DATA.summary,
+        wins: stats.wins ?? 0,
+        losses: stats.losses ?? 0,
+        draws: stats.draws ?? 0,
+        mathCorrect: stats.correct_math_problems ?? 0,
+        mathIncorrect: totalMathProblems - (stats.correct_math_problems ?? 0),
+        avgSolveTime: stats.avg_solve_time_s ?? 0,
+        bestSolveTime: stats.best_solve_time_s ?? 0,
         totalGames,
-        winRate: totalGames > 0 ? (MOCK_DATA.summary.wins / totalGames) * 100 : 0,
-        mathAccuracy: totalMathProblems > 0 ? (MOCK_DATA.summary.mathCorrect / totalMathProblems) * 100 : 0,
+        winRate: Number(stats.win_rate ?? 0),
+        mathAccuracy: Number(stats.math_accuracy ?? 0),
       },
+      // The following data is still mocked and can be implemented later
       progress: MOCK_DATA.progress.map(p => ({ ...p, time: parseFloat(p.time.toFixed(1)) })),
       accuracyByDifficulty: MOCK_DATA.accuracyByDifficulty.map(d => ({...d, accuracy: (d.correct / (d.correct + d.incorrect)) * 100})),
       openings: MOCK_DATA.openings,
       winLossData: [
-        { result: 'wins', value: MOCK_DATA.summary.wins, fill: 'hsl(var(--chart-1))' },
-        { result: 'losses', value: MOCK_DATA.summary.losses, fill: 'hsl(var(--chart-2))' },
-        { result: 'draws', value: MOCK_DATA.summary.draws, fill: 'hsl(var(--chart-3))' },
+        { result: 'wins', value: stats.wins ?? 0, fill: 'hsl(var(--chart-1))' },
+        { result: 'losses', value: stats.losses ?? 0, fill: 'hsl(var(--chart-2))' },
+        { result: 'draws', value: stats.draws ?? 0, fill: 'hsl(var(--chart-3))' },
       ],
     };
-  }, []);
+  };
+
+  const { data, isLoading } = useQuery({
+    queryKey: ['statistics', user?.id],
+    queryFn: () => {
+        if (!user?.id) return Promise.resolve(null);
+        return fetchStatistics(user.id);
+    },
+    enabled: !!user,
+  });
+
+  if (isLoading || !data) {
+    return null;
+  }
 
   return data;
 };
