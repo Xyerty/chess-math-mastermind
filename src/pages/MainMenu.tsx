@@ -1,15 +1,17 @@
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
-import { Play, Settings, BookOpen, BarChart3 } from "lucide-react";
+import { Play, Settings, BookOpen, BarChart3, Sun, Moon } from "lucide-react";
 import { useLanguage } from "../contexts/LanguageContext";
 import GameSetupModal from "../components/GameSetupModal";
 import { useDifficulty, Difficulty } from "../contexts/DifficultyContext";
 import { Button } from "@/components/ui/button";
+import { useTheme } from "next-themes";
 
 const MainMenu = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
+  const { theme, setTheme } = useTheme();
   const [isSetupModalOpen, setIsSetupModalOpen] = useState(false);
   const { setMathDifficulty, setAiDifficulty } = useDifficulty();
 
@@ -48,7 +50,19 @@ const MainMenu = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-100 via-white to-green-100 flex flex-col items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-100 via-white to-green-100 dark:from-blue-950/50 dark:via-background dark:to-green-950/50 flex flex-col items-center justify-center p-4">
+      <div className="absolute top-4 right-4 z-20">
+        <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+            aria-label="Toggle theme"
+        >
+            <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+            <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+            <span className="sr-only">Toggle theme</span>
+        </Button>
+      </div>
       {/* Animated Chess Pieces Background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-10 sm:top-20 left-10 sm:left-20 text-4xl sm:text-6xl text-muted-foreground/10 animate-pulse">♛</div>
@@ -107,7 +121,7 @@ const MainMenu = () => {
         </div>
 
         {/* Sentry Test Button */}
-        <div className="my-8 bg-yellow-100/70 border-l-4 border-yellow-500 text-yellow-800 p-4 rounded-md shadow-sm" role="alert">
+        <div className="my-8 bg-yellow-100/70 border-l-4 border-yellow-500 text-yellow-800 dark:bg-yellow-900/30 dark:border-yellow-600 dark:text-yellow-200 p-4 rounded-md shadow-sm" role="alert">
           <p className="font-bold">Developer Test Panel</p>
           <p className="text-sm">Click the button below to test Sentry error tracking. This will throw a harmless error that should appear in your Sentry dashboard.</p>
           <Button

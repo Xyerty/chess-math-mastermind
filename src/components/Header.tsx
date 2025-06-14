@@ -8,13 +8,15 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Menu, Home, Settings, BarChart3, BookOpen, Sword } from 'lucide-react';
+import { Menu, Home, Settings, BarChart3, BookOpen, Sword, Moon, Sun } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useTheme } from 'next-themes';
 
 const Header = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { t } = useLanguage();
+    const { setTheme, theme } = useTheme();
 
     const getTitle = () => {
         switch (location.pathname) {
@@ -61,7 +63,16 @@ const Header = () => {
                 {getTitle()}
             </h1>
 
-            <div className="w-[40px]"></div> {/* Spacer to balance the menu button */}
+            <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                aria-label="Toggle theme"
+            >
+                <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+                <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+                <span className="sr-only">Toggle theme</span>
+            </Button>
         </header>
     );
 };

@@ -1,14 +1,17 @@
-
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Globe, BrainCircuit, Calculator } from "lucide-react";
+import { Globe, BrainCircuit, Calculator, Palette, Sun, Moon } from "lucide-react";
 import { useLanguage } from "../contexts/LanguageContext";
 import { useDifficulty, Difficulty } from "../contexts/DifficultyContext";
+import { useTheme } from "next-themes";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 const Settings = () => {
   const { t, language, setLanguage } = useLanguage();
   const { mathDifficulty, setMathDifficulty, aiDifficulty, setAiDifficulty } = useDifficulty();
+  const { theme, setTheme } = useTheme();
 
   return (
     <div className="max-w-2xl mx-auto space-y-6 p-4">
@@ -77,6 +80,36 @@ const Settings = () => {
         </CardContent>
       </Card>
 
+      {/* Visual Theme Settings */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Palette className="h-5 w-5" />
+            {t('settings.visualThemes')}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+           <div className="flex items-center justify-between">
+            <Label htmlFor="dark-mode" className="flex flex-col gap-1 cursor-pointer">
+              <span>Dark Mode</span>
+              <span className="font-normal text-sm text-muted-foreground">
+                Switch between light and dark themes.
+              </span>
+            </Label>
+            <div className="flex items-center gap-2">
+                <Sun className="h-5 w-5" />
+                <Switch
+                  id="dark-mode"
+                  checked={theme === 'dark'}
+                  onCheckedChange={(checked) => setTheme(checked ? 'dark' : 'light')}
+                  aria-label="Dark mode toggle"
+                />
+                <Moon className="h-5 w-5" />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Coming Soon Features */}
       <Card>
         <CardHeader>
@@ -86,7 +119,6 @@ const Settings = () => {
           <p className="text-muted-foreground mb-4">{t('settings.features')}</p>
           <ul className="space-y-2 text-sm text-muted-foreground">
             <li>{t('settings.soundPrefs')}</li>
-            <li>{t('settings.visualThemes')}</li>
             <li>{t('settings.timeLimits')}</li>
           </ul>
         </CardContent>
