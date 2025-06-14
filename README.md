@@ -48,3 +48,19 @@ npm run dev
 ```
 
 Now you're all set to play and contribute! 🎉
+
+## 🔒 Security Scanning with Snyk
+
+This project uses [Snyk](https://snyk.io/) to continuously find and fix vulnerabilities. To run a security scan locally, follow these steps after installing the dependencies:
+
+```sh
+# 1. Authenticate with your Snyk account (first time only)
+npx snyk auth
+
+# 2. Test your project for vulnerabilities
+npx snyk test
+
+# 3. Monitor your project to get notified about new vulnerabilities
+npx snyk monitor
+```
+
