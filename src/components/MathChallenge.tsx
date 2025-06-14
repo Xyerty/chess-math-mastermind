@@ -30,17 +30,24 @@ const MathChallenge: React.FC<MathChallengeProps> = ({
   const isMounted = useRef(true);
   const [timeLeft, setTimeLeft] = useState(timeLimit);
 
-  // Timer countdown
+  // Generate problem only when difficulty changes
   useEffect(() => {
     isMounted.current = true;
     setProblem(generateMathProblem(difficulty));
-    
+    return () => { isMounted.current = false; };
+  }, [difficulty]);
+
+  // Timer countdown
+  useEffect(() => {
     if (timeLimit === Infinity) return;
+
+    setTimeLeft(timeLimit); // Reset timer when timeLimit or difficulty changes
 
     const timer = setInterval(() => {
       setTimeLeft(prev => {
         if (prev <= 1) {
           clearInterval(timer);
+          // isMounted check prevents calling onFailure after component unmounts
           if (isMounted.current) {
             onFailure();
           }
@@ -51,7 +58,6 @@ const MathChallenge: React.FC<MathChallengeProps> = ({
     }, 1000);
 
     return () => {
-      isMounted.current = false;
       clearInterval(timer);
     };
   }, [timeLimit, onFailure, difficulty]);

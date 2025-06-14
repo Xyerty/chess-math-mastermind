@@ -1,4 +1,3 @@
-
 import React, { useCallback, useState } from "react";
 import { useLanguage } from "../contexts/LanguageContext";
 import { useChessGame } from "../hooks/useChessGame";
@@ -88,7 +87,7 @@ const Game = () => {
     clearHint();
   };
 
-  const handleMathSuccess = () => {
+  const handleMathSuccess = useCallback(() => {
     try {
       const moveExecuted = executePendingMove();
       completeMathChallenge(true);
@@ -99,25 +98,25 @@ const Game = () => {
       console.error('Error executing move after math success:', error);
       completeMathChallenge(false);
     }
-  };
+  }, [executePendingMove, completeMathChallenge]);
 
-  const handleMathFailure = () => {
+  const handleMathFailure = useCallback(() => {
     try {
       completeMathChallenge(false);
       clearSelection(); // Clear selection since move failed
     } catch (error) {
       console.error('Error handling math failure:', error);
     }
-  };
+  }, [completeMathChallenge, clearSelection]);
 
-  const handleMathCancel = () => {
+  const handleMathCancel = useCallback(() => {
     try {
       cancelMathChallenge();
       clearSelection();
     } catch (error) {
       console.error('Error canceling math challenge:', error);
     }
-  };
+  }, [cancelMathChallenge, clearSelection]);
 
   const handleGoHome = () => {
     navigate('/');
