@@ -18,10 +18,18 @@ interface PythonAnalysisResponse {
 }
 
 class PythonEngineService {
-  private baseUrl = 'http://127.0.0.1:8000';
+  private baseUrl = process.env.NODE_ENV === 'production' 
+    ? '' // No Python backend in production on Vercel Hobby
+    : 'http://127.0.0.1:8000';
   private isAvailable = false;
 
   async checkAvailability(): Promise<boolean> {
+    // In production on Vercel, Python engine is not available
+    if (process.env.NODE_ENV === 'production') {
+      this.isAvailable = false;
+      return false;
+    }
+
     try {
       const response = await fetch(`${this.baseUrl}/health`, {
         method: 'GET',
@@ -38,6 +46,10 @@ class PythonEngineService {
   }
 
   async getMove(fen: string, difficulty: 'easy' | 'medium' | 'hard', timeLimit: number = 2.0): Promise<PythonMoveResponse | null> {
+    if (process.env.NODE_ENV === 'production') {
+      return null; // Fall back to JavaScript AI
+    }
+
     if (!this.isAvailable) {
       await this.checkAvailability();
     }
@@ -71,6 +83,10 @@ class PythonEngineService {
   }
 
   async analyzePosition(fen: string, depth: number = 3): Promise<PythonAnalysisResponse | null> {
+    if (process.env.NODE_ENV === 'production') {
+      return null; // Fall back to JavaScript AI
+    }
+
     if (!this.isAvailable) {
       await this.checkAvailability();
     }
