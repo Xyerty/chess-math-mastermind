@@ -5,9 +5,6 @@ import { useAuth } from '@clerk/clerk-react';
 import { SignIn, SignUp } from '@clerk/clerk-react';
 import { Sparkles, Shield } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { GuestModeCard } from '@/components/auth/GuestModeCard';
-import { AuthToggle } from '@/components/auth/AuthToggle';
-import { SignInForm } from '@/components/auth/SignInForm';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const AuthPage = () => {
@@ -54,12 +51,12 @@ const AuthPage = () => {
                 Welcome to Chess Game
               </CardTitle>
               <CardDescription className="text-lg text-slate-600 dark:text-slate-400">
-                Sign in to save your progress and compete
+                Sign in or create an account
               </CardDescription>
             </div>
           </CardHeader>
           
-          <CardContent className="space-y-6">
+          <CardContent>
             {/* Primary Clerk Auth */}
             <div className="space-y-4">
               <Tabs defaultValue="signin" className="w-full">
@@ -97,37 +94,8 @@ const AuthPage = () => {
                 </TabsContent>
               </Tabs>
             </div>
-            
-            {/* Divider */}
-            <div className="relative my-8">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t border-slate-200 dark:border-slate-700" />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-white dark:bg-slate-900 px-4 text-slate-500 dark:text-slate-400 font-medium">
-                  Or continue with
-                </span>
-              </div>
-            </div>
-            
-            {/* Fallback Supabase Auth - Collapsed by default */}
-            <AuthToggle 
-              triggerText="Traditional email/password" 
-              className="w-full"
-            >
-              <SignInForm 
-                setLoading={() => {}} 
-                setError={() => {}} 
-                loading={false} 
-              />
-            </AuthToggle>
           </CardContent>
         </Card>
-
-        {/* Guest Mode Option */}
-        <div className="animate-fade-in delay-300">
-          <GuestModeCard />
-        </div>
 
         {/* Footer */}
         <div className="text-center text-sm text-slate-500 dark:text-slate-400 animate-fade-in delay-500">
