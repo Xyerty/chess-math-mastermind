@@ -48,9 +48,11 @@ export class PlayFabService {
         if (error) {
           console.error('PlayFab login error:', error);
           reject(new Error(`PlayFab login failed: ${error.errorMessage || 'Unknown error'}`));
-        } else {
-          console.log('PlayFab login successful:', result?.data?.PlayFabId);
+        } else if (result) {
+          console.log('PlayFab login successful:', result.data?.PlayFabId);
           resolve(result);
+        } else {
+          reject(new Error('PlayFab login failed: No result returned'));
         }
       });
     });
@@ -110,9 +112,11 @@ export class PlayFabService {
         if (error) {
           console.error('Failed to fetch leaderboard:', error);
           reject(new Error(`Failed to fetch leaderboard: ${error.errorMessage}`));
-        } else {
-          console.log('Leaderboard fetched successfully:', result?.data?.Leaderboard?.length, 'entries');
+        } else if (result) {
+          console.log('Leaderboard fetched successfully:', result.data?.Leaderboard?.length, 'entries');
           resolve(result);
+        } else {
+          reject(new Error('Failed to fetch leaderboard: No result returned'));
         }
       });
     });
