@@ -3,21 +3,24 @@ import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Save, X } from 'lucide-react';
-import { useGuestMode } from '@/hooks/useGuestMode';
 
 export const GuestConversionBanner = () => {
   const navigate = useNavigate();
-  const { isGuest, exitGuestMode } = useGuestMode();
 
-  if (!isGuest) return null;
+  // Since we've simplified to Clerk-only auth, we'll hide this banner for now
+  // In the future, this could be used for other conversion purposes
+  const isGuest = false;
 
   const handleSaveProgress = () => {
     navigate('/auth?intent=save');
   };
 
   const handleDismiss = () => {
-    exitGuestMode();
+    // No guest mode to exit, so this is a no-op
+    console.log('Banner dismissed');
   };
+
+  if (!isGuest) return null;
 
   return (
     <Card className="mb-4 border-amber-200 bg-amber-50 dark:bg-amber-950/20 dark:border-amber-800">
