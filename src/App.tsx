@@ -5,6 +5,7 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import ProvidersWrapper from "./components/ProvidersWrapper";
 import AppRoutes from "./components/AppRoutes";
 import { CLERK_PUBLISHABLE_KEY } from "./config/clerk";
+import { Toaster } from "@/components/ui/sonner";
 
 const App: React.FC = () => {
   return (
@@ -12,6 +13,7 @@ const App: React.FC = () => {
       <ClerkProvider publishableKey={CLERK_PUBLISHABLE_KEY}>
         <ProvidersWrapper>
           <AppRoutes />
+          <Toaster richColors position="top-right" />
         </ProvidersWrapper>
       </ClerkProvider>
     </ErrorBoundary>
