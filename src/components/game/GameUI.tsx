@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Loader2, Wifi, WifiOff } from 'lucide-react';
-import { ChessGameState, GameMode, Player } from '../../features/chess/types';
+import { GameMode } from '../../features/chess/types';
 import ChessBoard from '../ChessBoard';
 import GameStatus from '../GameStatus';
 import BottomActionMenu from '../BottomActionMenu';
@@ -10,83 +10,55 @@ import MoveHistory from '../MoveHistory';
 import GameEndModal from '../GameEndModal';
 import MathChallenge from '../MathChallenge';
 import { Button } from '@/components/ui/button';
-import { MathChallengeState } from '../../hooks/useMathChallenge';
-import { HintAnalysis } from '../../hooks/useHint';
-
-interface PlayFabDataForUI {
-  connectionStatus: 'disconnected' | 'connecting' | 'connected' | 'error';
-}
+import { useChessGame } from '../../hooks/useChessGame';
+import { useGameController } from '../../hooks/useGameController';
+import { usePlayFab } from '../../hooks/usePlayFab';
 
 interface GameUIProps {
-  // Game State
-  gameState: ChessGameState;
+  chessGame: ReturnType<typeof useChessGame>;
+  gameController: ReturnType<typeof useGameController>;
+  playFab: ReturnType<typeof usePlayFab>;
   gameMode: GameMode;
-  isGameOver: boolean;
-  winner: Player | null;
-
-  // Chess Board
-  onChessBoardClick: (row: number, col: number) => void;
-
-  // Actions
-  onNewGame: () => void;
-  onResign: () => void;
-  onGoHome: () => void;
-
-  // AI
-  isAIThinking: boolean;
-  usingPythonEngine: boolean;
   aiDifficulty: 'easy' | 'medium' | 'hard';
-
-  // Hints
-  showHint: boolean;
-  currentHint: HintAnalysis | null;
-  onHintRequest: () => void;
-  onCloseHint: () => void;
-  canRequestHint: boolean;
-  isAnalyzing: boolean;
-  hintsUsed: number;
-  maxHints: number;
-
-  // Math Challenge
-  mathState: MathChallengeState;
-  onMathSuccess: () => void;
-  onMathFailure: () => void;
-  onMathCancel: () => void;
-  mathAccuracy: number;
-
-  // PlayFab
-  playFabData: PlayFabDataForUI;
-  retryConnection: () => void;
 }
 
 const GameUI: React.FC<GameUIProps> = ({
-  gameState,
+  chessGame,
+  gameController,
+  playFab,
   gameMode,
-  isGameOver,
-  winner,
-  onChessBoardClick,
-  onNewGame,
-  onResign,
-  onGoHome,
-  isAIThinking,
-  usingPythonEngine,
   aiDifficulty,
-  showHint,
-  currentHint,
-  onHintRequest,
-  onCloseHint,
-  canRequestHint,
-  isAnalyzing,
-  hintsUsed,
-  maxHints,
-  mathState,
-  onMathSuccess,
-  onMathFailure,
-  onMathCancel,
-  mathAccuracy,
-  playFabData,
-  retryConnection,
 }) => {
+  const {
+    gameState,
+    isAIThinking,
+    usingPythonEngine,
+    currentHint,
+    canRequestHint,
+    isAnalyzing,
+    hintsUsed,
+    maxHints,
+    mathState,
+    mathAccuracy,
+  } = chessGame;
+
+  const {
+    isGameOver,
+    winner,
+    onChessBoardClick,
+    handleNewGame,
+    resignGame,
+    handleGoHome,
+    showHint,
+    handleHintRequest,
+    handleCloseHint,
+    handleMathSuccess,
+    handleMathFailure,
+    handleMathCancel,
+  } = gameController;
+
+  const { playFabData, retryConnection } = playFab;
+
   return (
     <>
       <div className="flex flex-col h-full" style={{ paddingBottom: '70px' }}>
@@ -154,7 +126,7 @@ const GameUI: React.FC<GameUIProps> = ({
                 <div className="mt-4">
                   <HintDisplay 
                     hint={currentHint}
-                    onClose={onCloseHint}
+                    onClose={handleCloseHint}
                     hintsRemaining={maxHints - hintsUsed}
                   />
                 </div>
@@ -168,9 +140,9 @@ const GameUI: React.FC<GameUIProps> = ({
       </div>
 
       <BottomActionMenu 
-        onNewGame={onNewGame}
-        onResign={onResign}
-        onHint={onHintRequest}
+        onNewGame={handleNewGame}
+        onResign={resignGame}
+        onHint={handleHintRequest}
         canRequestHint={canRequestHint}
         isAnalyzing={isAnalyzing}
       />
@@ -179,15 +151,15 @@ const GameUI: React.FC<GameUIProps> = ({
         isOpen={isGameOver}
         status={gameState.gameStatus}
         winner={winner}
-        onNewGame={onNewGame}
-        onGoHome={onGoHome}
+        onNewGame={handleNewGame}
+        onGoHome={handleGoHome}
       />
 
       {mathState.isActive && (
         <MathChallenge
-          onSuccess={onMathSuccess}
-          onFailure={onMathFailure}
-          onClose={onMathCancel}
+          onSuccess={handleMathSuccess}
+          onFailure={handleMathFailure}
+          onClose={handleMathCancel}
           difficulty={mathState.difficulty}
           timeLimit={gameMode === 'speed' ? 15 : 30}
         />

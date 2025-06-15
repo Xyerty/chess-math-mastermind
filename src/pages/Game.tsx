@@ -15,53 +15,17 @@ const Game = () => {
   const { gameMode } = useGameMode();
   
   const chessGame = useChessGame(aiDifficulty, gameMode);
-  
-  const {
-    showHint,
-    onChessBoardClick,
-    handleNewGame,
-    handleHintRequest,
-    handleCloseHint,
-    handleMathSuccess,
-    handleMathFailure,
-    handleMathCancel,
-    handleGoHome,
-    isGameOver,
-    winner,
-    resignGame,
-  } = useGameController({ chessGame, navigate });
-
-  const { playFabData, retryConnection } = usePlayFab();
+  const gameController = useGameController({ chessGame, navigate });
+  const playFab = usePlayFab();
 
   return (
-    <GameErrorBoundary onReset={handleNewGame} onGoHome={handleGoHome}>
+    <GameErrorBoundary onReset={gameController.handleNewGame} onGoHome={gameController.handleGoHome}>
       <GameUI
-        gameState={chessGame.gameState}
+        chessGame={chessGame}
+        gameController={gameController}
+        playFab={playFab}
         gameMode={gameMode}
-        isGameOver={isGameOver}
-        winner={winner}
-        onChessBoardClick={onChessBoardClick}
-        onNewGame={handleNewGame}
-        onResign={resignGame}
-        onGoHome={handleGoHome}
-        isAIThinking={chessGame.isAIThinking}
-        usingPythonEngine={chessGame.usingPythonEngine}
         aiDifficulty={aiDifficulty}
-        showHint={showHint}
-        currentHint={chessGame.currentHint}
-        onHintRequest={handleHintRequest}
-        onCloseHint={handleCloseHint}
-        canRequestHint={chessGame.canRequestHint}
-        isAnalyzing={chessGame.isAnalyzing}
-        hintsUsed={chessGame.hintsUsed}
-        maxHints={chessGame.maxHints}
-        mathState={chessGame.mathState}
-        onMathSuccess={handleMathSuccess}
-        onMathFailure={handleMathFailure}
-        onMathCancel={handleMathCancel}
-        mathAccuracy={chessGame.mathAccuracy}
-        playFabData={playFabData}
-        retryConnection={retryConnection}
       />
     </GameErrorBoundary>
   );
