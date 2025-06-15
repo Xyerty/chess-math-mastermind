@@ -1,14 +1,9 @@
 
-// Remove hardcoded fallback to force proper environment variable usage
-export const CLERK_PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
+// Hardcoded Clerk publishable key for immediate functionality
+// Note: For production, consider using environment variables
+export const CLERK_PUBLISHABLE_KEY = "pk_test_cmVsYXhpbmctc2hlcGhlcmQtMTAuY2xlcmsuYWNjb3VudHMuZGV2JA";
 
-if (!CLERK_PUBLISHABLE_KEY) {
-  console.error("❌ Missing VITE_CLERK_PUBLISHABLE_KEY environment variable");
-  console.error("Please set VITE_CLERK_PUBLISHABLE_KEY in your project's environment variables");
-  console.error("Get your key from: https://dashboard.clerk.com/");
-  // The error is now handled gracefully in App.tsx to avoid a blank screen.
-} else {
-  console.log("✅ Clerk configuration loaded successfully");
-  console.log("Environment:", import.meta.env.MODE);
-  console.log("Clerk key starts with:", CLERK_PUBLISHABLE_KEY.substring(0, 20) + "...");
-}
+// Always log success since we have a hardcoded key
+console.log("✅ Clerk configuration loaded successfully");
+console.log("Environment:", import.meta.env.MODE);
+console.log("Clerk key starts with:", CLERK_PUBLISHABLE_KEY.substring(0, 20) + "...");
