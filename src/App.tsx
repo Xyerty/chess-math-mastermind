@@ -1,4 +1,3 @@
-
 import React from "react";
 import { ClerkProvider } from "@clerk/clerk-react";
 import { BrowserRouter, useNavigate } from "react-router-dom";
@@ -16,7 +15,8 @@ const ClerkProviderWithRouter: React.FC<{children: React.ReactNode}> = ({ childr
     return (
         <ClerkProvider
             publishableKey={CLERK_PUBLISHABLE_KEY}
-            navigate={(to) => navigate(to)}
+            routerPush={(to) => navigate(to)}
+            routerReplace={(to) => navigate(to, { replace: true })}
         >
             {children}
         </ClerkProvider>
