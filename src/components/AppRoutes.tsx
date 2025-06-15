@@ -1,6 +1,5 @@
-
 import React, { Suspense } from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import * as Sentry from "@sentry/react";
 import { useAuth } from "@clerk/clerk-react";
 
@@ -32,7 +31,7 @@ const AppRoutes: React.FC = () => {
     }
 
     return (
-        <BrowserRouter>
+        <>
             {/* These components are available on all routes */}
             <BetaBanner />
             <FloatingAuthStatus />
@@ -71,7 +70,7 @@ const AppRoutes: React.FC = () => {
                     )}
                 </SentryRoutes>
             </Suspense>
-        </BrowserRouter>
+        </>
     );
 };
 
