@@ -1,262 +1,111 @@
-
-import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
+import { Difficulty, useDifficulty } from "../contexts/DifficultyContext";
+import { useState } from "react";
+import { useLanguage } from "../contexts/LanguageContext";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useLanguage } from '../contexts/LanguageContext';
-import { useDifficulty, Difficulty } from '../contexts/DifficultyContext';
-import { useGameMode } from '../contexts/GameModeContext';
-import { useOpponent, OpponentType, PlayerColor } from '../contexts/OpponentContext';
-import { GameMode } from '../features/chess/types';
-import { BrainCircuit, Calculator, Play, Clock, Users, User, Gamepad, ChevronRight, CircleArrowLeft } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { toast } from 'sonner';
+import { Loader2, Search, XCircle } from "lucide-react";
+import type { Tables } from "@/integrations/supabase/types";
 
 interface GameSetupModalProps {
   isOpen: boolean;
   onClose: () => void;
   onStartGame: (mathDifficulty: Difficulty, aiDifficulty: Difficulty) => void;
   onFindMatch: () => void;
+  onCancelMatch: () => void;
+  ticket: Tables<'matchmaking_tickets'> | null | undefined;
+  isTicketLoading: boolean;
 }
 
-const GameSetupModal: React.FC<GameSetupModalProps> = ({ isOpen, onClose, onStartGame, onFindMatch }) => {
+const GameSetupModal = ({ isOpen, onClose, onStartGame, onFindMatch, onCancelMatch, ticket, isTicketLoading }: GameSetupModalProps) => {
+  const { mathDifficulty, setMathDifficulty, aiDifficulty, setAiDifficulty } = useDifficulty();
+  const [currentMathDifficulty, setCurrentMathDifficulty] = useState<Difficulty>(mathDifficulty);
+  const [currentAiDifficulty, setCurrentAiDifficulty] = useState<Difficulty>(aiDifficulty);
   const { t } = useLanguage();
-  const { mathDifficulty: currentMathDifficulty, aiDifficulty: currentAiDifficulty } = useDifficulty();
-  const { gameMode: currentGameMode, setGameMode } = useGameMode();
-  const { opponentType: currentOpponentType, setOpponentType, playerColor: currentPlayerColor, setPlayerColor } = useOpponent();
-  
-  const [mathDifficulty, setMathDifficulty] = useState<Difficulty>(currentMathDifficulty);
-  const [aiDifficulty, setAiDifficulty] = useState<Difficulty>(currentAiDifficulty);
-  const [localGameMode, setLocalGameMode] = useState<GameMode>(currentGameMode);
-  const [localOpponentType, setLocalOpponentType] = useState<OpponentType>(currentOpponentType);
-  const [localPlayerColor, setLocalPlayerColor] = useState<PlayerColor>(currentPlayerColor);
-  
-  const [view, setView] = useState<'select' | 'practice'>('select');
 
-  const handleStartPractice = () => {
-    setGameMode(localGameMode);
-    setOpponentType(localOpponentType);
-    setPlayerColor(localPlayerColor);
-    onStartGame(mathDifficulty, aiDifficulty);
-    setView('select');
+  const handleStart = () => {
+    onStartGame(currentMathDifficulty, currentAiDifficulty);
     onClose();
   };
-  
-  const handleSelectRanked = () => {
-    // This feature is coming soon.
-    toast.info("Coming Soon!", { description: "1v1 Ranked is under development." });
-  }
 
-  const handleCloseDialog = () => {
-    setView('select');
-    onClose();
-  }
-
-  const renderPracticeConfig = () => (
-    <>
-      <DialogHeader>
-        <div className="flex items-center justify-between">
-            <Button variant="ghost" size="icon" className="invisible">
-                <CircleArrowLeft className="h-5 w-5" />
-            </Button>
-            <DialogTitle className="text-2xl font-bold text-center text-primary flex items-center justify-center gap-2">
-                <Play className="h-6 w-6" />
-                Practice Setup
-            </DialogTitle>
-            <Button variant="ghost" size="icon" onClick={() => setView('select')}>
-                <CircleArrowLeft className="h-5 w-5" />
-            </Button>
-        </div>
-        <DialogDescription className="text-center text-muted-foreground pt-2">
-            Hone your skills against the AI or a friend.
-        </DialogDescription>
-      </DialogHeader>
-      
-      <div className="grid gap-6 py-6">
-        {/* Opponent Type */}
-        <div className="grid grid-cols-4 items-center gap-4">
-            <label htmlFor="opponent-type" className="text-right col-span-1 flex items-center justify-end gap-2 text-sm font-medium">
-                <Users className="h-4 w-4 text-muted-foreground" />
-                Opponent
-            </label>
-            <Select value={localOpponentType} onValueChange={(value: OpponentType) => setLocalOpponentType(value)}>
-                <SelectTrigger id="opponent-type" className="col-span-3">
-                <SelectValue placeholder="Select opponent" />
-                </SelectTrigger>
-                <SelectContent>
-                <SelectItem value="human">Human vs Human</SelectItem>
-                <SelectItem value="ai">Human vs AI</SelectItem>
-                </SelectContent>
-            </Select>
-        </div>
-
-        {/* Player Color (only show when playing against AI) */}
-        {localOpponentType === 'ai' && (
-            <div className="grid grid-cols-4 items-center gap-4">
-                <label htmlFor="player-color" className="text-right col-span-1 flex items-center justify-end gap-2 text-sm font-medium">
-                <User className="h-4 w-4 text-muted-foreground" />
-                Play as
-                </label>
-                <Select value={localPlayerColor} onValueChange={(value: PlayerColor) => setLocalPlayerColor(value)}>
-                <SelectTrigger id="player-color" className="col-span-3">
-                    <SelectValue placeholder="Select color" />
-                </SelectTrigger>
-                <SelectContent>
-                    <SelectItem value="white">White</SelectItem>
-                    <SelectItem value="black">Black</SelectItem>
-                </SelectContent>
-                </Select>
-            </div>
-        )}
-
-        {/* Game Mode */}
-        <div className="grid grid-cols-4 items-center gap-4">
-            <label htmlFor="game-mode" className="text-right col-span-1 flex items-center justify-end gap-2 text-sm font-medium">
-                <Clock className="h-4 w-4 text-muted-foreground" />
-                {t('gameSetup.gameMode')}
-            </label>
-            <Select value={localGameMode} onValueChange={(value: GameMode) => setLocalGameMode(value)}>
-                <SelectTrigger id="game-mode" className="col-span-3">
-                <SelectValue placeholder="Select game mode" />
-                </SelectTrigger>
-                <SelectContent>
-                <SelectItem value="classic">{t('gameMode.classic')}</SelectItem>
-                <SelectItem value="speed">{t('gameMode.speed')}</SelectItem>
-                <SelectItem value="math-master">{t('gameMode.mathMaster')}</SelectItem>
-                </SelectContent>
-            </Select>
-        </div>
-
-        {/* Math Difficulty */}
-        <div className="grid grid-cols-4 items-center gap-4">
-            <label htmlFor="math-difficulty" className="text-right col-span-1 flex items-center justify-end gap-2 text-sm font-medium">
-                <Calculator className="h-4 w-4 text-muted-foreground" />
-                {t('settings.mathDifficulty')}
-            </label>
-            <Select value={mathDifficulty} onValueChange={(value: Difficulty) => setMathDifficulty(value)}>
-                <SelectTrigger id="math-difficulty" className="col-span-3">
-                <SelectValue placeholder={t('settings.mathDifficulty')} />
-                </SelectTrigger>
-                <SelectContent>
-                <SelectItem value="easy">Easy</SelectItem>
-                <SelectItem value="medium">Medium</SelectItem>
-                <SelectItem value="hard">Hard</SelectItem>
-                </SelectContent>
-            </Select>
-        </div>
-
-        {/* AI Strength (only show when playing against AI) */}
-        {localOpponentType === 'ai' && (
-            <div className="grid grid-cols-4 items-center gap-4">
-                <label htmlFor="ai-difficulty" className="text-right col-span-1 flex items-center justify-end gap-2 text-sm font-medium">
-                    <BrainCircuit className="h-4 w-4 text-muted-foreground" />
-                {t('settings.aiStrength')}
-                </label>
-                <Select value={aiDifficulty} onValueChange={(value: Difficulty) => setAiDifficulty(value)}>
-                <SelectTrigger id="ai-difficulty" className="col-span-3">
-                    <SelectValue placeholder={t('settings.aiStrength')} />
-                </SelectTrigger>
-                <SelectContent>
-                    <SelectItem value="easy">Easy</SelectItem>
-                    <SelectItem value="medium">Medium</SelectItem>
-                    <SelectItem value="hard">Hard</SelectItem>
-                </SelectContent>
-                </Select>
-            </div>
-        )}
-      </div>
-
-      <DialogFooter>
-        <Button onClick={handleStartPractice} className="w-full text-lg h-12">
-            <Play className="mr-2 h-5 w-5" />
-            {t('gameSetup.startGame')}
-        </Button>
-      </DialogFooter>
-    </>
-  );
-
-  const renderSelectMode = () => (
-    <>
-      <DialogHeader>
-          <DialogTitle className="text-2xl font-bold text-center text-primary flex items-center justify-center gap-2">
-              <Play className="h-6 w-6" />
-              Select Game Mode
-          </DialogTitle>
-          <DialogDescription className="text-center text-muted-foreground pt-2">
-              Choose how you want to challenge your mind.
-          </DialogDescription>
-      </DialogHeader>
-      <div className="grid gap-4 py-6">
-        <ModeCard 
-            icon={BrainCircuit}
-            title="Practice"
-            description="Play vs AI or a friend locally"
-            onClick={() => setView('practice')}
-        />
-        <ModeCard 
-            icon={Users}
-            title="1v1 Ranked"
-            description="Compete against others online"
-            onClick={() => {}}
-            disabled
-            comingSoon
-        />
-        <ModeCard 
-            icon={Gamepad}
-            title="Matte Royale"
-            description="16-player battle royale. Last one standing wins!"
-            onClick={() => {}}
-            disabled
-            comingSoon
-        />
-      </div>
-    </>
-  );
+  const isSearching = ticket?.status === 'searching';
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleCloseDialog}>
-      <DialogContent className="sm:max-w-[480px] bg-card/80 backdrop-blur-sm border-border/50 shadow-2xl rounded-2xl animate-scale-in">
-        {view === 'select' ? renderSelectMode() : renderPracticeConfig()}
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-[480px]">
+        <DialogHeader>
+          <DialogTitle>{t('gameSetup.title')}</DialogTitle>
+          <DialogDescription>{t('gameSetup.description')}</DialogDescription>
+        </DialogHeader>
+        <Tabs defaultValue="practice" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="practice">{t('gameSetup.practice')}</TabsTrigger>
+            <TabsTrigger value="ranked">{t('gameSetup.ranked')}</TabsTrigger>
+          </TabsList>
+          <TabsContent value="practice" className="space-y-4 pt-4">
+            <div className="space-y-2">
+              <h3 className="text-lg font-medium">{t('gameSetup.mathDifficulty')}</h3>
+              <Select value={currentMathDifficulty} onValueChange={(value) => setCurrentMathDifficulty(value as Difficulty)}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder={t(`difficulty.${currentMathDifficulty}`)} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="easy">{t('difficulty.easy')}</SelectItem>
+                  <SelectItem value="medium">{t('difficulty.medium')}</SelectItem>
+                  <SelectItem value="hard">{t('difficulty.hard')}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <h3 className="text-lg font-medium">{t('gameSetup.aiDifficulty')}</h3>
+              <Select value={currentAiDifficulty} onValueChange={(value) => setCurrentAiDifficulty(value as Difficulty)}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder={t(`difficulty.${currentAiDifficulty}`)} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="easy">{t('difficulty.easy')}</SelectItem>
+                  <SelectItem value="medium">{t('difficulty.medium')}</SelectItem>
+                  <SelectItem value="hard">{t('difficulty.hard')}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <DialogFooter>
+              <Button onClick={handleStart}>{t('gameSetup.startGame')}</Button>
+            </DialogFooter>
+          </TabsContent>
+          <TabsContent value="ranked" className="space-y-4 pt-4 text-center">
+            <h3 className="font-semibold text-lg">1v1 Ranked Match</h3>
+            <p className="text-sm text-muted-foreground">
+              Challenge another player and climb the leaderboard. Your Elo rating will be on the line!
+            </p>
+            {isTicketLoading && <div className="flex justify-center items-center p-8"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>}
+            
+            {!isTicketLoading && (
+              <>
+                {isSearching ? (
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-center text-primary font-semibold animate-pulse">
+                      <Search className="mr-2 h-5 w-5" />
+                      Searching for opponent...
+                    </div>
+                    <Button variant="destructive" onClick={onCancelMatch} className="w-full">
+                      <XCircle className="mr-2 h-4 w-4"/>
+                      Cancel Search
+                    </Button>
+                  </div>
+                ) : (
+                  <Button onClick={onFindMatch} size="lg" className="w-full">
+                    Find Match
+                  </Button>
+                )}
+              </>
+            )}
+          </TabsContent>
+        </Tabs>
       </DialogContent>
     </Dialog>
   );
 };
-
-interface ModeCardProps {
-    icon: React.ElementType;
-    title: string;
-    description: string;
-    onClick: () => void;
-    disabled?: boolean;
-    comingSoon?: boolean;
-}
-
-const ModeCard: React.FC<ModeCardProps> = ({ icon: Icon, title, description, onClick, disabled, comingSoon }) => (
-    <button
-        onClick={onClick}
-        disabled={disabled}
-        className={cn(
-            "flex items-center gap-4 p-4 rounded-lg border-2 transition-all duration-200",
-            "bg-background/50 hover:bg-accent hover:border-primary/50",
-            "focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background",
-            "disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-background/50 disabled:hover:border-transparent"
-        )}
-    >
-        <div className="bg-primary/10 p-3 rounded-lg">
-            <Icon className="h-6 w-6 text-primary" />
-        </div>
-        <div className="text-left flex-grow">
-            <h3 className="font-semibold text-foreground flex items-center gap-2">
-                {title}
-            </h3>
-            <p className="text-sm text-muted-foreground">{description}</p>
-        </div>
-        {comingSoon && (
-            <span className="text-xs bg-muted text-muted-foreground font-medium px-2 py-1.5 rounded-full">Coming Soon</span>
-        )}
-        {!disabled && !comingSoon && <ChevronRight className="h-5 w-5 text-muted-foreground ml-auto flex-shrink-0" />}
-    </button>
-);
-
 
 export default GameSetupModal;

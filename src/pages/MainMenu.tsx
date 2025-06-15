@@ -1,5 +1,4 @@
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Play, BookOpen, BarChart3, Trophy, Award } from "lucide-react";
 import { useLanguage } from "../contexts/LanguageContext";
@@ -11,6 +10,7 @@ import { useUser } from "@clerk/clerk-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { usePlayFab } from "../hooks/usePlayFab";
 import { toast } from "sonner";
+import { useMatchmaking, useMatchmakingTicket } from "@/hooks/useMatchmaking";
 
 const MainMenu = () => {
   const navigate = useNavigate();
@@ -18,7 +18,18 @@ const MainMenu = () => {
   const [isSetupModalOpen, setIsSetupModalOpen] = useState(false);
   const { setMathDifficulty, setAiDifficulty } = useDifficulty();
   const { user } = useUser();
-  const { findMatch } = usePlayFab();
+  const { findMatch, cancelMatch } = useMatchmaking();
+  const { data: ticket, isLoading: isTicketLoading } = useMatchmakingTicket();
+
+  useEffect(() => {
+    if (ticket?.status === 'matched' && ticket.game_session_id) {
+      toast.success("Match found! Joining game...");
+      setIsSetupModalOpen(false);
+      // For now, we just navigate to the generic game page.
+      // The next step will be to handle the game session ID.
+      navigate(`/game`);
+    }
+  }, [ticket, navigate]);
 
   const handleStartGame = (mathDifficulty: Difficulty, aiDifficulty: Difficulty) => {
     setMathDifficulty(mathDifficulty);
@@ -27,11 +38,11 @@ const MainMenu = () => {
   };
 
   const handleFindMatch = async () => {
-    // This functionality is not ready yet.
-    // await findMatch('ranked');
-    toast.info("Coming Soon!", {
-      description: "Ranked matchmaking is under development.",
-    });
+    await findMatch.mutateAsync('ranked');
+  };
+
+  const handleCancelMatch = async () => {
+    await cancelMatch.mutateAsync();
   };
 
   const getTimeOfDay = () => {
@@ -176,6 +187,9 @@ const MainMenu = () => {
         onClose={() => setIsSetupModalOpen(false)}
         onStartGame={handleStartGame}
         onFindMatch={handleFindMatch}
+        onCancelMatch={handleCancelMatch}
+        ticket={ticket}
+        isTicketLoading={isTicketLoading || findMatch.isPending || cancelMatch.isPending}
       />
     </div>
   );

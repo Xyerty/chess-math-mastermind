@@ -102,6 +102,89 @@ export type Database = {
         }
         Relationships: []
       }
+      game_session_players: {
+        Row: {
+          created_at: string
+          elo_after: number | null
+          elo_before: number | null
+          game_session_id: string
+          id: string
+          player_color: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          elo_after?: number | null
+          elo_before?: number | null
+          game_session_id: string
+          id?: string
+          player_color?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          elo_after?: number | null
+          elo_before?: number | null
+          game_session_id?: string
+          id?: string
+          player_color?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "game_session_players_game_session_id_fkey"
+            columns: ["game_session_id"]
+            isOneToOne: false
+            referencedRelation: "game_sessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "game_session_players_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      game_sessions: {
+        Row: {
+          created_at: string
+          game_mode: Database["public"]["Enums"]["game_mode"]
+          game_state: Json | null
+          id: string
+          status: Database["public"]["Enums"]["game_session_status"]
+          updated_at: string
+          winner_user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          game_mode: Database["public"]["Enums"]["game_mode"]
+          game_state?: Json | null
+          id?: string
+          status?: Database["public"]["Enums"]["game_session_status"]
+          updated_at?: string
+          winner_user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          game_mode?: Database["public"]["Enums"]["game_mode"]
+          game_state?: Json | null
+          id?: string
+          status?: Database["public"]["Enums"]["game_session_status"]
+          updated_at?: string
+          winner_user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "game_sessions_winner_user_id_fkey"
+            columns: ["winner_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       game_statistics: {
         Row: {
           avg_solve_time_s: number | null
@@ -149,6 +232,54 @@ export type Database = {
           wins?: number
         }
         Relationships: []
+      }
+      matchmaking_tickets: {
+        Row: {
+          created_at: string
+          elo: number
+          game_mode: Database["public"]["Enums"]["game_mode"]
+          game_session_id: string | null
+          id: string
+          status: Database["public"]["Enums"]["matchmaking_status"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          elo: number
+          game_mode: Database["public"]["Enums"]["game_mode"]
+          game_session_id?: string | null
+          id?: string
+          status?: Database["public"]["Enums"]["matchmaking_status"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          elo?: number
+          game_mode?: Database["public"]["Enums"]["game_mode"]
+          game_session_id?: string | null
+          id?: string
+          status?: Database["public"]["Enums"]["matchmaking_status"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "matchmaking_tickets_game_session_id_fkey"
+            columns: ["game_session_id"]
+            isOneToOne: false
+            referencedRelation: "game_sessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matchmaking_tickets_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       player_rankings: {
         Row: {
@@ -235,11 +366,17 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      calculate_elo_change: {
+        Args: { player_rating: number; opponent_rating: number; score: number }
+        Returns: number
+      }
     }
     Enums: {
       achievement_difficulty: "Common" | "Rare" | "Epic" | "Legendary"
       friendship_status: "pending" | "accepted" | "blocked"
+      game_mode: "classic" | "speed" | "math-master" | "ranked" | "royale"
+      game_session_status: "pending" | "in_progress" | "completed" | "aborted"
+      matchmaking_status: "searching" | "matched" | "cancelled" | "expired"
       sanction_type: "warning" | "temporary_ban" | "permanent_ban" | "mute"
     }
     CompositeTypes: {
@@ -358,6 +495,9 @@ export const Constants = {
     Enums: {
       achievement_difficulty: ["Common", "Rare", "Epic", "Legendary"],
       friendship_status: ["pending", "accepted", "blocked"],
+      game_mode: ["classic", "speed", "math-master", "ranked", "royale"],
+      game_session_status: ["pending", "in_progress", "completed", "aborted"],
+      matchmaking_status: ["searching", "matched", "cancelled", "expired"],
       sanction_type: ["warning", "temporary_ban", "permanent_ban", "mute"],
     },
   },
