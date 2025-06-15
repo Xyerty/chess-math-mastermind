@@ -1,4 +1,3 @@
-
 import { useState, useCallback } from 'react';
 import { ChessGameState, GameMode } from '../features/chess/types';
 import { pythonEngine } from '../services/pythonEngine';
@@ -6,7 +5,7 @@ import { boardToFen } from '../utils/fenConverter';
 import { generateAIMove } from '../features/chess/utils/ai';
 import { useToast } from '@/hooks/use-toast';
 
-interface HintAnalysis {
+export interface HintAnalysis {
   bestMove?: {
     from: { row: number; col: number };
     to: { row: number; col: number };
