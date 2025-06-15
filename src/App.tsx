@@ -17,7 +17,6 @@ import Game from "./pages/Game";
 import Tutorial from "./pages/Tutorial";
 import Settings from "./pages/Settings";
 import Statistics from "./pages/Statistics";
-import Leaderboards from "./pages/Leaderboards";
 import NotFound from "./pages/NotFound";
 import AppLayout from "./components/AppLayout";
 import AuthPage from "./pages/Auth";
@@ -90,11 +89,6 @@ const AppContent: React.FC = () => {
                             <Route path="/statistics" element={
                               <ProtectedRoute>
                                 <Statistics />
-                              </ProtectedRoute>
-                            } />
-                            <Route path="/leaderboards" element={
-                              <ProtectedRoute>
-                                <Leaderboards />
                               </ProtectedRoute>
                             } />
                           </Route>

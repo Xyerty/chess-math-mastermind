@@ -1,7 +1,6 @@
-
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@clerk/clerk-react';
 
 // Mock data for features not yet implemented in the database
 const MOCK_DATA = {
@@ -39,7 +38,7 @@ interface GameStatistics {
 }
 
 export const useStatisticsData = () => {
-  const { user } = useAuth();
+  const { userId } = useAuth();
 
   const fetchStatistics = async (userId: string) => {
     console.log('Fetching statistics for user:', userId);
@@ -96,15 +95,15 @@ export const useStatisticsData = () => {
   };
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ['statistics', user?.id],
+    queryKey: ['statistics', userId],
     queryFn: () => {
-      if (!user?.id) {
+      if (!userId) {
         console.log('No user ID available for statistics query');
         return Promise.resolve(null);
       }
-      return fetchStatistics(user.id);
+      return fetchStatistics(userId);
     },
-    enabled: !!user,
+    enabled: !!userId,
     retry: 1,
     staleTime: 5 * 60 * 1000, // 5 minutes
   });

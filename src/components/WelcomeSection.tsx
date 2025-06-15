@@ -1,11 +1,11 @@
 
 import React from 'react';
-import { useAuth } from '@/contexts/AuthContext';
+import { useUser } from '@clerk/clerk-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { User, TrendingUp, Clock } from 'lucide-react';
 
 const WelcomeSection = () => {
-  const { user, profile } = useAuth();
+  const { user } = useUser();
 
   const getTimeOfDay = () => {
     const hour = new Date().getHours();
@@ -14,7 +14,7 @@ const WelcomeSection = () => {
     return 'Good evening';
   };
 
-  const displayName = profile?.username || user?.email?.split('@')[0] || 'Player';
+  const displayName = user?.firstName || user?.username || 'Player';
 
   return (
     <Card className="bg-gradient-to-r from-primary/10 to-primary/5 border-primary/20">
