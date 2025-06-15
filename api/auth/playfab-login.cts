@@ -1,4 +1,6 @@
-import type { VercelRequest, VercelResponse } from '@vercel/node';
+
+// No import statements to ensure pure CommonJS execution.
+// Vercel types are inferred or can be handled as 'any' to avoid module conflicts.
 
 // Use CommonJS require for runtime dependencies
 const { Clerk } = require('@clerk/clerk-sdk-node');
@@ -14,7 +16,7 @@ const supabase = createClient(
     process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
-module.exports = async function handler(req: VercelRequest, res: VercelResponse) {
+module.exports = async function handler(req: any, res: any) {
     if (req.method !== 'POST') {
         res.setHeader('Allow', 'POST');
         return res.status(405).json({ error: 'Method Not Allowed' });

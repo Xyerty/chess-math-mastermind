@@ -1,7 +1,6 @@
-
-import { useAuth, useUser, useClerk } from '@clerk/clerk-react';
+import { useClerk } from '@clerk/clerk-react';
 import { Button } from '@/components/ui/button';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { LogIn, Settings, Award, LogOut, Trophy } from 'lucide-react';
 import { Skeleton } from './ui/skeleton';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -15,38 +14,31 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { toast } from "@/components/ui/sonner";
-import { useUserRanking } from '@/hooks/useUserRanking';
+import { useCurrentUser } from '@/contexts/UserContext';
 
 const FloatingAuthStatus = () => {
-  const { isSignedIn, isLoaded } = useAuth();
-  const { user } = useUser();
   const { signOut } = useClerk();
   const navigate = useNavigate();
-  const location = useLocation();
   const { t } = useLanguage();
-  const { data: ranking, isLoading: isRankingLoading } = useUserRanking();
-
-  if (location.pathname === '/auth') {
-    return null;
-  }
-
-  if (!isLoaded) {
+  const { currentUser, isLoading } = useCurrentUser();
+  
+  if (isLoading) {
     return (
        <div className="fixed top-4 right-4 z-50">
         <Skeleton className="h-12 w-12 rounded-full" />
       </div>
     )
   }
-
+  
   const handleSignOut = () => {
     signOut({ redirectUrl: '/auth' });
   };
   
-  const userInitials = `${user?.firstName?.charAt(0) ?? ''}${user?.lastName?.charAt(0) ?? ''}`;
+  const userInitials = currentUser ? `${currentUser.firstName?.charAt(0) ?? ''}${currentUser.fullName?.split(' ')?.[1]?.charAt(0) ?? ''}` : '';
 
   return (
     <div className="fixed top-4 right-4 z-50">
-      {isSignedIn && user ? (
+      {currentUser ? (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
              <button
@@ -59,7 +51,7 @@ const FloatingAuthStatus = () => {
               `}
             >
               <Avatar className="h-11 w-11">
-                <AvatarImage src={user.imageUrl} alt={user.fullName ?? 'User avatar'} />
+                <AvatarImage src={currentUser.imageUrl} alt={currentUser.fullName ?? 'User avatar'} />
                 <AvatarFallback>{userInitials}</AvatarFallback>
               </Avatar>
             </button>
@@ -67,20 +59,16 @@ const FloatingAuthStatus = () => {
           <DropdownMenuContent className="w-56 mt-2 border border-border shadow-2xl rounded-xl" align="end">
             <DropdownMenuLabel className="font-normal">
               <div className="flex flex-col space-y-1 p-1">
-                <p className="text-sm font-medium leading-none">{user.fullName}</p>
+                <p className="text-sm font-medium leading-none">{currentUser.fullName}</p>
                 <p className="text-xs leading-none text-muted-foreground">
-                  {user.primaryEmailAddress?.emailAddress}
+                  {currentUser.primaryEmailAddress}
                 </p>
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem className="cursor-default focus:bg-transparent py-2">
               <Trophy className="mr-2 h-4 w-4 text-yellow-500" />
-              {isRankingLoading ? (
-                <Skeleton className="h-4 w-20" />
-              ) : (
-                <span>Elo: <span className="font-bold">{ranking?.elo ?? 'N/A'}</span></span>
-              )}
+              <span>Elo: <span className="font-bold">{currentUser.elo ?? 'N/A'}</span></span>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem className="cursor-pointer py-2" onClick={() => navigate('/settings')}>

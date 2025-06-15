@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Play, BookOpen, BarChart3, Trophy, Award } from "lucide-react";
@@ -7,19 +6,19 @@ import { useDifficulty, Difficulty } from "../contexts/DifficultyContext";
 import GameSetupModal from "../components/GameSetupModal";
 import MenuCard from "../components/MenuCard";
 import TechLogos from "../components/TechLogos";
-import { useUser } from "@clerk/clerk-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { usePlayFab } from "../hooks/usePlayFab";
-import { toast } from "sonner";
 import { useMatchmaking } from "@/hooks/useMatchmaking";
 import { useMatchmakingTicket } from "@/hooks/useMatchmakingTicket";
+import { useCurrentUser } from "@/contexts/UserContext";
+import { Skeleton } from "@/components/ui/skeleton";
+import { toast } from "sonner";
 
 const MainMenu = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
   const [isSetupModalOpen, setIsSetupModalOpen] = useState(false);
   const { setMathDifficulty, setAiDifficulty } = useDifficulty();
-  const { user } = useUser();
+  const { currentUser, isLoading: isUserLoading } = useCurrentUser();
   const { findMatch, cancelMatch } = useMatchmaking();
   const { data: ticket, isLoading: isTicketLoading } = useMatchmakingTicket();
 
@@ -54,7 +53,7 @@ const MainMenu = () => {
     return t('welcome.goodEvening');
   };
 
-  const displayName = user?.firstName || user?.username || 'Player';
+  const displayName = currentUser?.firstName || currentUser?.username || 'Player';
   const fallbackInitials = (displayName?.[0] || 'P').toUpperCase();
 
   const menuItems = [
@@ -114,15 +113,25 @@ const MainMenu = () => {
           
           {/* Integrated Welcome Message */}
           <div className="mt-8 flex flex-col items-center justify-center gap-4 animate-fade-in" style={{ animationDelay: '300ms' }}>
-            <Avatar className="h-16 w-16 ring-4 ring-primary/20 shrink-0">
-              <AvatarImage src={user?.imageUrl} alt={displayName} />
-              <AvatarFallback className="text-xl font-semibold bg-primary/10 text-primary">
-                {fallbackInitials}
-              </AvatarFallback>
-            </Avatar>
+            {isUserLoading ? (
+              <Skeleton className="h-16 w-16 rounded-full" />
+            ) : (
+              <Avatar className="h-16 w-16 ring-4 ring-primary/20 shrink-0">
+                <AvatarImage src={currentUser?.imageUrl} alt={displayName} />
+                <AvatarFallback className="text-xl font-semibold bg-primary/10 text-primary">
+                  {fallbackInitials}
+                </AvatarFallback>
+              </Avatar>
+            )}
             <div className="text-center">
               <h2 className="text-2xl sm:text-3xl font-bold text-foreground">
-                {getTimeOfDay()}, <span className="text-primary">{displayName}</span>!
+                {getTimeOfDay()},{" "}
+                {isUserLoading ? (
+                  <Skeleton className="h-8 w-40 inline-block" />
+                ) : (
+                  <span className="text-primary">{displayName}</span>
+                )}
+                !
               </h2>
               <p className="text-muted-foreground mt-1">{t('welcome.challengePrompt')}</p>
             </div>
