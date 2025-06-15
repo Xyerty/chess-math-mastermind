@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import { useAuth } from '@clerk/clerk-react';
 import { SignIn, SignUp } from '@clerk/clerk-react';
-import { Sparkles, Shield } from 'lucide-react';
+import { Sparkles, Shield, Loader2 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
@@ -20,13 +20,10 @@ const AuthPage = () => {
   if (!isLoaded) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-indigo-100 dark:from-slate-900 dark:via-purple-900/20 dark:to-slate-900 flex items-center justify-center p-4">
-        <div className="w-full max-w-md">
-          <Card className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70">
-            <CardContent className="p-8 text-center">
-              <div className="animate-spin w-8 h-8 border-2 border-purple-500 border-t-transparent rounded-full mx-auto mb-4"></div>
-              <p className="text-slate-600 dark:text-slate-400">Loading...</p>
-            </CardContent>
-          </Card>
+        <div className="flex flex-col items-center gap-4 text-slate-600 dark:text-slate-400">
+          <Loader2 className="h-12 w-12 animate-spin text-purple-600 dark:text-purple-400" />
+          <p className="text-lg font-medium">Securing your session...</p>
+          <p className="text-sm">Please wait while we prepare the board.</p>
         </div>
       </div>
     );
@@ -41,14 +38,14 @@ const AuthPage = () => {
       
       <div className="w-full max-w-md space-y-8 relative z-10">
         {/* Main Auth Card */}
-        <Card className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border-white/20 dark:border-slate-700/50 shadow-2xl shadow-black/10 dark:shadow-black/30">
+        <Card className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/70 border-white/20 dark:border-slate-700/50 shadow-2xl shadow-black/10 dark:shadow-black/30 animate-scale-in">
           <CardHeader className="text-center space-y-4 pb-8">
             <div className="mx-auto w-20 h-20 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg shadow-purple-500/25 animate-bounce-in">
               <Shield className="h-10 w-10 text-white" />
             </div>
             <div className="space-y-2">
               <CardTitle className="text-3xl font-bold bg-gradient-to-r from-slate-900 to-slate-600 dark:from-white dark:to-slate-300 bg-clip-text text-transparent">
-                Welcome to Chess Game
+                Welcome to Mathematical Chess
               </CardTitle>
               <CardDescription className="text-lg text-slate-600 dark:text-slate-400">
                 Sign in or create an account
@@ -60,19 +57,21 @@ const AuthPage = () => {
             {/* Primary Clerk Auth */}
             <div className="space-y-4">
               <Tabs defaultValue="signin" className="w-full">
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="signin">Sign In</TabsTrigger>
-                  <TabsTrigger value="signup">Sign Up</TabsTrigger>
+                <TabsList className="grid w-full grid-cols-2 bg-slate-100 dark:bg-slate-800 p-1 rounded-lg">
+                  <TabsTrigger value="signin" className="data-[state=active]:bg-white dark:data-[state=active]:bg-slate-950 data-[state=active]:shadow-md rounded-md transition-all duration-300">Sign In</TabsTrigger>
+                  <TabsTrigger value="signup" className="data-[state=active]:bg-white dark:data-[state=active]:bg-slate-950 data-[state=active]:shadow-md rounded-md transition-all duration-300">Sign Up</TabsTrigger>
                 </TabsList>
                 <TabsContent value="signin" className="mt-6">
                   <div className="flex justify-center">
                     <SignIn 
                       routing="hash"
-                      redirectUrl="/"
+                      afterSignInUrl="/"
                       appearance={{
                         elements: {
-                          rootBox: "mx-auto",
-                          card: "shadow-none border-0 bg-transparent",
+                          rootBox: "w-full",
+                          card: "shadow-none border-0 bg-transparent w-full",
+                          formButtonPrimary: "bg-purple-600 hover:bg-purple-700 dark:bg-purple-500 dark:hover:bg-purple-600",
+                          footerActionLink: "text-purple-600 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300"
                         }
                       }}
                     />
@@ -82,11 +81,13 @@ const AuthPage = () => {
                   <div className="flex justify-center">
                     <SignUp 
                       routing="hash"
-                      redirectUrl="/"
+                      afterSignUpUrl="/"
                       appearance={{
                         elements: {
-                          rootBox: "mx-auto",
-                          card: "shadow-none border-0 bg-transparent",
+                          rootBox: "w-full",
+                          card: "shadow-none border-0 bg-transparent w-full",
+                          formButtonPrimary: "bg-purple-600 hover:bg-purple-700 dark:bg-purple-500 dark:hover:bg-purple-600",
+                          footerActionLink: "text-purple-600 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300"
                         }
                       }}
                     />
