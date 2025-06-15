@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Play, BookOpen, BarChart3, Settings } from "lucide-react";
@@ -55,7 +54,7 @@ const MainMenu = () => {
         {/* Header Section */}
         <div className="text-center animate-fade-in">
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-primary mb-4">
-            Mathematical Chess
+            Mathematical<br className="sm:hidden" /> Chess
           </h1>
           <p className="text-lg text-muted-foreground max-w-3xl mx-auto" style={{ animationDelay: '200ms' }}>
             Where strategy meets calculation. Challenge your mind with chess that requires both tactical thinking and mathematical precision.

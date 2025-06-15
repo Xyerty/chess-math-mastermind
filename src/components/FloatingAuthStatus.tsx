@@ -1,13 +1,18 @@
 
 import { useAuth, UserButton } from '@clerk/clerk-react';
 import { Button } from '@/components/ui/button';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { LogIn } from 'lucide-react';
 import { Skeleton } from './ui/skeleton';
 
 const FloatingAuthStatus = () => {
   const { isSignedIn, isLoaded } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  if (location.pathname === '/') {
+    return null;
+  }
 
   if (!isLoaded) {
     return (
