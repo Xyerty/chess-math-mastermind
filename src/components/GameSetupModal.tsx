@@ -8,15 +8,18 @@ import { useDifficulty, Difficulty } from '../contexts/DifficultyContext';
 import { useGameMode } from '../contexts/GameModeContext';
 import { useOpponent, OpponentType, PlayerColor } from '../contexts/OpponentContext';
 import { GameMode } from '../features/chess/types';
-import { BrainCircuit, Calculator, Play, Clock, Users, User } from 'lucide-react';
+import { BrainCircuit, Calculator, Play, Clock, Users, User, Gamepad, ChevronRight, CircleArrowLeft } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 
 interface GameSetupModalProps {
   isOpen: boolean;
   onClose: () => void;
   onStartGame: (mathDifficulty: Difficulty, aiDifficulty: Difficulty) => void;
+  onFindMatch: () => void;
 }
 
-const GameSetupModal: React.FC<GameSetupModalProps> = ({ isOpen, onClose, onStartGame }) => {
+const GameSetupModal: React.FC<GameSetupModalProps> = ({ isOpen, onClose, onStartGame, onFindMatch }) => {
   const { t } = useLanguage();
   const { mathDifficulty: currentMathDifficulty, aiDifficulty: currentAiDifficulty } = useDifficulty();
   const { gameMode: currentGameMode, setGameMode } = useGameMode();
@@ -27,131 +30,225 @@ const GameSetupModal: React.FC<GameSetupModalProps> = ({ isOpen, onClose, onStar
   const [localGameMode, setLocalGameMode] = useState<GameMode>(currentGameMode);
   const [localOpponentType, setLocalOpponentType] = useState<OpponentType>(currentOpponentType);
   const [localPlayerColor, setLocalPlayerColor] = useState<PlayerColor>(currentPlayerColor);
+  
+  const [view, setView] = useState<'select' | 'practice'>('select');
 
-  const handleStart = () => {
+  const handleStartPractice = () => {
     setGameMode(localGameMode);
     setOpponentType(localOpponentType);
     setPlayerColor(localPlayerColor);
     onStartGame(mathDifficulty, aiDifficulty);
+    setView('select');
     onClose();
   };
+  
+  const handleSelectRanked = () => {
+    setGameMode('ranked');
+    onFindMatch();
+    onClose();
+  }
 
-  return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[480px] bg-card/80 backdrop-blur-sm border-border/50 shadow-2xl rounded-2xl animate-scale-in">
-        <DialogHeader>
-          <DialogTitle className="text-2xl font-bold text-center text-primary flex items-center justify-center gap-2">
-            <Play className="h-6 w-6" />
-            {t('gameSetup.title')}
-          </DialogTitle>
-          <DialogDescription className="text-center text-muted-foreground pt-2">
-            {t('gameSetup.description')}
-          </DialogDescription>
-        </DialogHeader>
-        
-        <div className="grid gap-6 py-6">
-          {/* Opponent Type */}
-          <div className="grid grid-cols-4 items-center gap-4">
+  const handleCloseDialog = () => {
+    setView('select');
+    onClose();
+  }
+
+  const renderPracticeConfig = () => (
+    <>
+      <DialogHeader>
+        <div className="flex items-center justify-between">
+            <Button variant="ghost" size="icon" className="invisible">
+                <CircleArrowLeft className="h-5 w-5" />
+            </Button>
+            <DialogTitle className="text-2xl font-bold text-center text-primary flex items-center justify-center gap-2">
+                <Play className="h-6 w-6" />
+                Practice Setup
+            </DialogTitle>
+            <Button variant="ghost" size="icon" onClick={() => setView('select')}>
+                <CircleArrowLeft className="h-5 w-5" />
+            </Button>
+        </div>
+        <DialogDescription className="text-center text-muted-foreground pt-2">
+            Hone your skills against the AI or a friend.
+        </DialogDescription>
+      </DialogHeader>
+      
+      <div className="grid gap-6 py-6">
+        {/* Opponent Type */}
+        <div className="grid grid-cols-4 items-center gap-4">
             <label htmlFor="opponent-type" className="text-right col-span-1 flex items-center justify-end gap-2 text-sm font-medium">
-              <Users className="h-4 w-4 text-muted-foreground" />
-              Opponent
+                <Users className="h-4 w-4 text-muted-foreground" />
+                Opponent
             </label>
             <Select value={localOpponentType} onValueChange={(value: OpponentType) => setLocalOpponentType(value)}>
-              <SelectTrigger id="opponent-type" className="col-span-3">
+                <SelectTrigger id="opponent-type" className="col-span-3">
                 <SelectValue placeholder="Select opponent" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="human">Human vs Human</SelectItem>
-                <SelectItem value="ai">Human vs AI</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Player Color (only show when playing against AI) */}
-          {localOpponentType === 'ai' && (
-            <div className="grid grid-cols-4 items-center gap-4">
-              <label htmlFor="player-color" className="text-right col-span-1 flex items-center justify-end gap-2 text-sm font-medium">
-                <User className="h-4 w-4 text-muted-foreground" />
-                Play as
-              </label>
-              <Select value={localPlayerColor} onValueChange={(value: PlayerColor) => setLocalPlayerColor(value)}>
-                <SelectTrigger id="player-color" className="col-span-3">
-                  <SelectValue placeholder="Select color" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="white">White</SelectItem>
-                  <SelectItem value="black">Black</SelectItem>
+                <SelectItem value="human">Human vs Human</SelectItem>
+                <SelectItem value="ai">Human vs AI</SelectItem>
                 </SelectContent>
-              </Select>
-            </div>
-          )}
+            </Select>
+        </div>
 
-          {/* Game Mode */}
-          <div className="grid grid-cols-4 items-center gap-4">
+        {/* Player Color (only show when playing against AI) */}
+        {localOpponentType === 'ai' && (
+            <div className="grid grid-cols-4 items-center gap-4">
+                <label htmlFor="player-color" className="text-right col-span-1 flex items-center justify-end gap-2 text-sm font-medium">
+                <User className="h-4 w-4 text-muted-foreground" />
+                Play as
+                </label>
+                <Select value={localPlayerColor} onValueChange={(value: PlayerColor) => setLocalPlayerColor(value)}>
+                <SelectTrigger id="player-color" className="col-span-3">
+                    <SelectValue placeholder="Select color" />
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectItem value="white">White</SelectItem>
+                    <SelectItem value="black">Black</SelectItem>
+                </SelectContent>
+                </Select>
+            </div>
+        )}
+
+        {/* Game Mode */}
+        <div className="grid grid-cols-4 items-center gap-4">
             <label htmlFor="game-mode" className="text-right col-span-1 flex items-center justify-end gap-2 text-sm font-medium">
-              <Clock className="h-4 w-4 text-muted-foreground" />
-              {t('gameSetup.gameMode')}
+                <Clock className="h-4 w-4 text-muted-foreground" />
+                {t('gameSetup.gameMode')}
             </label>
             <Select value={localGameMode} onValueChange={(value: GameMode) => setLocalGameMode(value)}>
-              <SelectTrigger id="game-mode" className="col-span-3">
+                <SelectTrigger id="game-mode" className="col-span-3">
                 <SelectValue placeholder="Select game mode" />
-              </SelectTrigger>
-              <SelectContent>
+                </SelectTrigger>
+                <SelectContent>
                 <SelectItem value="classic">{t('gameMode.classic')}</SelectItem>
                 <SelectItem value="speed">{t('gameMode.speed')}</SelectItem>
                 <SelectItem value="math-master">{t('gameMode.mathMaster')}</SelectItem>
-              </SelectContent>
+                </SelectContent>
             </Select>
-          </div>
+        </div>
 
-          {/* Math Difficulty */}
-          <div className="grid grid-cols-4 items-center gap-4">
+        {/* Math Difficulty */}
+        <div className="grid grid-cols-4 items-center gap-4">
             <label htmlFor="math-difficulty" className="text-right col-span-1 flex items-center justify-end gap-2 text-sm font-medium">
-              <Calculator className="h-4 w-4 text-muted-foreground" />
-              {t('settings.mathDifficulty')}
+                <Calculator className="h-4 w-4 text-muted-foreground" />
+                {t('settings.mathDifficulty')}
             </label>
             <Select value={mathDifficulty} onValueChange={(value: Difficulty) => setMathDifficulty(value)}>
-              <SelectTrigger id="math-difficulty" className="col-span-3">
+                <SelectTrigger id="math-difficulty" className="col-span-3">
                 <SelectValue placeholder={t('settings.mathDifficulty')} />
-              </SelectTrigger>
-              <SelectContent>
+                </SelectTrigger>
+                <SelectContent>
                 <SelectItem value="easy">Easy</SelectItem>
                 <SelectItem value="medium">Medium</SelectItem>
                 <SelectItem value="hard">Hard</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* AI Strength (only show when playing against AI) */}
-          {localOpponentType === 'ai' && (
-            <div className="grid grid-cols-4 items-center gap-4">
-              <label htmlFor="ai-difficulty" className="text-right col-span-1 flex items-center justify-end gap-2 text-sm font-medium">
-                  <BrainCircuit className="h-4 w-4 text-muted-foreground" />
-                {t('settings.aiStrength')}
-              </label>
-              <Select value={aiDifficulty} onValueChange={(value: Difficulty) => setAiDifficulty(value)}>
-                <SelectTrigger id="ai-difficulty" className="col-span-3">
-                  <SelectValue placeholder={t('settings.aiStrength')} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="easy">Easy</SelectItem>
-                  <SelectItem value="medium">Medium</SelectItem>
-                  <SelectItem value="hard">Hard</SelectItem>
                 </SelectContent>
-              </Select>
-            </div>
-          )}
+            </Select>
         </div>
 
-        <DialogFooter>
-          <Button onClick={handleStart} className="w-full text-lg h-12 bg-primary hover:bg-primary/90">
+        {/* AI Strength (only show when playing against AI) */}
+        {localOpponentType === 'ai' && (
+            <div className="grid grid-cols-4 items-center gap-4">
+                <label htmlFor="ai-difficulty" className="text-right col-span-1 flex items-center justify-end gap-2 text-sm font-medium">
+                    <BrainCircuit className="h-4 w-4 text-muted-foreground" />
+                {t('settings.aiStrength')}
+                </label>
+                <Select value={aiDifficulty} onValueChange={(value: Difficulty) => setAiDifficulty(value)}>
+                <SelectTrigger id="ai-difficulty" className="col-span-3">
+                    <SelectValue placeholder={t('settings.aiStrength')} />
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectItem value="easy">Easy</SelectItem>
+                    <SelectItem value="medium">Medium</SelectItem>
+                    <SelectItem value="hard">Hard</SelectItem>
+                </SelectContent>
+                </Select>
+            </div>
+        )}
+      </div>
+
+      <DialogFooter>
+        <Button onClick={handleStartPractice} className="w-full text-lg h-12">
             <Play className="mr-2 h-5 w-5" />
             {t('gameSetup.startGame')}
-          </Button>
-        </DialogFooter>
+        </Button>
+      </DialogFooter>
+    </>
+  );
+
+  const renderSelectMode = () => (
+    <>
+      <DialogHeader>
+          <DialogTitle className="text-2xl font-bold text-center text-primary flex items-center justify-center gap-2">
+              <Play className="h-6 w-6" />
+              Select Game Mode
+          </DialogTitle>
+          <DialogDescription className="text-center text-muted-foreground pt-2">
+              Choose how you want to challenge your mind.
+          </DialogDescription>
+      </DialogHeader>
+      <div className="grid gap-4 py-6">
+        <ModeCard 
+            icon={BrainCircuit}
+            title="Practice"
+            description="Play vs AI or a friend locally"
+            onClick={() => setView('practice')}
+        />
+        <ModeCard 
+            icon={Users}
+            title="1v1 Ranked"
+            description="Compete against others online"
+            onClick={handleSelectRanked}
+        />
+        <ModeCard 
+            icon={Gamepad}
+            title="Matte Royale"
+            description="16-player battle royale. Last one standing wins!"
+            onClick={() => toast.info("Coming Soon!", { description: "Matte Royale is under development."})}
+            disabled
+        />
+      </div>
+    </>
+  );
+
+  return (
+    <Dialog open={isOpen} onOpenChange={handleCloseDialog}>
+      <DialogContent className="sm:max-w-[480px] bg-card/80 backdrop-blur-sm border-border/50 shadow-2xl rounded-2xl animate-scale-in">
+        {view === 'select' ? renderSelectMode() : renderPracticeConfig()}
       </DialogContent>
     </Dialog>
   );
 };
+
+interface ModeCardProps {
+    icon: React.ElementType;
+    title: string;
+    description: string;
+    onClick: () => void;
+    disabled?: boolean;
+}
+
+const ModeCard: React.FC<ModeCardProps> = ({ icon: Icon, title, description, onClick, disabled }) => (
+    <button
+        onClick={onClick}
+        disabled={disabled}
+        className={cn(
+            "flex items-center gap-4 p-4 rounded-lg border-2 transition-all duration-200",
+            "bg-background/50 hover:bg-accent hover:border-primary/50",
+            "focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background",
+            "disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-background/50 disabled:hover:border-transparent"
+        )}
+    >
+        <div className="bg-primary/10 p-3 rounded-lg">
+            <Icon className="h-6 w-6 text-primary" />
+        </div>
+        <div className="text-left">
+            <h3 className="font-semibold text-foreground">{title}</h3>
+            <p className="text-sm text-muted-foreground">{description}</p>
+        </div>
+        {!disabled && <ChevronRight className="h-5 w-5 text-muted-foreground ml-auto" />}
+    </button>
+);
+
 
 export default GameSetupModal;

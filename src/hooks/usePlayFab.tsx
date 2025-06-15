@@ -76,6 +76,17 @@ export const usePlayFab = () => {
         return Promise.resolve(null);
     }, []);
 
+    const findMatch = useCallback(async (gameMode: 'ranked' | 'royale') => {
+        console.warn(`PlayFab function 'findMatch' for ${gameMode} is not yet implemented.`);
+        // In a real implementation, this would call the backend to start matchmaking.
+        return { success: true, ticketId: `mock_ticket_${Date.now()}` };
+    }, []);
+
+    const cancelMatchmaking = useCallback(async (ticketId: string) => {
+        console.warn(`PlayFab function 'cancelMatchmaking' for ticket ${ticketId} is not yet implemented.`);
+        return { success: true };
+    }, []);
+
     const retryConnection = useCallback(() => {
        if(playFabData.connectionStatus === 'error') {
          loginToPlayFab();
@@ -90,5 +101,7 @@ export const usePlayFab = () => {
         getLeaderboard: () => emptyFunc('getLeaderboard'),
         trackMathChallenge: () => emptyFunc('trackMathChallenge'),
         retryConnection,
+        findMatch,
+        cancelMatchmaking,
     };
 };

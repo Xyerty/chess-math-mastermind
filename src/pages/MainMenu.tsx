@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Play, BookOpen, BarChart3, Settings } from "lucide-react";
@@ -9,6 +8,8 @@ import MenuCard from "../components/MenuCard";
 import TechLogos from "../components/TechLogos";
 import { useUser } from "@clerk/clerk-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { usePlayFab } from "../hooks/usePlayFab";
+import { toast } from "sonner";
 
 const MainMenu = () => {
   const navigate = useNavigate();
@@ -16,11 +17,19 @@ const MainMenu = () => {
   const [isSetupModalOpen, setIsSetupModalOpen] = useState(false);
   const { setMathDifficulty, setAiDifficulty } = useDifficulty();
   const { user } = useUser();
+  const { findMatch } = usePlayFab();
 
   const handleStartGame = (mathDifficulty: Difficulty, aiDifficulty: Difficulty) => {
     setMathDifficulty(mathDifficulty);
     setAiDifficulty(aiDifficulty);
     navigate("/game");
+  };
+
+  const handleFindMatch = async () => {
+    await findMatch('ranked');
+    toast.info("Searching for an opponent...", {
+      description: "Ranked matchmaking is coming soon!",
+    });
   };
 
   const getTimeOfDay = () => {
@@ -150,6 +159,7 @@ const MainMenu = () => {
         isOpen={isSetupModalOpen}
         onClose={() => setIsSetupModalOpen(false)}
         onStartGame={handleStartGame}
+        onFindMatch={handleFindMatch}
       />
     </div>
   );

@@ -2,7 +2,7 @@
 export type ChessPiece = 'wp' | 'wn' | 'wb' | 'wr' | 'wq' | 'wk' | 'bp' | 'bn' | 'bb' | 'br' | 'bq' | 'bk' | null;
 export type GameStatus = 'playing' | 'check' | 'checkmate' | 'stalemate' | 'timeout' | 'resigned';
 export type Player = 'white' | 'black';
-export type GameMode = 'classic' | 'speed' | 'math-master';
+export type GameMode = 'classic' | 'speed' | 'math-master' | 'ranked' | 'royale';
 
 export interface ChessMove {
   from: { row: number; col: number };

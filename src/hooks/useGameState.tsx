@@ -7,6 +7,7 @@ const getInitialTime = (gameMode: GameMode) => {
   switch (gameMode) {
     case 'speed':
       return 180; // 3 minutes
+    case 'ranked':
     case 'classic':
     case 'math-master':
     default:
