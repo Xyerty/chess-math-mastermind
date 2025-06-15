@@ -1,3 +1,4 @@
+
 import React, { useCallback, useState } from "react";
 import { useLanguage } from "../contexts/LanguageContext";
 import { useChessGame } from "../hooks/useChessGame";
@@ -13,6 +14,9 @@ import GameEndModal from "../components/GameEndModal";
 import MathChallenge from "../components/MathChallenge";
 import { useNavigate } from "react-router-dom";
 import { Player } from "../features/chess/types";
+import { usePlayFab } from "../hooks/usePlayFab";
+import { Button } from "@/components/ui/button";
+import { Loader2, Wifi, WifiOff } from 'lucide-react';
 
 const Game = () => {
   const { t } = useLanguage();
@@ -43,6 +47,7 @@ const Game = () => {
     mathAccuracy
   } = useChessGame(aiDifficulty, gameMode);
 
+  const { playFabData, retryConnection } = usePlayFab();
   const [showHint, setShowHint] = useState(false);
 
   const onChessBoardClick = useCallback((row: number, col: number) => {
@@ -157,6 +162,23 @@ const Game = () => {
                 aiDifficulty={aiDifficulty}
                 usingPythonEngine={usingPythonEngine}
               />
+
+              {/* PlayFab Connection Status */}
+              <div className="mt-4 p-3 bg-muted/50 dark:bg-muted/20 rounded-lg flex items-center justify-between text-sm shadow-inner">
+                <div className="flex items-center gap-2 font-semibold">
+                  {playFabData.connectionStatus === 'connected' && <Wifi className="h-5 w-5 text-green-500" />}
+                  {playFabData.connectionStatus === 'connecting' && <Loader2 className="h-5 w-5 animate-spin" />}
+                  {playFabData.connectionStatus === 'error' && <WifiOff className="h-5 w-5 text-destructive" />}
+                  {playFabData.connectionStatus === 'disconnected' && <WifiOff className="h-5 w-5 text-muted-foreground" />}
+                  <span>PlayFab Status</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="capitalize text-muted-foreground">{playFabData.connectionStatus}</span>
+                  {playFabData.connectionStatus === 'error' && (
+                      <Button onClick={retryConnection} size="sm" variant="secondary">Retry</Button>
+                  )}
+                </div>
+              </div>
 
               {/* Math Master Mode Stats */}
               {gameMode === 'math-master' && (

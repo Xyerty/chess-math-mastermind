@@ -30,6 +30,8 @@
 - Responsive design
 - Dark/light theme
 - Multi-language support
+- Secure user authentication via Clerk
+- PlayFab integration for backend services (requires environment variables)
 
 ❌ **Not Available:**
 - Python chess engine (Hobby tier limitation)
@@ -44,7 +46,13 @@
 
 ## Environment Variables
 
-No environment variables are required for the basic deployment.
+To deploy the application with full functionality, you must set the following environment variables in your Vercel project settings:
+
+-   `CLERK_SECRET_KEY`: Your secret key from the Clerk dashboard. You can find this under **API Keys -> Advanced -> Toggle "Show secret key"**. It will start with `sk_live_` or `sk_test_`.
+-   `PLAYFAB_TITLE_ID`: Your Title ID from the PlayFab Game Manager dashboard.
+-   `PLAYFAB_SECRET_KEY`: Your secret key from the PlayFab Game Manager dashboard. Go to **Settings -> Secret Keys**.
+
+These variables are essential for the backend orchestrator to securely connect Clerk authentication with PlayFab services. Without them, multiplayer features will not work.
 
 ## Monitoring
 
