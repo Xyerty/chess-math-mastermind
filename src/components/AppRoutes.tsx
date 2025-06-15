@@ -16,6 +16,7 @@ const Tutorial = React.lazy(() => import("../pages/Tutorial"));
 const Settings = React.lazy(() => import("../pages/Settings"));
 const Statistics = React.lazy(() => import("../pages/Statistics"));
 const Leaderboard = React.lazy(() => import("../pages/Leaderboard"));
+const Achievements = React.lazy(() => import("../pages/Achievements"));
 const NotFound = React.lazy(() => import("../pages/NotFound"));
 const AuthPage = React.lazy(() => import("../pages/Auth"));
 
@@ -43,6 +44,7 @@ const AppRoutes: React.FC = () => {
                         <Route path="/settings" element={<Settings />} />
                         <Route path="/statistics" element={<Statistics />} />
                         <Route path="/leaderboard" element={<Leaderboard />} />
+                        <Route path="/achievements" element={<Achievements />} />
                     </Route>
 
                     {/* Tutorial without layout but still protected */}

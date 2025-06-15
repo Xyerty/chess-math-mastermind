@@ -8,7 +8,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Menu, Home, Settings, BarChart3, BookOpen, Sword, Moon, Sun, Trophy } from 'lucide-react';
+import { Menu, Home, Settings, BarChart3, BookOpen, Sword, Moon, Sun, Trophy, Award } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useTheme } from 'next-themes';
 
@@ -30,6 +30,8 @@ const Header = () => {
                 return t('stats.title');
             case '/leaderboard':
                 return "Leaderboard";
+            case '/achievements':
+                return "Achievements";
             case '/tutorial':
                  return t('mainMenu.howToPlay');
             default:
@@ -41,6 +43,7 @@ const Header = () => {
       { title: "Home", path: "/", icon: Home },
       { title: t('mainMenu.playGame'), path: "/game", icon: Sword },
       { title: "Leaderboard", path: "/leaderboard", icon: Trophy },
+      { title: "Achievements", path: "/achievements", icon: Award },
       { title: t('mainMenu.howToPlay'), path: "/tutorial", icon: BookOpen },
       { title: t('mainMenu.statistics'), path: "/statistics", icon: BarChart3 },
       { title: t('mainMenu.settings'), path: "/settings", icon: Settings },

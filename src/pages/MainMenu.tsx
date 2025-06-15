@@ -1,6 +1,7 @@
+
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Play, BookOpen, BarChart3, Trophy } from "lucide-react";
+import { Play, BookOpen, BarChart3, Trophy, Award } from "lucide-react";
 import { useLanguage } from "../contexts/LanguageContext";
 import { useDifficulty, Difficulty } from "../contexts/DifficultyContext";
 import GameSetupModal from "../components/GameSetupModal";
@@ -60,6 +61,13 @@ const MainMenu = () => {
       action: () => navigate("/leaderboard"),
     },
     {
+      key: 'achievements',
+      title: "Achievements", // NOTE: This text is not yet translated.
+      icon: Award,
+      description: "Track your progress and unlock rewards.", // NOTE: This text is not yet translated.
+      action: () => navigate("/achievements"),
+    },
+    {
       key: 'howToPlay',
       title: t('mainMenu.howToPlay'),
       icon: BookOpen,
@@ -77,7 +85,7 @@ const MainMenu = () => {
   ];
 
   const playItem = menuItems.find(item => item.key === 'play');
-  const secondaryItems = menuItems.filter(item => ['leaderboard', 'howToPlay', 'statistics'].includes(item.key));
+  const secondaryItems = menuItems.filter(item => ['leaderboard', 'achievements', 'howToPlay', 'statistics'].includes(item.key));
 
   return (
     <div className="bg-gradient-to-br from-gray-50 to-slate-100 dark:from-slate-900 dark:to-background">
@@ -125,7 +133,7 @@ const MainMenu = () => {
           )}
           
           {/* Secondary Actions */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 animate-fade-in" style={{ animationDelay: '600ms' }}>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 animate-fade-in" style={{ animationDelay: '600ms' }}>
             {secondaryItems.map((item) => (
               <MenuCard
                 key={item.key}
