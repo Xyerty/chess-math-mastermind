@@ -5,14 +5,10 @@ import { BrainCircuit, Loader } from 'lucide-react';
 
 interface AIThinkingIndicatorProps {
   isThinking: boolean;
-  difficulty: string;
-  thinkingTime?: number;
 }
 
 const AIThinkingIndicator: React.FC<AIThinkingIndicatorProps> = ({ 
-  isThinking, 
-  difficulty, 
-  thinkingTime 
+  isThinking
 }) => {
   if (!isThinking) return null;
 
@@ -24,11 +20,7 @@ const AIThinkingIndicator: React.FC<AIThinkingIndicatorProps> = ({
           <Loader className="h-4 w-4 animate-spin text-primary" />
         </div>
         <div>
-          <div className="font-semibold text-primary">AI is thinking...</div>
-          <div className="text-sm text-muted-foreground">
-            Difficulty: {difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}
-            {thinkingTime && ` • ${thinkingTime}ms`}
-          </div>
+          <div className="font-semibold text-primary">AI is considering its move...</div>
         </div>
       </CardContent>
     </Card>

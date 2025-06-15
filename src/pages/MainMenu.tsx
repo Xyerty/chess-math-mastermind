@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Play, BookOpen, BarChart3, Trophy } from "lucide-react";
@@ -27,9 +26,10 @@ const MainMenu = () => {
   };
 
   const handleFindMatch = async () => {
-    await findMatch('ranked');
-    toast.info("Searching for an opponent...", {
-      description: "Ranked matchmaking is coming soon!",
+    // This functionality is not ready yet.
+    // await findMatch('ranked');
+    toast.info("Coming Soon!", {
+      description: "Ranked matchmaking is under development.",
     });
   };
 
@@ -80,7 +80,7 @@ const MainMenu = () => {
   const secondaryItems = menuItems.filter(item => ['leaderboard', 'howToPlay', 'statistics'].includes(item.key));
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-slate-100 dark:from-slate-900 dark:to-background">
+    <div className="bg-gradient-to-br from-gray-50 to-slate-100 dark:from-slate-900 dark:to-background">
       <div className="container mx-auto px-4 py-8 sm:py-12 max-w-4xl space-y-12">
         {/* Consolidated Header Section */}
         <div className="text-center animate-fade-in">

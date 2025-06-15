@@ -8,7 +8,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Menu, Home, Settings, BarChart3, BookOpen, Sword, Moon, Sun } from 'lucide-react';
+import { Menu, Home, Settings, BarChart3, BookOpen, Sword, Moon, Sun, Trophy } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useTheme } from 'next-themes';
 
@@ -20,12 +20,16 @@ const Header = () => {
 
     const getTitle = () => {
         switch (location.pathname) {
+            case '/':
+                return null;
             case '/game':
                 return t('game.title');
             case '/settings':
                 return t('settings.title');
             case '/statistics':
                 return t('stats.title');
+            case '/leaderboard':
+                return "Leaderboard";
             case '/tutorial':
                  return t('mainMenu.howToPlay');
             default:
@@ -36,10 +40,13 @@ const Header = () => {
     const menuItems = [
       { title: "Home", path: "/", icon: Home },
       { title: t('mainMenu.playGame'), path: "/game", icon: Sword },
+      { title: "Leaderboard", path: "/leaderboard", icon: Trophy },
       { title: t('mainMenu.howToPlay'), path: "/tutorial", icon: BookOpen },
       { title: t('mainMenu.statistics'), path: "/statistics", icon: BarChart3 },
       { title: t('mainMenu.settings'), path: "/settings", icon: Settings },
     ];
+    
+    const title = getTitle();
 
     return (
         <header className="flex items-center justify-between p-4 border-b bg-card/95 backdrop-blur-sm shadow-sm sticky top-0 z-40 h-[65px]">
@@ -59,9 +66,11 @@ const Header = () => {
                 </DropdownMenuContent>
             </DropdownMenu>
 
-            <h1 className="text-xl lg:text-2xl font-bold text-primary text-center absolute left-1/2 -translate-x-1/2 whitespace-nowrap">
-                {getTitle()}
-            </h1>
+            {title && (
+                <h1 className="text-xl lg:text-2xl font-bold text-primary text-center absolute left-1/2 -translate-x-1/2 whitespace-nowrap">
+                    {title}
+                </h1>
+            )}
 
             <Button
                 variant="ghost"

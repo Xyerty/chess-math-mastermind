@@ -32,35 +32,17 @@ const AppRoutes: React.FC = () => {
                     {/* Public route for authentication */}
                     <Route path="/auth" element={<AuthPage />} />
 
-                    {/* Protected routes - require authentication */}
-                    <Route path="/" element={
+                    {/* Protected routes with the shared layout */}
+                    <Route element={
                         <ProtectedRoute>
-                            <MainMenu />
+                            <AppLayout />
                         </ProtectedRoute>
-                    } />
-
-                    {/* Routes with the shared layout - all protected */}
-                    <Route element={<AppLayout />}>
-                        <Route path="/game" element={
-                            <ProtectedRoute>
-                                <Game />
-                            </ProtectedRoute>
-                        } />
-                        <Route path="/settings" element={
-                            <ProtectedRoute>
-                                <Settings />
-                            </ProtectedRoute>
-                        } />
-                        <Route path="/statistics" element={
-                            <ProtectedRoute>
-                                <Statistics />
-                            </ProtectedRoute>
-                        } />
-                        <Route path="/leaderboard" element={
-                            <ProtectedRoute>
-                                <Leaderboard />
-                            </ProtectedRoute>
-                        } />
+                    }>
+                        <Route path="/" element={<MainMenu />} />
+                        <Route path="/game" element={<Game />} />
+                        <Route path="/settings" element={<Settings />} />
+                        <Route path="/statistics" element={<Statistics />} />
+                        <Route path="/leaderboard" element={<Leaderboard />} />
                     </Route>
 
                     {/* Tutorial without layout but still protected */}

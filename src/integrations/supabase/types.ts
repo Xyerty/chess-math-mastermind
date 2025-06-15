@@ -45,6 +45,33 @@ export type Database = {
         }
         Relationships: []
       }
+      achievements: {
+        Row: {
+          description: string
+          difficulty: Database["public"]["Enums"]["achievement_difficulty"]
+          icon_asset_name: string
+          id: string
+          name: string
+          points: number
+        }
+        Insert: {
+          description: string
+          difficulty: Database["public"]["Enums"]["achievement_difficulty"]
+          icon_asset_name: string
+          id?: string
+          name: string
+          points: number
+        }
+        Update: {
+          description?: string
+          difficulty?: Database["public"]["Enums"]["achievement_difficulty"]
+          icon_asset_name?: string
+          id?: string
+          name?: string
+          points?: number
+        }
+        Relationships: []
+      }
       friendships: {
         Row: {
           action_user_id: string
@@ -174,6 +201,35 @@ export type Database = {
         }
         Relationships: []
       }
+      user_achievements: {
+        Row: {
+          achievement_id: string
+          id: string
+          unlocked_at: string
+          user_id: string
+        }
+        Insert: {
+          achievement_id: string
+          id?: string
+          unlocked_at?: string
+          user_id: string
+        }
+        Update: {
+          achievement_id?: string
+          id?: string
+          unlocked_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_achievements_achievement_id_fkey"
+            columns: ["achievement_id"]
+            isOneToOne: false
+            referencedRelation: "achievements"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -182,6 +238,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
+      achievement_difficulty: "Common" | "Rare" | "Epic" | "Legendary"
       friendship_status: "pending" | "accepted" | "blocked"
       sanction_type: "warning" | "temporary_ban" | "permanent_ban" | "mute"
     }
@@ -299,6 +356,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      achievement_difficulty: ["Common", "Rare", "Epic", "Legendary"],
       friendship_status: ["pending", "accepted", "blocked"],
       sanction_type: ["warning", "temporary_ban", "permanent_ban", "mute"],
     },

@@ -43,9 +43,8 @@ const GameSetupModal: React.FC<GameSetupModalProps> = ({ isOpen, onClose, onStar
   };
   
   const handleSelectRanked = () => {
-    setGameMode('ranked');
-    onFindMatch();
-    onClose();
+    // This feature is coming soon.
+    toast.info("Coming Soon!", { description: "1v1 Ranked is under development." });
   }
 
   const handleCloseDialog = () => {
@@ -198,14 +197,17 @@ const GameSetupModal: React.FC<GameSetupModalProps> = ({ isOpen, onClose, onStar
             icon={Users}
             title="1v1 Ranked"
             description="Compete against others online"
-            onClick={handleSelectRanked}
+            onClick={() => {}}
+            disabled
+            comingSoon
         />
         <ModeCard 
             icon={Gamepad}
             title="Matte Royale"
             description="16-player battle royale. Last one standing wins!"
-            onClick={() => toast.info("Coming Soon!", { description: "Matte Royale is under development."})}
+            onClick={() => {}}
             disabled
+            comingSoon
         />
       </div>
     </>
@@ -226,9 +228,10 @@ interface ModeCardProps {
     description: string;
     onClick: () => void;
     disabled?: boolean;
+    comingSoon?: boolean;
 }
 
-const ModeCard: React.FC<ModeCardProps> = ({ icon: Icon, title, description, onClick, disabled }) => (
+const ModeCard: React.FC<ModeCardProps> = ({ icon: Icon, title, description, onClick, disabled, comingSoon }) => (
     <button
         onClick={onClick}
         disabled={disabled}
@@ -242,11 +245,16 @@ const ModeCard: React.FC<ModeCardProps> = ({ icon: Icon, title, description, onC
         <div className="bg-primary/10 p-3 rounded-lg">
             <Icon className="h-6 w-6 text-primary" />
         </div>
-        <div className="text-left">
-            <h3 className="font-semibold text-foreground">{title}</h3>
+        <div className="text-left flex-grow">
+            <h3 className="font-semibold text-foreground flex items-center gap-2">
+                {title}
+            </h3>
             <p className="text-sm text-muted-foreground">{description}</p>
         </div>
-        {!disabled && <ChevronRight className="h-5 w-5 text-muted-foreground ml-auto" />}
+        {comingSoon && (
+            <span className="text-xs bg-muted text-muted-foreground font-medium px-2 py-1.5 rounded-full">Coming Soon</span>
+        )}
+        {!disabled && !comingSoon && <ChevronRight className="h-5 w-5 text-muted-foreground ml-auto flex-shrink-0" />}
     </button>
 );
 
