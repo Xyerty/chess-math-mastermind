@@ -1,4 +1,5 @@
-import React from "react";
+
+import React, { Suspense } from "react";
 import * as Sentry from "@sentry/react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -12,17 +13,21 @@ import { DifficultyProvider } from "./contexts/DifficultyContext";
 import { SettingsProvider } from "./contexts/SettingsContext";
 import { GameModeProvider } from "./contexts/GameModeContext";
 import { OpponentProvider } from "./contexts/OpponentContext";
-import MainMenu from "./pages/MainMenu";
-import Game from "./pages/Game";
-import Tutorial from "./pages/Tutorial";
-import Settings from "./pages/Settings";
-import Statistics from "./pages/Statistics";
-import NotFound from "./pages/NotFound";
 import AppLayout from "./components/AppLayout";
-import AuthPage from "./pages/Auth";
 import ProtectedRoute from "./components/ProtectedRoute";
 import FloatingAuthStatus from "./components/FloatingAuthStatus";
 import ErrorBoundary from "./components/ErrorBoundary";
+import PageLoader from "./components/PageLoader";
+
+// Lazy-loaded pages
+const MainMenu = React.lazy(() => import("./pages/MainMenu"));
+const Game = React.lazy(() => import("./pages/Game"));
+const Tutorial = React.lazy(() => import("./pages/Tutorial"));
+const Settings = React.lazy(() => import("./pages/Settings"));
+const Statistics = React.lazy(() => import("./pages/Statistics"));
+const NotFound = React.lazy(() => import("./pages/NotFound"));
+const AuthPage = React.lazy(() => import("./pages/Auth"));
+
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -63,46 +68,48 @@ const AppContent: React.FC = () => {
                       <Sonner />
                       <BrowserRouter>
                         <FloatingAuthStatus />
-                        <SentryRoutes>
-                          {/* Public route for authentication */}
-                          <Route path="/auth" element={<AuthPage />} />
-                          
-                          {/* Protected routes - require authentication */}
-                          <Route path="/" element={
-                            <ProtectedRoute>
-                              <MainMenu />
-                            </ProtectedRoute>
-                          } />
-                          
-                          {/* Routes with the shared layout - all protected */}
-                          <Route element={<AppLayout />}>
-                            <Route path="/game" element={
+                        <Suspense fallback={<PageLoader />}>
+                          <SentryRoutes>
+                            {/* Public route for authentication */}
+                            <Route path="/auth" element={<AuthPage />} />
+                            
+                            {/* Protected routes - require authentication */}
+                            <Route path="/" element={
                               <ProtectedRoute>
-                                <Game />
+                                <MainMenu />
                               </ProtectedRoute>
                             } />
-                            <Route path="/settings" element={
-                              <ProtectedRoute>
-                                <Settings />
-                              </ProtectedRoute>
-                            } />
-                            <Route path="/statistics" element={
-                              <ProtectedRoute>
-                                <Statistics />
-                              </ProtectedRoute>
-                            } />
-                          </Route>
+                            
+                            {/* Routes with the shared layout - all protected */}
+                            <Route element={<AppLayout />}>
+                              <Route path="/game" element={
+                                <ProtectedRoute>
+                                  <Game />
+                                </ProtectedRoute>
+                              } />
+                              <Route path="/settings" element={
+                                <ProtectedRoute>
+                                  <Settings />
+                                </ProtectedRoute>
+                              } />
+                              <Route path="/statistics" element={
+                                <ProtectedRoute>
+                                  <Statistics />
+                                </ProtectedRoute>
+                              } />
+                            </Route>
 
-                          {/* Tutorial without layout but still protected */}
-                          <Route path="/tutorial" element={
-                            <ProtectedRoute>
-                              <Tutorial />
-                            </ProtectedRoute>
-                          } />
-                          
-                          {/* 404 page */}
-                          <Route path="*" element={<NotFound />} />
-                        </SentryRoutes>
+                            {/* Tutorial without layout but still protected */}
+                            <Route path="/tutorial" element={
+                              <ProtectedRoute>
+                                <Tutorial />
+                              </ProtectedRoute>
+                            } />
+                            
+                            {/* 404 page */}
+                            <Route path="*" element={<NotFound />} />
+                          </SentryRoutes>
+                        </Suspense>
                       </BrowserRouter>
                     </TooltipProvider>
                   </OpponentProvider>
