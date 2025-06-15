@@ -39,8 +39,8 @@ const AuthPage = () => {
       card: "shadow-none border-0 bg-transparent w-full p-0",
       formButtonPrimary: "bg-primary text-primary-foreground hover:bg-primary/90 h-11 text-sm font-medium",
       footerActionLink: "text-primary hover:underline",
-      socialButtonsBlockButton: "border-border hover:bg-muted",
-      formInput: "border-border h-10",
+      socialButtonsBlockButton: "border-border hover:bg-muted h-11 text-sm font-medium",
+      formInput: "h-10 bg-background border-input ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
       dividerText: "text-muted-foreground",
       dividerLine: "bg-border",
     }
@@ -75,13 +75,13 @@ const AuthPage = () => {
               <TabsList className="grid w-full grid-cols-2 bg-muted/60 dark:bg-slate-800/60 p-1 rounded-lg">
                 <TabsTrigger 
                   value="signin" 
-                  className="py-2 text-muted-foreground transition-all duration-300 ease-in-out data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md data-[state=active]:shadow-primary/20 rounded-md hover:bg-muted/80"
+                  className="h-10 flex items-center justify-center text-muted-foreground transition-all duration-300 ease-in-out data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md data-[state=active]:shadow-primary/20 rounded-md hover:bg-muted/80"
                 >
                   Sign In
                 </TabsTrigger>
                 <TabsTrigger 
                   value="signup" 
-                  className="py-2 text-muted-foreground transition-all duration-300 ease-in-out data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md data-[state=active]:shadow-primary/20 rounded-md hover:bg-muted/80"
+                  className="h-10 flex items-center justify-center text-muted-foreground transition-all duration-300 ease-in-out data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md data-[state=active]:shadow-primary/20 rounded-md hover:bg-muted/80"
                 >
                   Sign Up
                 </TabsTrigger>
