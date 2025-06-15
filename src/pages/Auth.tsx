@@ -6,6 +6,7 @@ import { SignIn, SignUp } from '@clerk/clerk-react';
 import { Sparkles, Shield, Loader2 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import TechLogos from '@/components/TechLogos';
 
 const AuthPage = () => {
   const navigate = useNavigate();
@@ -19,9 +20,9 @@ const AuthPage = () => {
 
   if (!isLoaded) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-indigo-100 dark:from-slate-900 dark:via-purple-900/20 dark:to-slate-900 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-100 dark:from-slate-900 dark:via-teal-900/20 dark:to-slate-900 flex items-center justify-center p-4">
         <div className="flex flex-col items-center gap-4 text-slate-600 dark:text-slate-400">
-          <Loader2 className="h-12 w-12 animate-spin text-purple-600 dark:text-purple-400" />
+          <Loader2 className="h-12 w-12 animate-spin text-teal-600 dark:text-teal-400" />
           <p className="text-lg font-medium">Securing your session...</p>
           <p className="text-sm">Please wait while we prepare the board.</p>
         </div>
@@ -31,7 +32,7 @@ const AuthPage = () => {
 
   const clerkAppearance = {
     variables: {
-      colorPrimary: '#6d28d9', // Tailwind's purple-600
+      colorPrimary: '#0d9488', // tailwind's teal-600
       borderRadius: 'var(--radius)',
     },
     elements: {
@@ -39,25 +40,35 @@ const AuthPage = () => {
       card: "shadow-none border-0 bg-transparent w-full p-0",
       formButtonPrimary: "h-12 text-base font-semibold shadow-lg hover:shadow-primary/30 hover:-translate-y-0.5 transition-all duration-300",
       footerActionLink: "text-primary hover:underline",
-      socialButtonsBlockButton: "border-border hover:bg-muted h-11 text-sm font-medium",
-      formInput: "h-11 bg-background border-input ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+      socialButtonsBlockButton: `
+        h-12 text-base font-medium border-border 
+        hover:bg-muted transition-all duration-300
+        shadow-md hover:shadow-lg hover:-translate-y-0.5
+      `,
+      socialButtonsBlockButton__google: `
+        bg-white/80 dark:bg-slate-800/80
+        hover:bg-white dark:hover:bg-slate-800
+        text-foreground
+        border-slate-300 dark:border-slate-700
+      `,
+      formInput: "h-11 bg-background/80 border-input ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
       dividerText: "text-muted-foreground",
       dividerLine: "bg-border",
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-indigo-100 dark:from-slate-900 dark:via-purple-900/20 dark:to-slate-900 flex items-center justify-center p-4 sm:p-6 md:p-8 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-100 dark:from-slate-900 dark:via-teal-900/20 dark:to-slate-900 flex flex-col items-center justify-center p-4 sm:p-6 md:p-8 relative overflow-hidden">
       {/* Background Elements */}
       <div className="absolute inset-0 bg-grid-slate-100 dark:bg-grid-slate-700/25 bg-[size:20px_20px] opacity-10" />
-      <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-purple-400/10 rounded-full blur-3xl animate-pulse" />
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-indigo-400/10 rounded-full blur-3xl animate-pulse delay-1000" />
+      <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-teal-400/10 rounded-full blur-3xl animate-pulse" />
+      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-cyan-400/10 rounded-full blur-3xl animate-pulse delay-1000" />
       
-      <div className="w-full max-w-md space-y-6 relative z-10">
+      <div className="w-full max-w-md space-y-6 relative z-10 flex-grow flex flex-col justify-center">
         {/* Main Auth Card */}
-        <Card className="backdrop-blur-xl bg-white/90 dark:bg-slate-900/90 border-white/20 dark:border-slate-700/50 shadow-2xl shadow-black/10 dark:shadow-black/30 animate-scale-in">
+        <Card className="backdrop-blur-xl bg-white/80 dark:bg-slate-900/80 border-white/20 dark:border-slate-700/50 shadow-2xl shadow-black/10 dark:shadow-black/30 animate-scale-in">
           <CardHeader className="text-center space-y-4 pb-6">
-            <div className="mx-auto w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg shadow-purple-500/25 animate-bounce-in">
+            <div className="mx-auto w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-teal-500 to-cyan-600 rounded-2xl flex items-center justify-center shadow-lg shadow-teal-500/25 animate-bounce-in">
               <Shield className="h-8 w-8 sm:h-10 sm:w-10 text-white" />
             </div>
             <div className="space-y-1">
@@ -109,6 +120,10 @@ const AuthPage = () => {
             Secure authentication by Clerk
           </p>
         </div>
+      </div>
+      
+      <div className="w-full max-w-md relative z-10 animate-fade-in delay-700">
+        <TechLogos />
       </div>
     </div>
   );

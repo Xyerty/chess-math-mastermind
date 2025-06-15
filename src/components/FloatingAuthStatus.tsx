@@ -12,7 +12,7 @@ const FloatingAuthStatus = () => {
   if (!isLoaded) {
     return (
        <div className="fixed top-4 right-4 z-50">
-        <Skeleton className="h-12 w-48" />
+        <Skeleton className="h-12 w-12 rounded-full" />
       </div>
     )
   }
@@ -23,16 +23,28 @@ const FloatingAuthStatus = () => {
         <UserButton 
           appearance={{
             elements: {
-              avatarBox: "h-10 w-10",
-              userButtonTrigger: "shadow-lg border hover:bg-accent rounded-lg p-2"
+              avatarBox: "h-12 w-12",
+              userButtonTrigger: `
+                shadow-xl border-2 border-primary/10 hover:border-primary/30
+                rounded-full p-0.5 bg-background
+                transition-all duration-300
+                hover:scale-105 active:scale-95
+              `,
+              userButtonPopoverCard: `
+                mt-2 border border-border shadow-2xl rounded-xl
+              `,
+              userButtonPopoverMain: `p-2`,
+              userButtonPopoverActions: `px-2 pb-2`,
+              userButtonPopoverActionButton: `rounded-md text-sm sm:text-base`,
+              userButtonPopoverActionButton__manageAccount: `text-foreground hover:bg-accent`,
+              userButtonPopoverActionButton__signOut: `text-destructive-foreground bg-destructive/90 hover:bg-destructive`,
             }
           }}
-          showName={true}
           afterSignOutUrl="/auth"
         />
       ) : (
-        <Button onClick={() => navigate('/auth')} className="shadow-lg">
-          <LogIn className="mr-2 h-4 w-4" />
+        <Button onClick={() => navigate('/auth')} className="shadow-lg h-12 px-6">
+          <LogIn className="mr-2 h-5 w-5" />
           Login / Sign Up
         </Button>
       )}

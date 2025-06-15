@@ -7,6 +7,7 @@ import { useDifficulty, Difficulty } from "../contexts/DifficultyContext";
 import GameSetupModal from "../components/GameSetupModal";
 import WelcomeSection from "../components/WelcomeSection";
 import MenuCard from "../components/MenuCard";
+import TechLogos from "../components/TechLogos";
 
 const MainMenu = () => {
   const navigate = useNavigate();
@@ -49,7 +50,7 @@ const MainMenu = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-slate-100 dark:from-slate-900 dark:to-background">
       <div className="container mx-auto px-4 py-8 sm:py-12 max-w-6xl space-y-12">
         {/* Header Section */}
         <div className="text-center animate-fade-in">
@@ -99,6 +100,10 @@ const MainMenu = () => {
             <h3 className="font-semibold text-lg">Skill Building</h3>
             <p className="text-sm text-muted-foreground">Improve with every game</p>
           </div>
+        </div>
+
+        <div className="animate-fade-in" style={{ animationDelay: '1000ms' }}>
+          <TechLogos />
         </div>
       </div>
 
