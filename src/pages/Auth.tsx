@@ -1,3 +1,4 @@
+
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { useAuth } from '@clerk/clerk-react';
@@ -10,11 +11,11 @@ import SignUpForm from '@/components/auth/SignUpForm';
 import { Button } from '@/components/ui/button';
 
 const AuthPage = () => {
-  const { isSignedIn, isLoaded } = useAuth();
+  const { isLoaded } = useAuth();
   const [authView, setAuthView] = useState<'signin' | 'signup'>('signin');
 
-  // Note: The AuthAwareRouter component handles redirects for signed-in users
-  // This page now focuses purely on authentication UI
+  // The redirect logic for already-signed-in users is now handled globally in AppRoutes.tsx.
+  // This page can now focus purely on the authentication UI.
 
   if (!isLoaded) {
     return (
