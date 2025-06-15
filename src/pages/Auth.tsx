@@ -1,4 +1,3 @@
-
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { useAuth } from '@clerk/clerk-react';
@@ -9,25 +8,13 @@ import GoogleSignInButton from '@/components/auth/GoogleSignInButton';
 import SignInForm from '@/components/auth/SignInForm';
 import SignUpForm from '@/components/auth/SignUpForm';
 import { Button } from '@/components/ui/button';
-import { usePlayFab } from '@/hooks/usePlayFab';
 
 const AuthPage = () => {
-  const navigate = useNavigate();
   const { isSignedIn, isLoaded } = useAuth();
-  const { loginToPlayFab, playFabData } = usePlayFab();
   const [authView, setAuthView] = useState<'signin' | 'signup'>('signin');
 
-  useEffect(() => {
-    if (isLoaded && isSignedIn) {
-      if (!playFabData.isLoggedIn && playFabData.connectionStatus !== 'connecting' && playFabData.connectionStatus !== 'connected') {
-        loginToPlayFab().finally(() => {
-          navigate('/');
-        });
-      } else {
-        navigate('/');
-      }
-    }
-  }, [isSignedIn, isLoaded, navigate, loginToPlayFab, playFabData]);
+  // Note: The AuthAwareRouter component handles redirects for signed-in users
+  // This page now focuses purely on authentication UI
 
   if (!isLoaded) {
     return (
@@ -90,7 +77,6 @@ const AuthPage = () => {
               : 'Already have an account? Sign In'}
           </Button>
         </div>
-
 
         {/* Footer */}
         <div className="text-center text-xs sm:text-sm text-slate-500 dark:text-slate-400 animate-fade-in delay-500">

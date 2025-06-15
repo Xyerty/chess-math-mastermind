@@ -1,4 +1,3 @@
-
 import React, { Suspense } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import * as Sentry from "@sentry/react";
@@ -8,6 +7,7 @@ import ProtectedRoute from "./ProtectedRoute";
 import FloatingAuthStatus from "./FloatingAuthStatus";
 import PageLoader from "./PageLoader";
 import BetaBanner from "./BetaBanner";
+import AuthAwareRouter from "./AuthAwareRouter";
 
 // Lazy-loaded pages
 const MainMenu = React.lazy(() => import("../pages/MainMenu"));
@@ -26,38 +26,40 @@ const SentryRoutes = Sentry.withSentryReactRouterV6Routing(Routes);
 const AppRoutes: React.FC = () => {
     return (
         <BrowserRouter>
-            <BetaBanner />
-            <FloatingAuthStatus />
-            <Suspense fallback={<PageLoader />}>
-                <SentryRoutes>
-                    {/* Public route for authentication */}
-                    <Route path="/auth" element={<AuthPage />} />
+            <AuthAwareRouter>
+                <BetaBanner />
+                <FloatingAuthStatus />
+                <Suspense fallback={<PageLoader />}>
+                    <SentryRoutes>
+                        {/* Public route for authentication */}
+                        <Route path="/auth" element={<AuthPage />} />
 
-                    {/* Protected routes with the shared layout */}
-                    <Route element={
-                        <ProtectedRoute>
-                            <AppLayout />
-                        </ProtectedRoute>
-                    }>
-                        <Route path="/" element={<MainMenu />} />
-                        <Route path="/game" element={<Game />} />
-                        <Route path="/settings" element={<Settings />} />
-                        <Route path="/statistics" element={<Statistics />} />
-                        <Route path="/leaderboard" element={<Leaderboard />} />
-                        <Route path="/achievements" element={<Achievements />} />
-                    </Route>
+                        {/* Protected routes with the shared layout */}
+                        <Route element={
+                            <ProtectedRoute>
+                                <AppLayout />
+                            </ProtectedRoute>
+                        }>
+                            <Route path="/" element={<MainMenu />} />
+                            <Route path="/game" element={<Game />} />
+                            <Route path="/settings" element={<Settings />} />
+                            <Route path="/statistics" element={<Statistics />} />
+                            <Route path="/leaderboard" element={<Leaderboard />} />
+                            <Route path="/achievements" element={<Achievements />} />
+                        </Route>
 
-                    {/* Tutorial without layout but still protected */}
-                    <Route path="/tutorial" element={
-                        <ProtectedRoute>
-                            <Tutorial />
-                        </ProtectedRoute>
-                    } />
+                        {/* Tutorial without layout but still protected */}
+                        <Route path="/tutorial" element={
+                            <ProtectedRoute>
+                                <Tutorial />
+                            </ProtectedRoute>
+                        } />
 
-                    {/* 404 page */}
-                    <Route path="*" element={<NotFound />} />
-                </SentryRoutes>
-            </Suspense>
+                        {/* 404 page */}
+                        <Route path="*" element={<NotFound />} />
+                    </SentryRoutes>
+                </Suspense>
+            </AuthAwareRouter>
         </BrowserRouter>
     );
 };
