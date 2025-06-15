@@ -1,7 +1,7 @@
 
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@clerk/clerk-react';
+import { useSupabaseClient } from './useSupabase';
 
 export interface UserRanking {
   elo: number;
@@ -12,6 +12,7 @@ export interface UserRanking {
 
 export const useUserRanking = () => {
   const { userId, isLoaded } = useAuth();
+  const supabase = useSupabaseClient();
 
   const fetchUserRanking = async (id: string): Promise<UserRanking | null> => {
     const { data, error } = await supabase

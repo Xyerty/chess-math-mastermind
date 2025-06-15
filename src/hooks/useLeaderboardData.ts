@@ -1,8 +1,8 @@
 
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { useUser } from '@clerk/clerk-react';
-import { useEffect, useState } from 'react';
+import { useSupabaseClient } from './useSupabase';
+import { SupabaseClient } from '@supabase/supabase-js';
+import type { Database } from '@/integrations/supabase/types';
 
 export interface LeaderboardEntry {
   user_id: string;
@@ -14,7 +14,7 @@ export interface LeaderboardEntry {
   avatar_url: string | null;
 }
 
-const fetchLeaderboardWithProfiles = async (): Promise<LeaderboardEntry[]> => {
+const fetchLeaderboardWithProfiles = async (supabase: SupabaseClient<Database>): Promise<LeaderboardEntry[]> => {
   // RLS on `player_rankings` allows public reads.
   const { data: rankings, error: rankingsError } = await supabase
     .from('player_rankings')
@@ -51,9 +51,10 @@ const fetchLeaderboardWithProfiles = async (): Promise<LeaderboardEntry[]> => {
 };
 
 export const useLeaderboardData = () => {
+  const supabase = useSupabaseClient();
   return useQuery({
     queryKey: ['leaderboard'],
-    queryFn: fetchLeaderboardWithProfiles,
+    queryFn: () => fetchLeaderboardWithProfiles(supabase),
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 };
