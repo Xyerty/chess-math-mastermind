@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { useAuth } from '@clerk/clerk-react';
-import { useAuth as useSupabaseAuth } from '@/contexts/AuthContext';
 import { Navigate } from 'react-router-dom';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -11,12 +10,8 @@ interface ProtectedRouteProps {
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const { isSignedIn, isLoaded } = useAuth();
-  const { user: supabaseUser, loading: supabaseLoading } = useSupabaseAuth();
 
-  const loading = !isLoaded || supabaseLoading;
-  const isAuthenticated = isSignedIn || supabaseUser;
-
-  if (loading) {
+  if (!isLoaded) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="space-y-4 w-full max-w-md">
@@ -28,7 +23,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     );
   }
 
-  if (!isAuthenticated) {
+  if (!isSignedIn) {
     return <Navigate to="/auth" replace />;
   }
 
