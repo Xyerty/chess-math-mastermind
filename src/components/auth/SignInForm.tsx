@@ -1,7 +1,6 @@
 
 import { useState } from 'react';
 import { useSignIn } from '@clerk/clerk-react';
-import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -18,7 +17,6 @@ const formSchema = z.object({
 export default function SignInForm() {
   const { isLoaded, signIn, setActive } = useSignIn();
   const [error, setError] = useState('');
-  const navigate = useNavigate();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -36,12 +34,15 @@ export default function SignInForm() {
 
       if (result.status === 'complete') {
         await setActive({ session: result.createdSessionId });
-        navigate('/');
+        // Use a hard redirect to ensure the auth state is correctly loaded on the next page.
+        // This prevents race conditions with React Router.
+        window.location.href = '/';
       } else {
         console.error(result);
         setError('An unexpected error occurred. Please try again.');
       }
-    } catch (err: any) {
+    } catch (err: any)
+{
       setError(err.errors?.[0]?.message || 'Invalid email or password.');
     }
   };

@@ -1,7 +1,6 @@
 
 import { useState } from 'react';
 import { useSignUp } from '@clerk/clerk-react';
-import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -19,7 +18,6 @@ export default function SignUpForm() {
   const { isLoaded, signUp, setActive } = useSignUp();
   const [pendingVerification, setPendingVerification] = useState(false);
   const [error, setError] = useState('');
-  const navigate = useNavigate();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -52,7 +50,9 @@ export default function SignUpForm() {
       const result = await signUp.attemptEmailAddressVerification({ code });
       if (result.status === 'complete') {
         await setActive({ session: result.createdSessionId });
-        navigate('/');
+        // Use a hard redirect to ensure the auth state is correctly loaded on the next page.
+        // This prevents race conditions with React Router.
+        window.location.href = '/';
       } else {
         setError('Verification failed. Please try again.');
       }
