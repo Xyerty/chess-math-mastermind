@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Play, BookOpen, BarChart3, Trophy, Award } from "lucide-react";
@@ -10,7 +11,8 @@ import { useUser } from "@clerk/clerk-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { usePlayFab } from "../hooks/usePlayFab";
 import { toast } from "sonner";
-import { useMatchmaking, useMatchmakingTicket } from "@/hooks/useMatchmaking";
+import { useMatchmaking } from "@/hooks/useMatchmaking";
+import { useMatchmakingTicket } from "@/hooks/useMatchmakingTicket";
 
 const MainMenu = () => {
   const navigate = useNavigate();
