@@ -1,6 +1,7 @@
 
-import { GetToken } from '@clerk/clerk-react';
+import { useAuth } from '@clerk/clerk-react';
 
+type GetTokenFn = ReturnType<typeof useAuth>['getToken'];
 type FetchOptions = RequestInit;
 
 /**
@@ -13,7 +14,7 @@ type FetchOptions = RequestInit;
  * @returns A Promise that resolves to the Response.
  */
 export const authenticatedFetch = async (
-  getToken: GetToken,
+  getToken: GetTokenFn,
   url: string,
   options: FetchOptions = {}
 ): Promise<Response> => {
