@@ -11,22 +11,37 @@ import SignUpForm from '@/components/auth/SignUpForm';
 import { Button } from '@/components/ui/button';
 
 const AuthPage = () => {
-  const { isLoaded } = useAuth();
+  const { isLoaded, isSignedIn } = useAuth();
   const [authView, setAuthView] = useState<'signin' | 'signup'>('signin');
+  const navigate = useNavigate();
 
-  // The redirect logic for already-signed-in users is now handled globally in AppRoutes.tsx.
-  // This page can now focus purely on the authentication UI.
+  // Add debugging for auth page
+  console.log("📄 Auth Page - isLoaded:", isLoaded, "isSignedIn:", isSignedIn);
+
+  // Redirect authenticated users immediately
+  useEffect(() => {
+    if (isLoaded && isSignedIn) {
+      console.log("✅ User is authenticated, redirecting to main menu");
+      navigate('/', { replace: true });
+    }
+  }, [isLoaded, isSignedIn, navigate]);
 
   if (!isLoaded) {
+    console.log("⏳ Auth page waiting for Clerk to load...");
     return (
       <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-100 dark:from-slate-900 dark:via-teal-900/20 dark:to-slate-900 flex items-center justify-center p-4">
         <div className="flex flex-col items-center gap-4 text-slate-600 dark:text-slate-400">
           <Loader2 className="h-12 w-12 animate-spin text-teal-600 dark:text-teal-400" />
-          <p className="text-lg font-medium">Securing your session...</p>
+          <p className="text-lg font-medium">Initializing authentication...</p>
           <p className="text-sm">Please wait while we prepare the board.</p>
         </div>
       </div>
     );
+  }
+
+  // If user is signed in, they shouldn't see this page (will be redirected)
+  if (isSignedIn) {
+    return null;
   }
 
   return (

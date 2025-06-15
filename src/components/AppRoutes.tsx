@@ -1,3 +1,4 @@
+
 import React, { Suspense } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import * as Sentry from "@sentry/react";
@@ -24,11 +25,20 @@ const SentryRoutes = Sentry.withSentryReactRouterV6Routing(Routes);
 const AppRoutes: React.FC = () => {
     const { isLoaded, isSignedIn } = useAuth();
 
+    // Add debugging for authentication state
+    console.log("🔍 Auth State Debug:", {
+        isLoaded,
+        isSignedIn,
+        timestamp: new Date().toISOString()
+    });
+
     // Render a global loading screen until the authentication state is determined.
-    // This prevents race conditions and flashes of incorrect content.
     if (!isLoaded) {
-        return <PageLoader message="Securing your session..." />;
+        console.log("⏳ Waiting for Clerk to load...");
+        return <PageLoader message="Initializing authentication..." />;
     }
+
+    console.log("✅ Clerk loaded, user signed in:", isSignedIn);
 
     return (
         <>

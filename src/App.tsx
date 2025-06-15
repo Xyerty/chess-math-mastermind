@@ -1,3 +1,4 @@
+
 import React from "react";
 import { ClerkProvider } from "@clerk/clerk-react";
 import { BrowserRouter, useNavigate } from "react-router-dom";
@@ -8,21 +9,38 @@ import { CLERK_PUBLISHABLE_KEY } from "./config/clerk";
 import { Toaster } from "@/components/ui/sonner";
 import { usePlayFabInitialization } from "./services/playFabInit";
 
-// This new component allows ClerkProvider to access React Router's navigation context.
+// Authentication Error Boundary specifically for Clerk issues
+const AuthErrorBoundary: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  return (
+    <ErrorBoundary>
+      {children}
+    </ErrorBoundary>
+  );
+};
+
+// This component allows ClerkProvider to access React Router's navigation context.
 const ClerkProviderWithRouter: React.FC<{children: React.ReactNode}> = ({ children }) => {
     const navigate = useNavigate();
+
+    // Add debugging for Clerk initialization
+    console.log("🔧 Initializing Clerk with key:", CLERK_PUBLISHABLE_KEY.substring(0, 20) + "...");
 
     return (
         <ClerkProvider
             publishableKey={CLERK_PUBLISHABLE_KEY}
-            routerPush={(to) => navigate(to)}
-            routerReplace={(to) => navigate(to, { replace: true })}
+            routerPush={(to) => {
+                console.log("🔄 Clerk routing to:", to);
+                navigate(to);
+            }}
+            routerReplace={(to) => {
+                console.log("🔄 Clerk replacing route to:", to);
+                navigate(to, { replace: true });
+            }}
         >
             {children}
         </ClerkProvider>
     );
 };
-
 
 const AppContent: React.FC = () => {
   // Initialize PlayFab in the background without blocking navigation
@@ -37,14 +55,18 @@ const AppContent: React.FC = () => {
 };
 
 const App: React.FC = () => {
+  console.log("🚀 App initializing...");
+  
   return (
     <ErrorBoundary>
       <BrowserRouter>
-        <ClerkProviderWithRouter>
-          <ProvidersWrapper>
-            <AppContent />
-          </ProvidersWrapper>
-        </ClerkProviderWithRouter>
+        <AuthErrorBoundary>
+          <ClerkProviderWithRouter>
+            <ProvidersWrapper>
+              <AppContent />
+            </ProvidersWrapper>
+          </ClerkProviderWithRouter>
+        </AuthErrorBoundary>
       </BrowserRouter>
     </ErrorBoundary>
   );
