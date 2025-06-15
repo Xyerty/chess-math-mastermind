@@ -1,8 +1,6 @@
-
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { useUserRanking, type UserRanking } from '@/hooks/useUserRanking';
-import { type User } from '@clerk/clerk-react';
 
 // This interface combines Clerk's user data with our app-specific ranking data.
 export interface CurrentUser extends UserRanking {
