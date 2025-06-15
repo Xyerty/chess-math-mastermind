@@ -37,10 +37,10 @@ const AuthPage = () => {
     elements: {
       rootBox: "w-full",
       card: "shadow-none border-0 bg-transparent w-full p-0",
-      formButtonPrimary: "bg-primary text-primary-foreground hover:bg-primary/90 h-11 text-sm font-medium",
+      formButtonPrimary: "h-12 text-base font-semibold shadow-lg hover:shadow-primary/30 hover:-translate-y-0.5 transition-all duration-300",
       footerActionLink: "text-primary hover:underline",
       socialButtonsBlockButton: "border-border hover:bg-muted h-11 text-sm font-medium",
-      formInput: "h-10 bg-background border-input ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+      formInput: "h-11 bg-background border-input ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
       dividerText: "text-muted-foreground",
       dividerLine: "bg-border",
     }
@@ -49,13 +49,13 @@ const AuthPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-indigo-100 dark:from-slate-900 dark:via-purple-900/20 dark:to-slate-900 flex items-center justify-center p-4 sm:p-6 md:p-8 relative overflow-hidden">
       {/* Background Elements */}
-      <div className="absolute inset-0 bg-grid-slate-100 dark:bg-grid-slate-700/25 bg-[size:20px_20px] opacity-20" />
-      <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-purple-400/20 rounded-full blur-3xl animate-pulse" />
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-indigo-400/20 rounded-full blur-3xl animate-pulse delay-1000" />
+      <div className="absolute inset-0 bg-grid-slate-100 dark:bg-grid-slate-700/25 bg-[size:20px_20px] opacity-10" />
+      <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-purple-400/10 rounded-full blur-3xl animate-pulse" />
+      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-indigo-400/10 rounded-full blur-3xl animate-pulse delay-1000" />
       
       <div className="w-full max-w-md space-y-6 relative z-10">
         {/* Main Auth Card */}
-        <Card className="backdrop-blur-xl bg-white/70 dark:bg-slate-900/80 border-white/20 dark:border-slate-700/50 shadow-2xl shadow-black/10 dark:shadow-black/30 animate-scale-in">
+        <Card className="backdrop-blur-xl bg-white/90 dark:bg-slate-900/90 border-white/20 dark:border-slate-700/50 shadow-2xl shadow-black/10 dark:shadow-black/30 animate-scale-in">
           <CardHeader className="text-center space-y-4 pb-6">
             <div className="mx-auto w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg shadow-purple-500/25 animate-bounce-in">
               <Shield className="h-8 w-8 sm:h-10 sm:w-10 text-white" />
@@ -72,7 +72,7 @@ const AuthPage = () => {
           
           <CardContent className="px-4 sm:px-6">
             <Tabs defaultValue="signin" className="w-full">
-              <TabsList className="grid w-full grid-cols-2 bg-muted/60 dark:bg-slate-800/60 p-1 rounded-lg">
+              <TabsList className="grid w-full grid-cols-2 bg-muted/80 dark:bg-slate-800/80 p-1 rounded-lg">
                 <TabsTrigger 
                   value="signin" 
                   className="h-10 flex items-center justify-center text-muted-foreground transition-all duration-300 ease-in-out data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md data-[state=active]:shadow-primary/20 rounded-md hover:bg-muted/80"

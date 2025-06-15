@@ -50,25 +50,25 @@ const MainMenu = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8 max-w-6xl">
+      <div className="container mx-auto px-4 py-8 sm:py-12 max-w-6xl space-y-12">
         {/* Header Section */}
-        <div className="text-center mb-8">
+        <div className="text-center animate-fade-in">
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-primary mb-4">
             Mathematical Chess
           </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-lg text-muted-foreground max-w-3xl mx-auto" style={{ animationDelay: '200ms' }}>
             Where strategy meets calculation. Challenge your mind with chess that requires both tactical thinking and mathematical precision.
           </p>
         </div>
 
         {/* Welcome Section */}
-        <div className="mb-8">
+        <div className="animate-fade-in" style={{ animationDelay: '400ms' }}>
           <WelcomeSection />
         </div>
 
         {/* Menu Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          {menuItems.map((item) => (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+          {menuItems.map((item, index) => (
             <MenuCard
               key={item.title}
               title={item.title}
@@ -76,26 +76,28 @@ const MainMenu = () => {
               icon={item.icon}
               onClick={item.action}
               primary={item.primary}
+              className={item.primary ? "md:col-span-2" : ""}
+              style={{ animationDelay: `${500 + index * 100}ms` }}
             />
           ))}
         </div>
 
         {/* Quick Stats or Tips Section */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
-          <div className="p-4 rounded-lg bg-accent/50">
-            <div className="text-2xl font-bold text-primary mb-1">♜</div>
-            <h3 className="font-semibold text-sm">Strategic Thinking</h3>
-            <p className="text-xs text-muted-foreground">Plan your moves carefully</p>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center animate-fade-in" style={{ animationDelay: '900ms' }}>
+          <div className="p-6 rounded-lg bg-accent/50 hover:bg-accent/80 transition-colors">
+            <div className="text-4xl font-bold text-primary mb-2">♜</div>
+            <h3 className="font-semibold text-lg">Strategic Thinking</h3>
+            <p className="text-sm text-muted-foreground">Plan your moves carefully</p>
           </div>
-          <div className="p-4 rounded-lg bg-accent/50">
-            <div className="text-2xl font-bold text-primary mb-1">∑</div>
-            <h3 className="font-semibold text-sm">Math Challenges</h3>
-            <p className="text-xs text-muted-foreground">Solve to unlock moves</p>
+          <div className="p-6 rounded-lg bg-accent/50 hover:bg-accent/80 transition-colors">
+            <div className="text-4xl font-bold text-primary mb-2">∑</div>
+            <h3 className="font-semibold text-lg">Math Challenges</h3>
+            <p className="text-sm text-muted-foreground">Solve to unlock moves</p>
           </div>
-          <div className="p-4 rounded-lg bg-accent/50">
-            <div className="text-2xl font-bold text-primary mb-1">🏆</div>
-            <h3 className="font-semibold text-sm">Skill Building</h3>
-            <p className="text-xs text-muted-foreground">Improve with every game</p>
+          <div className="p-6 rounded-lg bg-accent/50 hover:bg-accent/80 transition-colors">
+            <div className="text-4xl font-bold text-primary mb-2">🏆</div>
+            <h3 className="font-semibold text-lg">Skill Building</h3>
+            <p className="text-sm text-muted-foreground">Improve with every game</p>
           </div>
         </div>
       </div>
