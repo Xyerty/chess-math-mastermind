@@ -1,6 +1,6 @@
-
 import { useState, useCallback } from 'react';
 import { useAuth } from '@clerk/clerk-react';
+import { authenticatedFetch } from '../lib/authenticatedFetch';
 
 interface PlayFabData {
     isLoggedIn: boolean;
@@ -26,22 +26,10 @@ export const usePlayFab = () => {
         setPlayFabData(prev => ({ ...prev, connectionStatus: 'connecting', error: null }));
         
         try {
-            const token = await getToken();
-            if (!token) {
-                throw new Error("Clerk token not available. User might not be logged in.");
-            }
-
-            const response = await fetch('/api/auth/playfab-login', {
+            const response = await authenticatedFetch(getToken, '/api/auth/playfab-login', {
                 method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                },
             });
-
             const responseData = await response.json();
-            if (!response.ok) {
-                throw new Error(responseData.error || 'Failed to connect to PlayFab');
-            }
 
             const { sessionTicket, playFabId } = responseData;
 
@@ -69,8 +57,6 @@ export const usePlayFab = () => {
         }
     }, [getToken]);
     
-    // The other functions are still placeholders. They will need to be implemented 
-    // in a similar fashion, calling backend APIs instead of PlayFab directly.
     const emptyFunc = useCallback((name: string) => {
         console.warn(`PlayFab function '${name}' is not yet implemented in the backend orchestrator.`);
         return Promise.resolve(null);
