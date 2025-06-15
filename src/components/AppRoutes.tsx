@@ -7,6 +7,7 @@ import AppLayout from "./AppLayout";
 import ProtectedRoute from "./ProtectedRoute";
 import FloatingAuthStatus from "./FloatingAuthStatus";
 import PageLoader from "./PageLoader";
+import BetaBanner from "./BetaBanner";
 
 // Lazy-loaded pages
 const MainMenu = React.lazy(() => import("../pages/MainMenu"));
@@ -14,6 +15,7 @@ const Game = React.lazy(() => import("../pages/Game"));
 const Tutorial = React.lazy(() => import("../pages/Tutorial"));
 const Settings = React.lazy(() => import("../pages/Settings"));
 const Statistics = React.lazy(() => import("../pages/Statistics"));
+const Leaderboard = React.lazy(() => import("../pages/Leaderboard"));
 const NotFound = React.lazy(() => import("../pages/NotFound"));
 const AuthPage = React.lazy(() => import("../pages/Auth"));
 
@@ -23,6 +25,7 @@ const SentryRoutes = Sentry.withSentryReactRouterV6Routing(Routes);
 const AppRoutes: React.FC = () => {
     return (
         <BrowserRouter>
+            <BetaBanner />
             <FloatingAuthStatus />
             <Suspense fallback={<PageLoader />}>
                 <SentryRoutes>
@@ -51,6 +54,11 @@ const AppRoutes: React.FC = () => {
                         <Route path="/statistics" element={
                             <ProtectedRoute>
                                 <Statistics />
+                            </ProtectedRoute>
+                        } />
+                        <Route path="/leaderboard" element={
+                            <ProtectedRoute>
+                                <Leaderboard />
                             </ProtectedRoute>
                         } />
                     </Route>

@@ -9,6 +9,72 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      account_sanctions: {
+        Row: {
+          expires_at: string | null
+          id: string
+          is_active: boolean
+          issued_at: string
+          issued_by_user_id: string | null
+          reason: string | null
+          sanction_type: Database["public"]["Enums"]["sanction_type"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          issued_at?: string
+          issued_by_user_id?: string | null
+          reason?: string | null
+          sanction_type: Database["public"]["Enums"]["sanction_type"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          issued_at?: string
+          issued_by_user_id?: string | null
+          reason?: string | null
+          sanction_type?: Database["public"]["Enums"]["sanction_type"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      friendships: {
+        Row: {
+          action_user_id: string
+          created_at: string
+          id: string
+          status: Database["public"]["Enums"]["friendship_status"]
+          updated_at: string
+          user_one_id: string
+          user_two_id: string
+        }
+        Insert: {
+          action_user_id: string
+          created_at?: string
+          id?: string
+          status: Database["public"]["Enums"]["friendship_status"]
+          updated_at?: string
+          user_one_id: string
+          user_two_id: string
+        }
+        Update: {
+          action_user_id?: string
+          created_at?: string
+          id?: string
+          status?: Database["public"]["Enums"]["friendship_status"]
+          updated_at?: string
+          user_one_id?: string
+          user_two_id?: string
+        }
+        Relationships: []
+      }
       game_statistics: {
         Row: {
           avg_solve_time_s: number | null
@@ -57,6 +123,33 @@ export type Database = {
         }
         Relationships: []
       }
+      player_rankings: {
+        Row: {
+          draws: number
+          elo: number
+          losses: number
+          updated_at: string
+          user_id: string
+          wins: number
+        }
+        Insert: {
+          draws?: number
+          elo?: number
+          losses?: number
+          updated_at?: string
+          user_id: string
+          wins?: number
+        }
+        Update: {
+          draws?: number
+          elo?: number
+          losses?: number
+          updated_at?: string
+          user_id?: string
+          wins?: number
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -89,7 +182,8 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      friendship_status: "pending" | "accepted" | "blocked"
+      sanction_type: "warning" | "temporary_ban" | "permanent_ban" | "mute"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -204,6 +298,9 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      friendship_status: ["pending", "accepted", "blocked"],
+      sanction_type: ["warning", "temporary_ban", "permanent_ban", "mute"],
+    },
   },
 } as const

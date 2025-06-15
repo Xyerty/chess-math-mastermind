@@ -2,7 +2,7 @@
 import { useAuth, useUser, useClerk } from '@clerk/clerk-react';
 import { Button } from '@/components/ui/button';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { LogIn, Settings, Award, LogOut } from 'lucide-react';
+import { LogIn, Settings, Award, LogOut, Trophy } from 'lucide-react';
 import { Skeleton } from './ui/skeleton';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { 
@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { toast } from "@/components/ui/sonner";
+import { useUserRanking } from '@/hooks/useUserRanking';
 
 const FloatingAuthStatus = () => {
   const { isSignedIn, isLoaded } = useAuth();
@@ -23,6 +24,7 @@ const FloatingAuthStatus = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useLanguage();
+  const { data: ranking, isLoading: isRankingLoading } = useUserRanking();
 
   if (location.pathname === '/auth') {
     return null;
@@ -71,6 +73,15 @@ const FloatingAuthStatus = () => {
                 </p>
               </div>
             </DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem className="cursor-default focus:bg-transparent py-2">
+              <Trophy className="mr-2 h-4 w-4 text-yellow-500" />
+              {isRankingLoading ? (
+                <Skeleton className="h-4 w-20" />
+              ) : (
+                <span>Elo: <span className="font-bold">{ranking?.elo ?? 'N/A'}</span></span>
+              )}
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem className="cursor-pointer py-2" onClick={() => navigate('/settings')}>
               <Settings className="mr-2 h-4 w-4" />
