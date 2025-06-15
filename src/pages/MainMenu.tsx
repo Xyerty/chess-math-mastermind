@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Play, BookOpen, BarChart3, Settings } from "lucide-react";
@@ -24,26 +25,26 @@ const MainMenu = () => {
     {
       title: t('mainMenu.playGame'),
       icon: Play,
-      description: "Start a new chess game with mathematical challenges",
+      description: t('mainMenu.playGameDescription'),
       primary: true,
       action: () => setIsSetupModalOpen(true),
     },
     {
       title: t('mainMenu.howToPlay'),
       icon: BookOpen,
-      description: "Learn the rules and master the strategies",
+      description: t('mainMenu.howToPlayDescription'),
       action: () => navigate("/tutorial"),
     },
     {
       title: t('mainMenu.statistics'),
       icon: BarChart3,
-      description: "Track your progress and performance",
+      description: t('mainMenu.statisticsDescription'),
       action: () => navigate("/statistics"),
     },
     {
       title: t('mainMenu.settings'),
       icon: Settings,
-      description: "Customize your game experience",
+      description: t('mainMenu.settingsDescription'),
       action: () => navigate("/settings"),
     },
   ];
@@ -57,7 +58,7 @@ const MainMenu = () => {
             Mathematical<br className="sm:hidden" /> Chess
           </h1>
           <p className="text-lg text-muted-foreground max-w-3xl mx-auto" style={{ animationDelay: '200ms' }}>
-            Where strategy meets calculation. Challenge your mind with chess that requires both tactical thinking and mathematical precision.
+            {t('mainMenu.appDescription')}
           </p>
         </div>
 
@@ -86,18 +87,18 @@ const MainMenu = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center animate-fade-in" style={{ animationDelay: '900ms' }}>
           <div className="p-6 rounded-lg bg-accent/50 hover:bg-accent/80 transition-colors">
             <div className="text-4xl font-bold text-primary mb-2">♜</div>
-            <h3 className="font-semibold text-lg">Strategic Thinking</h3>
-            <p className="text-sm text-muted-foreground">Plan your moves carefully</p>
+            <h3 className="font-semibold text-lg">{t('mainMenu.strategicThinkingTitle')}</h3>
+            <p className="text-sm text-muted-foreground">{t('mainMenu.strategicThinkingDescription')}</p>
           </div>
           <div className="p-6 rounded-lg bg-accent/50 hover:bg-accent/80 transition-colors">
             <div className="text-4xl font-bold text-primary mb-2">∑</div>
-            <h3 className="font-semibold text-lg">Math Challenges</h3>
-            <p className="text-sm text-muted-foreground">Solve to unlock moves</p>
+            <h3 className="font-semibold text-lg">{t('mainMenu.mathChallengesTitle')}</h3>
+            <p className="text-sm text-muted-foreground">{t('mainMenu.mathChallengesDescription')}</p>
           </div>
           <div className="p-6 rounded-lg bg-accent/50 hover:bg-accent/80 transition-colors">
             <div className="text-4xl font-bold text-primary mb-2">🏆</div>
-            <h3 className="font-semibold text-lg">Skill Building</h3>
-            <p className="text-sm text-muted-foreground">Improve with every game</p>
+            <h3 className="font-semibold text-lg">{t('mainMenu.skillBuildingTitle')}</h3>
+            <p className="text-sm text-muted-foreground">{t('mainMenu.skillBuildingDescription')}</p>
           </div>
         </div>
 

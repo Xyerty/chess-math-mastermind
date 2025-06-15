@@ -4,11 +4,13 @@ import { Button } from '@/components/ui/button';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { LogIn } from 'lucide-react';
 import { Skeleton } from './ui/skeleton';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const FloatingAuthStatus = () => {
   const { isSignedIn, isLoaded } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useLanguage();
 
   if (location.pathname === '/') {
     return null;
@@ -50,7 +52,7 @@ const FloatingAuthStatus = () => {
       ) : (
         <Button onClick={() => navigate('/auth')} className="shadow-lg h-12 px-6">
           <LogIn className="mr-2 h-5 w-5" />
-          Login / Sign Up
+          {t('auth.loginSignUp')}
         </Button>
       )}
     </div>
