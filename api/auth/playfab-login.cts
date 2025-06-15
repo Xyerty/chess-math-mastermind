@@ -1,7 +1,8 @@
-
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { Clerk } from '@clerk/clerk-sdk-node';
-import { createClient } from '@supabase/supabase-js';
+
+// Use CommonJS require for runtime dependencies
+const { Clerk } = require('@clerk/clerk-sdk-node');
+const { createClient } = require('@supabase/supabase-js');
 
 const clerk = Clerk({ secretKey: process.env.CLERK_SECRET_KEY });
 const PLAYFAB_TITLE_ID = process.env.PLAYFAB_TITLE_ID;
