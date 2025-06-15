@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { memo } from 'react';
 import { useAuth } from '@clerk/clerk-react';
 import { Navigate } from 'react-router-dom';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -30,4 +30,4 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   return <>{children}</>;
 };
 
-export default ProtectedRoute;
+export default memo(ProtectedRoute);

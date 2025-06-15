@@ -1,4 +1,3 @@
-
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import path from "path";
@@ -28,8 +27,15 @@ export default defineConfig(({ mode }) => ({
         manualChunks: {
           vendor: ['react', 'react-dom'],
           router: ['react-router-dom'],
-          ui: ['@radix-ui/react-slot', '@radix-ui/react-dialog', 'lucide-react'],
-          chess: ['@tanstack/react-query'],
+          clerk: ['@clerk/clerk-react'],
+          ui: [
+            '@radix-ui/react-slot', 
+            '@radix-ui/react-dialog', 
+            'lucide-react',
+            '@radix-ui/react-tabs',
+            '@radix-ui/react-tooltip'
+          ],
+          'tanstack-query': ['@tanstack/react-query'],
         },
       },
     },

@@ -1,4 +1,5 @@
 
+import { memo } from 'react';
 import { Loader2 } from 'lucide-react';
 
 const PageLoader = ({ message = "Loading page..." }: { message?: string }) => {
@@ -12,4 +13,4 @@ const PageLoader = ({ message = "Loading page..." }: { message?: string }) => {
   );
 };
 
-export default PageLoader;
+export default memo(PageLoader);

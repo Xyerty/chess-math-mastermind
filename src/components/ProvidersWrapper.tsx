@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { memo } from 'react';
 import { ThemeProvider } from "next-themes";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -36,4 +36,4 @@ const ProvidersWrapper: React.FC<{ children: React.ReactNode }> = ({ children })
   );
 };
 
-export default ProvidersWrapper;
+export default memo(ProvidersWrapper);
