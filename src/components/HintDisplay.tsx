@@ -4,7 +4,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { X, TrendingUp, TrendingDown, AlertTriangle, Target } from 'lucide-react';
-import { useLanguage } from '../contexts/LanguageContext';
 
 interface HintAnalysis {
   bestMove?: {
@@ -24,8 +23,6 @@ interface HintDisplayProps {
 }
 
 const HintDisplay: React.FC<HintDisplayProps> = ({ hint, onClose, hintsRemaining }) => {
-  const { t } = useLanguage();
-
   const formatSquare = (square: { row: number; col: number }) => {
     const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
     const ranks = ['8', '7', '6', '5', '4', '3', '2', '1'];

@@ -1,6 +1,6 @@
 
 import { useState, useCallback, useEffect } from 'react';
-import { ChessGameState, ChessMove, GameStatus, GameMode, Player } from '../features/chess/types';
+import { ChessGameState, GameStatus, GameMode } from '../features/chess/types';
 import { generateAIMove } from '../features/chess/utils/ai';
 import { isKingInCheck, hasAnyValidMoves } from '../features/chess/utils/board';
 import { pythonEngine } from '../services/pythonEngine';

@@ -1,6 +1,6 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Clock, User, Trophy, BrainCircuit, Cpu } from "lucide-react";
+import { User, Trophy } from "lucide-react";
 import { useLanguage } from "../contexts/LanguageContext";
 import { useOpponent } from "../contexts/OpponentContext";
 import type { GameStatus } from "../features/chess/types";
@@ -22,10 +22,8 @@ const GameStatus: React.FC<GameStatusProps> = ({
   gameStatus,
   moveCount,
   time,
-  aiStats,
   isAIThinking = false,
   aiDifficulty = 'medium',
-  usingPythonEngine = false,
 }) => {
   const { t } = useLanguage();
   const { opponentType, playerColor } = useOpponent();

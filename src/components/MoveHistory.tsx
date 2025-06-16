@@ -34,7 +34,7 @@ const MoveHistory: React.FC<MoveHistoryProps> = ({ moves }) => {
               {moves.length === 0 ? (
                 <li className="text-muted-foreground">No moves yet.</li>
               ) : (
-                moves.map((move, index) => {
+                moves.map((_move, index) => {
                   if (index % 2 !== 0) return null; // Only render for white's move, showing both
                   
                   const moveNumber = Math.floor(index / 2) + 1;

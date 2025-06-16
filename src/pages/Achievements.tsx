@@ -1,5 +1,4 @@
 
-import React from 'react';
 import { useAchievements, Achievement } from '@/hooks/useAchievements';
 import PageLoader from '@/components/PageLoader';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';

@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDifficulty, Difficulty } from "../contexts/DifficultyContext";
 import GameSetupModal from "../components/GameSetupModal";

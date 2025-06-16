@@ -22,21 +22,6 @@ const MOCK_DATA = {
   ],
 };
 
-interface GameStatistics {
-  user_id: string;
-  total_games: number;
-  wins: number;
-  losses: number;
-  draws: number;
-  win_rate: number;
-  total_math_problems: number;
-  correct_math_problems: number;
-  math_accuracy: number;
-  avg_solve_time_s: number | null;
-  best_solve_time_s: number | null;
-  updated_at: string;
-}
-
 export const useStatisticsData = () => {
   const { userId } = useAuth();
 

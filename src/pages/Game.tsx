@@ -1,5 +1,4 @@
 
-import React from "react";
 import { useChessGame } from "../hooks/useChessGame";
 import GameErrorBoundary from "../components/GameErrorBoundary";
 import { useDifficulty } from "../contexts/DifficultyContext";

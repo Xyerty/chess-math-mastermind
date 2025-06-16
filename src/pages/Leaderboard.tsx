@@ -1,5 +1,4 @@
 
-import React from 'react';
 import { useLeaderboardData } from '@/hooks/useLeaderboardData';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
