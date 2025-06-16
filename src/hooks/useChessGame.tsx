@@ -18,7 +18,7 @@ export const useChessGame = (aiDifficulty: 'easy' | 'medium' | 'hard', gameMode:
     clearSelection,
   } = useGameState(gameMode);
 
-  useGameTimer({ gameState, setGameState, gameMode });
+  useGameTimer({ gameState, setGameState });
 
   const {
     isAIThinking,

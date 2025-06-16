@@ -1,6 +1,6 @@
 
 import { useState, useCallback } from 'react';
-import { ChessGameState, GameStatus, GameMode } from '../features/chess/types';
+import { ChessGameState, GameMode } from '../features/chess/types';
 import { defaultPosition } from '../features/chess/constants';
 
 const getInitialTime = (gameMode: GameMode) => {

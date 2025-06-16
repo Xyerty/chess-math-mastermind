@@ -1,14 +1,13 @@
 
 import { useEffect } from 'react';
-import { ChessGameState, GameMode } from '../features/chess/types';
+import { ChessGameState } from '../features/chess/types';
 
 interface UseGameTimerProps {
   gameState: ChessGameState;
   setGameState: React.Dispatch<React.SetStateAction<ChessGameState>>;
-  gameMode: GameMode;
 }
 
-export const useGameTimer = ({ gameState, setGameState, gameMode }: UseGameTimerProps) => {
+export const useGameTimer = ({ gameState, setGameState }: UseGameTimerProps) => {
   useEffect(() => {
     let timerId: NodeJS.Timeout | undefined;
 

@@ -19,7 +19,7 @@ interface GameSetupModalProps {
 }
 
 const GameSetupModal = ({ isOpen, onClose, onStartGame, onFindMatch, onCancelMatch, ticket, isTicketLoading }: GameSetupModalProps) => {
-  const { mathDifficulty, setMathDifficulty, aiDifficulty, setAiDifficulty } = useDifficulty();
+  const { mathDifficulty, aiDifficulty } = useDifficulty();
   const [currentMathDifficulty, setCurrentMathDifficulty] = useState<Difficulty>(mathDifficulty);
   const [currentAiDifficulty, setCurrentAiDifficulty] = useState<Difficulty>(aiDifficulty);
   const { t } = useLanguage();

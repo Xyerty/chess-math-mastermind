@@ -1,5 +1,4 @@
 
-import React from "react";
 import { useLanguage } from "../contexts/LanguageContext";
 import { useStatisticsData } from "../hooks/useStatisticsData";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
