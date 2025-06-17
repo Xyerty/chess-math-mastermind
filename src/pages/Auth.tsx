@@ -2,7 +2,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { useAuth } from '@clerk/clerk-react';
-import { Crown, Loader2, Sparkles } from 'lucide-react';
+import { Crown, Loader2, Sparkles, AlertTriangle } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import TechLogos from '@/components/TechLogos';
 import GoogleSignInButton from '@/components/auth/GoogleSignInButton';
@@ -13,10 +13,23 @@ import { Button } from '@/components/ui/button';
 const AuthPage = () => {
   const { isLoaded, isSignedIn } = useAuth();
   const [authView, setAuthView] = useState<'signin' | 'signup'>('signin');
+  const [initializationTimeout, setInitializationTimeout] = useState(false);
   const navigate = useNavigate();
 
   // Add debugging for auth page
   console.log("📄 Auth Page - isLoaded:", isLoaded, "isSignedIn:", isSignedIn);
+
+  // Set a timeout for initialization
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (!isLoaded) {
+        console.warn("⚠️ Clerk initialization taking longer than expected");
+        setInitializationTimeout(true);
+      }
+    }, 10000); // 10 seconds timeout
+
+    return () => clearTimeout(timer);
+  }, [isLoaded]);
 
   // Redirect authenticated users immediately
   useEffect(() => {
@@ -31,9 +44,28 @@ const AuthPage = () => {
     return (
       <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-100 dark:from-slate-900 dark:via-teal-900/20 dark:to-slate-900 flex items-center justify-center p-4">
         <div className="flex flex-col items-center gap-4 text-slate-600 dark:text-slate-400">
-          <Loader2 className="h-12 w-12 animate-spin text-teal-600 dark:text-teal-400" />
-          <p className="text-lg font-medium">Initializing authentication...</p>
-          <p className="text-sm">Please wait while we prepare the board.</p>
+          {initializationTimeout ? (
+            <>
+              <AlertTriangle className="h-12 w-12 text-amber-600 dark:text-amber-400" />
+              <p className="text-lg font-medium">Initialization taking longer than expected</p>
+              <p className="text-sm text-center max-w-md">
+                Please check your Clerk configuration and refresh the page.
+              </p>
+              <Button 
+                onClick={() => window.location.reload()} 
+                variant="outline" 
+                className="mt-4"
+              >
+                Refresh Page
+              </Button>
+            </>
+          ) : (
+            <>
+              <Loader2 className="h-12 w-12 animate-spin text-teal-600 dark:text-teal-400" />
+              <p className="text-lg font-medium">Initializing authentication...</p>
+              <p className="text-sm">Please wait while we prepare the board.</p>
+            </>
+          )}
         </div>
       </div>
     );

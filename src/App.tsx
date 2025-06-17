@@ -1,3 +1,4 @@
+
 import React from "react";
 import { ClerkProvider } from "@clerk/clerk-react";
 import { BrowserRouter, useNavigate } from "react-router-dom";
@@ -23,7 +24,7 @@ const ClerkProviderWithRouter: React.FC<{children: React.ReactNode}> = ({ childr
     const navigate = useNavigate();
 
     // Add debugging for Clerk initialization
-    console.log("🔧 Initializing Clerk with key:", CLERK_PUBLISHABLE_KEY.substring(0, 20) + "...");
+    console.log("🔧 Initializing Clerk with key:", CLERK_PUBLISHABLE_KEY?.substring(0, 20) + "...");
 
     return (
         <ClerkProvider
