@@ -1,9 +1,11 @@
-
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App.tsx';
 import './index.css';
 import * as Sentry from "@sentry/react";
+import { ClerkProvider } from '@clerk/clerk-react';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { ProtectedRoute } from '../components/auth/ProtectedRoute.tsx'; // Using relative path
 
 // Only initialize Sentry if DSN is provided
 const sentryDsn = import.meta.env.VITE_SENTRY_DSN;
@@ -84,17 +86,59 @@ const ErrorFallback = ({ error, resetError }: { error: unknown; resetError: () =
   );
 };
 
+// Get Clerk Publishable Key
+const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
+
+if (!PUBLISHABLE_KEY) {
+  throw new Error("Missing VITE_CLERK_PUBLISHABLE_KEY in .env.local");
+}
+
+// Define DashboardPage placeholder
+const DashboardPage = () => <div><h1>Dashboard</h1><p>This is a protected page.</p></div>;
+
+// Create the router configuration
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <App />, // App will contain the main layout and navigation
+    children: [
+      {
+        path: "/",
+        // Placeholder for home page content, Sentry will wrap this via App
+        element: <div><h1>Home Page</h1><p>This is the public home page.</p></div>,
+      },
+      {
+        path: "/dashboard",
+        element: <ProtectedRoute />,
+        children: [
+          {
+            path: "/dashboard",
+            element: <DashboardPage />,
+          }
+        ]
+      }
+    ]
+  }
+]);
+
+// Application component with Sentry Error Boundary
+const AppWithSentryAndRouter = () => (
+  <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
+    <RouterProvider router={router} />
+  </ClerkProvider>
+);
+
 // Use Sentry ErrorBoundary if available, otherwise use a simple fallback
-const AppWithErrorBoundary = sentryDsn ? (
+const AppToRender = sentryDsn ? (
   <Sentry.ErrorBoundary fallback={ErrorFallback}>
-    <App />
+    <AppWithSentryAndRouter />
   </Sentry.ErrorBoundary>
 ) : (
-  <App />
+  <AppWithSentryAndRouter />
 );
 
 root.render(
   <React.StrictMode>
-    {AppWithErrorBoundary}
+    {AppToRender}
   </React.StrictMode>
 );
