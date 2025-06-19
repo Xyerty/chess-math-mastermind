@@ -25,6 +25,14 @@ jest.mock('../lib/authenticatedFetch', () => ({
   authenticatedFetch: jest.fn(async () => ({ ok: true, json: async () => ({}) })),
 }));
 
+// Mock useAuth hook to provide a getToken function
+jest.mock('@clerk/clerk-react', () => ({
+  useAuth: () => ({
+    getToken: jest.fn(async () => 'mock-token'),
+    isSignedIn: true,
+    userId: 'mock-user-id',
+  }),
+}));
 
 describe('BottomActionMenu', () => {
   jest.useFakeTimers(); // Enable Jest's fake timers
@@ -90,7 +98,8 @@ describe('BottomActionMenu', () => {
 
     const handleHint = jest.fn(async () => {
       try {
-        const response = await authenticatedFetch('/api/hint', { method: 'POST' });
+        const mockGetToken = jest.fn(async () => 'mock-token');
+        const response = await authenticatedFetch(mockGetToken, '/api/hint', { method: 'POST' });
         if (response.ok) {
           return await response.json();
         }
