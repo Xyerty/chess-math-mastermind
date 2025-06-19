@@ -52,7 +52,9 @@ const ClerkProviderWithRouter: React.FC<{children: React.ReactNode}> = ({ childr
 
 const AppContent: React.FC = () => {
   // Initialize PlayFab in the background without blocking navigation
-  usePlayFabInitialization();
+  if (CLERK_ENABLED) {
+    usePlayFabInitialization();
+  }
 
   return (
     <>
