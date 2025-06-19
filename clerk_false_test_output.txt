@@ -1,0 +1,23 @@
+ts-jest[config] (WARN) [94mmessage[0m[90m TS151001: [0mIf you have issues related to imports, you should consider setting `esModuleInterop` to `true` in your TypeScript configuration file (usually `tsconfig.json`). See https://blogs.msdn.microsoft.com/typescript/2018/01/31/announcing-typescript-2-7/#easier-ecmascript-module-interoperability for more information.
+PASS src/components/BottomActionMenu.test.tsx
+  BottomActionMenu
+    ✓ renders all buttons (70 ms)
+    ✓ calls the correct handlers on click (31 ms)
+    ✓ uses network delay helpers for hint action (19 ms)
+
+-----------------------|---------|----------|---------|---------|-------------------
+File                   | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s
+-----------------------|---------|----------|---------|---------|-------------------
+All files              |   99.14 |       50 |     100 |   99.14 |
+ components            |   98.18 |    33.33 |     100 |   98.18 |
+  BottomActionMenu.tsx |   98.18 |    33.33 |     100 |   98.18 | 38
+ components/ui         |     100 |       50 |     100 |     100 |
+  button.tsx           |     100 |       50 |     100 |     100 | 44
+ lib                   |     100 |      100 |     100 |     100 |
+  utils.ts             |     100 |      100 |     100 |     100 |
+-----------------------|---------|----------|---------|---------|-------------------
+Test Suites: 1 passed, 1 total
+Tests:       3 passed, 3 total
+Snapshots:   0 total
+Time:        1.682 s, estimated 2 s
+Ran all test suites.
