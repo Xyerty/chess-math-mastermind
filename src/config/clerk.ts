@@ -1,6 +1,8 @@
 
+import { env, validateEnvironment } from './environment';
+
 // Get Clerk publishable key from environment variables
-export const CLERK_PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
+export const CLERK_PUBLISHABLE_KEY = env.clerk.publishableKey;
 
 // Validate that the key is present
 if (!CLERK_PUBLISHABLE_KEY) {
@@ -14,4 +16,10 @@ if (!CLERK_PUBLISHABLE_KEY) {
   if (!CLERK_PUBLISHABLE_KEY.startsWith("pk_")) {
     console.warn("⚠️ Clerk publishable key should start with 'pk_'");
   }
+}
+
+// Validate environment on startup
+const envErrors = validateEnvironment();
+if (envErrors.length > 0) {
+  console.error("❌ Environment validation failed:", envErrors);
 }

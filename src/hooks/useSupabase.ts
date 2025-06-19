@@ -3,9 +3,7 @@ import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { useAuth } from "@clerk/clerk-react";
 import { useState } from 'react';
 import type { Database } from '@/integrations/supabase/types';
-
-const SUPABASE_URL = "https://arcfrqbvhpchdaflfxjt.supabase.co";
-const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFyY2ZycWJ2aHBjaGRhZmxmeGp0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk5MjM1MjQsImV4cCI6MjA2NTQ5OTUyNH0.JHeIDb4wyg0Y378f8ExNrRTggJXArMxR2WVzjb6TNjI";
+import { env } from '@/config/environment';
 
 let supabaseInstance: SupabaseClient<Database> | null = null;
 
@@ -19,8 +17,8 @@ export const useSupabaseClient = () => {
     }
     
     supabaseInstance = createClient<Database>(
-      SUPABASE_URL,
-      SUPABASE_PUBLISHABLE_KEY,
+      env.supabase.url,
+      env.supabase.anonKey,
       {
         global: {
           fetch: async (url, options) => {

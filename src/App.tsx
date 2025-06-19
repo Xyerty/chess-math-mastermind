@@ -9,6 +9,8 @@ import { CLERK_PUBLISHABLE_KEY } from "./config/clerk";
 import { Toaster } from "@/components/ui/sonner";
 import { usePlayFabInitialization } from "./services/playFabInit";
 import MissingEnvVar from "./components/MissingEnvVar";
+import EnvironmentCheck from "./components/EnvironmentCheck";
+import { env } from "./config/environment";
 
 // Authentication Error Boundary specifically for Clerk issues
 const AuthErrorBoundary: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -49,6 +51,7 @@ const AppContent: React.FC = () => {
 
   return (
     <>
+      {env.isDevelopment && <EnvironmentCheck />}
       <AppRoutes />
       <Toaster richColors position="top-right" />
     </>

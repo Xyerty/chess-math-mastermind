@@ -1,4 +1,6 @@
 
+import { env } from '@/config/environment';
+
 interface PythonMoveResponse {
   move: {
     from: { row: number; col: number };
@@ -18,14 +20,19 @@ interface PythonAnalysisResponse {
 }
 
 class PythonEngineService {
-  private baseUrl = process.env.NODE_ENV === 'production' 
-    ? '' // No Python backend in production on Vercel Hobby
-    : 'http://127.0.0.1:8000';
+  private baseUrl = env.pythonEngine.url;
   private isAvailable = false;
+  private enabled = env.features.pythonEngine;
 
   async checkAvailability(): Promise<boolean> {
-    // In production on Vercel, Python engine is not available
-    if (process.env.NODE_ENV === 'production') {
+    // If Python engine is disabled via feature flag, return false
+    if (!this.enabled) {
+      this.isAvailable = false;
+      return false;
+    }
+
+    // In production environments without explicit Python engine URL, disable it
+    if (env.isProduction && env.pythonEngine.url === 'http://127.0.0.1:8000') {
       this.isAvailable = false;
       return false;
     }
@@ -46,7 +53,7 @@ class PythonEngineService {
   }
 
   async getMove(fen: string, difficulty: 'easy' | 'medium' | 'hard', timeLimit: number = 2.0): Promise<PythonMoveResponse | null> {
-    if (process.env.NODE_ENV === 'production') {
+    if (!this.enabled) {
       return null; // Fall back to JavaScript AI
     }
 
@@ -83,7 +90,7 @@ class PythonEngineService {
   }
 
   async analyzePosition(fen: string, depth: number = 3): Promise<PythonAnalysisResponse | null> {
-    if (process.env.NODE_ENV === 'production') {
+    if (!this.enabled) {
       return null; // Fall back to JavaScript AI
     }
 
@@ -115,7 +122,7 @@ class PythonEngineService {
   }
 
   getIsAvailable(): boolean {
-    return this.isAvailable;
+    return this.isAvailable && this.enabled;
   }
 }
 
