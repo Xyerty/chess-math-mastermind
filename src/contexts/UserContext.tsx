@@ -1,6 +1,8 @@
+
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { useUserRanking, type UserRanking } from '@/hooks/useUserRanking';
+import { CLERK_ENABLED } from '@/config/clerk';
 
 // This interface combines Clerk's user data with our app-specific ranking data.
 export interface CurrentUser extends UserRanking {
@@ -21,6 +23,17 @@ interface UserContextType {
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  // If Clerk is disabled, provide a context with no user
+  if (!CLERK_ENABLED) {
+    const contextValue: UserContextType = {
+      currentUser: null,
+      isLoading: false,
+      error: null,
+    };
+    
+    return <UserContext.Provider value={contextValue}>{children}</UserContext.Provider>;
+  }
+
   const { user, isLoaded: isClerkLoaded, isSignedIn } = useUser();
   const { data: rankingData, isLoading: isRankingLoading, error: rankingError } = useUserRanking();
 

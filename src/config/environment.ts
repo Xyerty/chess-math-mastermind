@@ -5,6 +5,7 @@ interface EnvironmentConfig {
   isTest: boolean;
   clerk: {
     publishableKey: string;
+    enabled: boolean;
   };
   supabase: {
     url: string;
@@ -22,11 +23,13 @@ interface EnvironmentConfig {
     playFab: boolean;
     multiplayer: boolean;
     pythonEngine: boolean;
+    authentication: boolean;
   };
 }
 
 const getEnvironmentConfig = (): EnvironmentConfig => {
   const nodeEnv = import.meta.env.MODE || 'development';
+  const clerkKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY || '';
   
   return {
     isDevelopment: nodeEnv === 'development',
@@ -34,7 +37,8 @@ const getEnvironmentConfig = (): EnvironmentConfig => {
     isTest: nodeEnv === 'test',
     
     clerk: {
-      publishableKey: import.meta.env.VITE_CLERK_PUBLISHABLE_KEY || '',
+      publishableKey: clerkKey,
+      enabled: !!clerkKey,
     },
     
     supabase: {
@@ -56,6 +60,7 @@ const getEnvironmentConfig = (): EnvironmentConfig => {
       playFab: import.meta.env.VITE_ENABLE_PLAYFAB !== 'false',
       multiplayer: import.meta.env.VITE_ENABLE_MULTIPLAYER !== 'false',
       pythonEngine: import.meta.env.VITE_ENABLE_PYTHON_ENGINE !== 'false',
+      authentication: !!clerkKey,
     },
   };
 };
@@ -65,8 +70,9 @@ export const env = getEnvironmentConfig();
 export const validateEnvironment = (): string[] => {
   const errors: string[] = [];
   
-  if (!env.clerk.publishableKey) {
-    errors.push('VITE_CLERK_PUBLISHABLE_KEY is required');
+  // Clerk is now optional
+  if (!env.clerk.enabled && env.isDevelopment) {
+    console.warn('⚠️ VITE_CLERK_PUBLISHABLE_KEY is not set - authentication features will be disabled');
   }
   
   if (!env.supabase.url) {

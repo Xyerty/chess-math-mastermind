@@ -3,10 +3,13 @@ import { env, validateEnvironment } from './environment';
 
 // Get Clerk publishable key from environment variables
 export const CLERK_PUBLISHABLE_KEY = env.clerk.publishableKey;
+export const CLERK_ENABLED = env.clerk.enabled;
 
-// Validate that the key is present
-if (!CLERK_PUBLISHABLE_KEY) {
-  console.error("❌ VITE_CLERK_PUBLISHABLE_KEY is not set in environment variables");
+// Only show warnings in development if Clerk is not configured
+if (!CLERK_ENABLED) {
+  if (env.isDevelopment) {
+    console.warn("⚠️ VITE_CLERK_PUBLISHABLE_KEY is not set - authentication features are disabled");
+  }
 } else {
   console.log("✅ Clerk configuration loaded successfully");
   console.log("Environment:", import.meta.env.MODE);

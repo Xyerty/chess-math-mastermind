@@ -28,6 +28,7 @@ const EnvironmentCheck: React.FC = () => {
       <CardContent>
         <div className="space-y-2">
           <p><strong>Environment:</strong> {import.meta.env.MODE}</p>
+          <p><strong>Authentication:</strong> {env.features.authentication ? 'Enabled' : 'Disabled'}</p>
           <p><strong>Python Engine:</strong> {env.features.pythonEngine ? 'Enabled' : 'Disabled'}</p>
           <p><strong>PlayFab:</strong> {env.features.playFab ? 'Enabled' : 'Disabled'}</p>
           <p><strong>Multiplayer:</strong> {env.features.multiplayer ? 'Enabled' : 'Disabled'}</p>
@@ -42,6 +43,15 @@ const EnvironmentCheck: React.FC = () => {
                     <p key={index} className="text-sm">• {error}</p>
                   ))}
                 </div>
+              </AlertDescription>
+            </Alert>
+          )}
+          
+          {!env.features.authentication && (
+            <Alert className="mt-4">
+              <AlertTriangle className="h-4 w-4" />
+              <AlertDescription>
+                <p><strong>Authentication Disabled:</strong> Set VITE_CLERK_PUBLISHABLE_KEY to enable user accounts and multiplayer features.</p>
               </AlertDescription>
             </Alert>
           )}

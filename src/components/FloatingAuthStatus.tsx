@@ -1,7 +1,8 @@
+
 import { useClerk } from '@clerk/clerk-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
-import { LogIn, Settings, Award, LogOut, Trophy } from 'lucide-react';
+import { LogIn, Settings, Award, LogOut, Trophy, UserX } from 'lucide-react';
 import { Skeleton } from './ui/skeleton';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { 
@@ -15,12 +16,29 @@ import {
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { toast } from "@/components/ui/sonner";
 import { useCurrentUser } from '@/contexts/UserContext';
+import { CLERK_ENABLED } from '@/config/clerk';
 
 const FloatingAuthStatus = () => {
   const { signOut } = useClerk();
   const navigate = useNavigate();
   const { t } = useLanguage();
   const { currentUser, isLoading } = useCurrentUser();
+  
+  // If authentication is disabled, show a disabled state
+  if (!CLERK_ENABLED) {
+    return (
+      <div className="fixed top-4 right-4 z-50">
+        <Button 
+          variant="outline" 
+          disabled 
+          className="shadow-lg h-12 px-6 opacity-50"
+        >
+          <UserX className="mr-2 h-5 w-5" />
+          Auth Disabled
+        </Button>
+      </div>
+    );
+  }
   
   if (isLoading) {
     return (
