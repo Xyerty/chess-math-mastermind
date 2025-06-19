@@ -1,87 +1,64 @@
-
 import React from "react";
-import { ClerkProvider } from "@clerk/clerk-react";
-import { BrowserRouter, useNavigate } from "react-router-dom";
-import ErrorBoundary from "./components/ErrorBoundary";
+import { SignedIn, SignedOut, UserButton } from "@clerk/clerk-react";
+import { Link, Outlet, useNavigate } from "react-router-dom"; // useNavigate might be needed if Clerk interaction requires it, but ClerkProvider in main.tsx handles routing.
 import ProvidersWrapper from "./components/ProvidersWrapper";
-import AppRoutes from "./components/AppRoutes";
-import { CLERK_PUBLISHABLE_KEY, CLERK_ENABLED } from "./config/clerk";
-import { Toaster } from "@/components/ui/sonner";
+import { Toaster } from "@/components/ui/sonner"; // Assuming @ is src
 import { usePlayFabInitialization } from "./services/playFabInit";
 import EnvironmentCheck from "./components/EnvironmentCheck";
 import { env } from "./config/environment";
+import { CLERK_ENABLED } from "./config/clerk"; // CLERK_ENABLED might still be useful
 
-// Authentication Error Boundary specifically for Clerk issues
-const AuthErrorBoundary: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  return (
-    <ErrorBoundary>
-      {children}
-    </ErrorBoundary>
-  );
-};
+// console.log from original App.tsx can be removed or adapted if needed for debugging.
+// For this task, they are removed for clarity.
 
-// This component allows ClerkProvider to access React Router's navigation context.
-const ClerkProviderWithRouter: React.FC<{children: React.ReactNode}> = ({ children }) => {
-    const navigate = useNavigate();
-
-    // Only render ClerkProvider if Clerk is enabled
-    if (!CLERK_ENABLED) {
-      console.log("🔧 Clerk is disabled - running without authentication");
-      return <>{children}</>;
-    }
-
-    // Add debugging for Clerk initialization
-    console.log("🔧 Initializing Clerk with key:", CLERK_PUBLISHABLE_KEY?.substring(0, 20) + "...");
-
-    return (
-        <ClerkProvider
-            publishableKey={CLERK_PUBLISHABLE_KEY}
-            routerPush={(to) => {
-                console.log("🔄 Clerk routing to:", to);
-                navigate(to);
-            }}
-            routerReplace={(to) => {
-                console.log("🔄 Clerk replacing route to:", to);
-                navigate(to, { replace: true });
-            }}
-        >
-            {children}
-        </ClerkProvider>
-    );
-};
-
-const AppContent: React.FC = () => {
-  // Initialize PlayFab in the background without blocking navigation
+const App: React.FC = () => {
+  // Initialize PlayFab if Clerk is enabled and it's part of the core app functionality
+  // This needs to be called unconditionally within a component that's always part of the React tree.
+  // If ProvidersWrapper is always there, this is a good spot.
   if (CLERK_ENABLED) {
-    usePlayFabInitialization();
+    // usePlayFabInitialization(); // This is a hook, should be called at the top level of a component.
+    // Let's create a small component for this if it needs to be conditional.
   }
 
   return (
-    <>
+    <ProvidersWrapper>
+      {/* Conditional PlayFab Initialization Component */}
+      {CLERK_ENABLED && <PlayFabInitializer />}
+
+      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem', backgroundColor: '#f0f0f0', borderBottom: '1px solid #ccc' }}>
+        <nav style={{ display: 'flex', gap: '1rem' }}>
+          <Link to="/" style={{ textDecoration: 'none', color: 'blue' }}>Home</Link>
+          <Link to="/dashboard" style={{ textDecoration: 'none', color: 'blue' }}>Dashboard</Link>
+        </nav>
+        <div>
+          <SignedIn>
+            <UserButton afterSignOutUrl="/" />
+          </SignedIn>
+          <SignedOut>
+            {/* Relying on ProtectedRoute to handle redirects.
+                Clerk's hosted pages will manage sign-in.
+                A simple message or a <Link to="/sign-in">Sign In</Link> could be added if needed.
+            */}
+            <p>You are signed out.</p>
+          </SignedOut>
+        </div>
+      </header>
+
       {env.isDevelopment && <EnvironmentCheck />}
-      <AppRoutes />
+
+      <main style={{ padding: '1rem' }}>
+        <Outlet /> {/* This will render the child route's element (Home page, Dashboard, etc.) */}
+      </main>
+
       <Toaster richColors position="top-right" />
-    </>
+    </ProvidersWrapper>
   );
 };
 
-const App: React.FC = () => {
-  console.log("🚀 App initializing...");
-  console.log("🔐 Authentication enabled:", CLERK_ENABLED);
-  
-  return (
-    <ErrorBoundary>
-      <BrowserRouter>
-        <AuthErrorBoundary>
-          <ClerkProviderWithRouter>
-            <ProvidersWrapper>
-              <AppContent />
-            </ProvidersWrapper>
-          </ClerkProviderWithRouter>
-        </AuthErrorBoundary>
-      </BrowserRouter>
-    </ErrorBoundary>
-  );
+// Helper component to conditionally call the hook
+const PlayFabInitializer: React.FC = () => {
+  usePlayFabInitialization();
+  return null; // This component doesn't render anything itself
 };
 
 export default App;
