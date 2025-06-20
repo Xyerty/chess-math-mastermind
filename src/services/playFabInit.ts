@@ -2,8 +2,20 @@
 import { usePlayFab } from '@/hooks/usePlayFab';
 import { useAuth } from '@clerk/clerk-react';
 import { useEffect } from 'react';
+import { CLERK_ENABLED } from '@/config/clerk';
 
 export const usePlayFabInitialization = () => {
+  // If Clerk is disabled, return a default state and don't attempt to initialize
+  if (!CLERK_ENABLED) {
+    return {
+      isLoggedIn: false,
+      connectionStatus: 'disconnected' as const,
+      error: null,
+      sessionTicket: null,
+      playFabId: null,
+    };
+  }
+
   const { isSignedIn } = useAuth();
   const { loginToPlayFab, playFabData } = usePlayFab();
 
