@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App.tsx';
@@ -5,7 +6,7 @@ import './index.css';
 import * as Sentry from "@sentry/react";
 import { ClerkProvider } from '@clerk/clerk-react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import { ProtectedRoute } from '../components/auth/ProtectedRoute.tsx'; // Using relative path
+import { ProtectedRoute } from './components/auth/ProtectedRoute.tsx';
 
 // Only initialize Sentry if DSN is provided
 const sentryDsn = import.meta.env.VITE_SENTRY_DSN;

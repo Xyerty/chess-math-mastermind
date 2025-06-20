@@ -1,7 +1,7 @@
 
 import React from "react";
 import { SignedIn, SignedOut, UserButton } from "@clerk/clerk-react";
-import { Link, Outlet, useNavigate } from "react-router-dom";
+import { Link, Outlet } from "react-router-dom";
 import ProvidersWrapper from "./components/ProvidersWrapper";
 import { Toaster } from "@/components/ui/sonner";
 import { usePlayFabInitialization } from "./services/playFabInit";
