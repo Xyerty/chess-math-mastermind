@@ -12,28 +12,31 @@ import { GameModeProvider } from "../contexts/GameModeContext";
 import { OpponentProvider } from "../contexts/OpponentContext";
 import { queryClient } from '../config/queryClient';
 import { UserProvider } from '../contexts/UserContext';
+import { ServiceProvider } from './providers/ServiceProvider';
 
 const ProvidersWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
     <ThemeProvider attribute="class" defaultTheme="dark">
       <QueryClientProvider client={queryClient}>
-        <UserProvider>
-          <SettingsProvider>
-            <DifficultyProvider>
-              <LanguageProvider>
-                <GameModeProvider>
-                  <OpponentProvider>
-                    <TooltipProvider>
-                      <Toaster />
-                      <Sonner />
-                      {children}
-                    </TooltipProvider>
-                  </OpponentProvider>
-                </GameModeProvider>
-              </LanguageProvider>
-            </DifficultyProvider>
-          </SettingsProvider>
-        </UserProvider>
+        <ServiceProvider>
+          <UserProvider>
+            <SettingsProvider>
+              <DifficultyProvider>
+                <LanguageProvider>
+                  <GameModeProvider>
+                    <OpponentProvider>
+                      <TooltipProvider>
+                        <Toaster />
+                        <Sonner />
+                        {children}
+                      </TooltipProvider>
+                    </OpponentProvider>
+                  </GameModeProvider>
+                </LanguageProvider>
+              </DifficultyProvider>
+            </SettingsProvider>
+          </UserProvider>
+        </ServiceProvider>
       </QueryClientProvider>
     </ThemeProvider>
   );
