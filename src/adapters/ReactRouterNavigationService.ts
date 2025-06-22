@@ -3,16 +3,16 @@ import { NavigateFunction } from 'react-router-dom';
 import { BaseNavigationService } from '../services/navigation/NavigationService';
 
 export class ReactRouterNavigationService extends BaseNavigationService {
-  constructor(private navigate: NavigateFunction, private currentPath: string) {
+  constructor(private navigateFunction: NavigateFunction, private currentPath: string) {
     super();
   }
 
   navigate(path: string, options?: { replace?: boolean }): void {
-    this.navigate(path, options);
+    this.navigateFunction(path, options);
   }
 
   goBack(): void {
-    this.navigate(-1 as any); // React Router's navigate accepts -1 for back navigation
+    this.navigateFunction(-1 as any); // React Router's navigate accepts -1 for back navigation
   }
 
   getCurrentPath(): string {

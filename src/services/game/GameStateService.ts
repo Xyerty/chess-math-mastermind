@@ -23,7 +23,7 @@ export class DefaultGameStateService implements GameStateService {
     return new DefaultGameStateManager(gameMode);
   }
 
-  validateMove(state: ChessGameState, from: { row: number; col: number }, to: { row: number; col: number }): boolean {
+  validateMove(_state: ChessGameState, _from: { row: number; col: number }, _to: { row: number; col: number }): boolean {
     // Implementation would use the existing chess validation logic
     return true; // Placeholder
   }
@@ -32,7 +32,7 @@ export class DefaultGameStateService implements GameStateService {
     return { status: state.gameStatus };
   }
 
-  calculateScore(state: ChessGameState): { white: number; black: number } {
+  calculateScore(_state: ChessGameState): { white: number; black: number } {
     // Calculate material value or other scoring metrics
     return { white: 0, black: 0 };
   }
@@ -41,7 +41,7 @@ export class DefaultGameStateService implements GameStateService {
 class DefaultGameStateManager implements GameStateManager {
   private state: ChessGameState;
 
-  constructor(private gameMode: GameMode) {
+  constructor(gameMode: GameMode) {
     this.state = this.createInitialState(gameMode);
   }
 
@@ -57,7 +57,7 @@ class DefaultGameStateManager implements GameStateManager {
     this.state = this.createInitialState(gameMode);
   }
 
-  makeMove(from: { row: number; col: number }, to: { row: number; col: number }): boolean {
+  makeMove(_from: { row: number; col: number }, _to: { row: number; col: number }): boolean {
     // Implementation would use existing move logic
     return true; // Placeholder
   }

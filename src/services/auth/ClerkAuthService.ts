@@ -40,12 +40,12 @@ export class ClerkAuthService extends BaseAuthService {
     return this.authHook?.isSignedIn || false;
   }
 
-  async signIn(email: string, password: string): Promise<{ user?: AuthUser; error?: string }> {
+  async signIn(_email: string, _password: string): Promise<{ user?: AuthUser; error?: string }> {
     // This would integrate with Clerk's signIn methods
     throw new Error('Not implemented - would use Clerk signIn API');
   }
 
-  async signUp(email: string, password: string): Promise<{ user?: AuthUser; error?: string }> {
+  async signUp(_email: string, _password: string): Promise<{ user?: AuthUser; error?: string }> {
     // This would integrate with Clerk's signUp methods
     throw new Error('Not implemented - would use Clerk signUp API');
   }
@@ -55,7 +55,7 @@ export class ClerkAuthService extends BaseAuthService {
     throw new Error('Not implemented - would use Clerk signOut API');
   }
 
-  onAuthStateChange(callback: (user: AuthUser | null) => void): () => void {
+  onAuthStateChange(_callback: (user: AuthUser | null) => void): () => void {
     // This would set up Clerk's auth state listeners
     return () => {}; // cleanup function
   }
