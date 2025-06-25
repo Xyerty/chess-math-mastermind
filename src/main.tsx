@@ -1,12 +1,14 @@
+
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App.tsx';
 import './index.css';
 import * as Sentry from "@sentry/react";
-import { ClerkProvider } from '@clerk/clerk-react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import { ProtectedRoute } from './components/auth/ProtectedRoute.tsx';
-import { CLERK_ENABLED, CLERK_PUBLISHABLE_KEY } from './config/clerk.ts';
+import { SessionContextProvider } from '@supabase/auth-helpers-react';
+import { supabase } from './config/supabase';
+import { ProtectedRoute } from './components/auth/ProtectedRoute';
+import Login from './pages/Login';
 
 // Only initialize Sentry if DSN is provided
 const sentryDsn = import.meta.env.VITE_SENTRY_DSN;
@@ -102,37 +104,36 @@ const router = createBrowserRouter([
       },
       {
         path: "/dashboard",
-        element: CLERK_ENABLED ? <ProtectedRoute /> : <div><h1>Dashboard</h1><p>Clerk is not enabled. Please configure VITE_CLERK_PUBLISHABLE_KEY.</p></div>,
-        children: CLERK_ENABLED ? [
+        element: <ProtectedRoute />,
+        children: [
           {
             path: "/dashboard",
             element: <DashboardPage />,
           }
-        ] : [],
+        ]
       }
     ]
+  },
+  {
+    path: "/login",
+    element: <Login />
   }
 ]);
 
 // Application component with router
 const AppWithRouter = () => <RouterProvider router={router} />;
 
-// Conditionally wrap with ClerkProvider if enabled
-const AppWithClerk = CLERK_ENABLED ? (
-  <ClerkProvider publishableKey={CLERK_PUBLISHABLE_KEY}>
-    <AppWithRouter />
-  </ClerkProvider>
-) : (
-  <AppWithRouter />
-);
-
 // Use Sentry ErrorBoundary if available
 const AppToRender = sentryDsn ? (
   <Sentry.ErrorBoundary fallback={ErrorFallback}>
-    <AppWithClerk />
+    <SessionContextProvider supabaseClient={supabase}>
+      <AppWithRouter />
+    </SessionContextProvider>
   </Sentry.ErrorBoundary>
 ) : (
-  <AppWithClerk />
+  <SessionContextProvider supabaseClient={supabase}>
+    <AppWithRouter />
+  </SessionContextProvider>
 );
 
 root.render(

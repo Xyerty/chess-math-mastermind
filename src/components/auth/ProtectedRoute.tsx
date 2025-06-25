@@ -1,18 +1,14 @@
-import { useAuth } from "@clerk/clerk-react";
-import { Navigate, Outlet } from "react-router-dom";
 
-export function ProtectedRoute() {
-  const { isSignedIn, isLoaded } = useAuth();
+import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
+import { Navigate, Outlet } from 'react-router-dom';
 
-  if (!isLoaded) {
-    // Handle loading state, perhaps return a loading spinner
-    // For now, returning null or a simple loading text
-    return <div>Loading...</div>;
-  }
+export const ProtectedRoute = () => {
+  const session = useSession();
+  const supabase = useSupabaseClient();
 
-  if (!isSignedIn) {
-    return <Navigate to="/" replace />;
+  if (!session) {
+    return <Navigate to="/login" />;
   }
 
   return <Outlet />;
-}
+};
