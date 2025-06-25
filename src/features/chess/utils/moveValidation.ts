@@ -29,7 +29,7 @@ export const isValidMoveInternal = (board: ChessPiece[][], from: { row: number; 
   const colDiff = Math.abs(to.col - from.col);
 
   switch (pieceType) {
-    case 'p':
+    case 'p': {
       const direction = pieceColor === 'w' ? -1 : 1;
       const startRow = pieceColor === 'w' ? 6 : 1;
       
@@ -56,6 +56,7 @@ export const isValidMoveInternal = (board: ChessPiece[][], from: { row: number; 
         return true;
       }
       return false;
+    }
     case 'r': return (rowDiff === 0 || colDiff === 0) && isPathClear(board, from, to);
     case 'n': return (rowDiff === 2 && colDiff === 1) || (rowDiff === 1 && colDiff === 2);
     case 'b': return rowDiff === colDiff && isPathClear(board, from, to);

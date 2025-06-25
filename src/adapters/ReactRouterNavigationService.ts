@@ -12,7 +12,7 @@ export class ReactRouterNavigationService extends BaseNavigationService {
   }
 
   goBack(): void {
-    this.navigateFunction(-1 as any); // React Router's navigate accepts -1 for back navigation
+    this.navigateFunction(-1); // React Router's navigate accepts -1 for back navigation
   }
 
   getCurrentPath(): string {

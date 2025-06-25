@@ -42,16 +42,16 @@ export const usePlayFab = () => {
             });
             return { success: true };
 
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error('Failed to login to PlayFab:', error);
             setPlayFabData({
                 isLoggedIn: false,
                 connectionStatus: 'error',
-                error: error.message || 'An unknown error occurred.',
+                error: error instanceof Error ? error.message : 'An unknown error occurred.',
                 sessionTicket: null,
                 playFabId: null,
             });
-            return { success: false, error: error.message };
+            return { success: false, error: error instanceof Error ? error.message : 'An unknown error occurred.' };
         } finally {
             setLoading(false);
         }

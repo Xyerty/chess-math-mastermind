@@ -39,7 +39,7 @@ export const authenticatedFetch = async (
     let errorDetails;
     try {
       errorDetails = await response.json();
-    } catch (e) {
+    } catch {
       errorDetails = { error: 'Request failed with status: ' + response.status, details: await response.text() };
     }
     

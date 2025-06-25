@@ -22,18 +22,7 @@ interface UserContextType {
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
-export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // If Clerk is disabled, provide a context with no user
-  if (!CLERK_ENABLED) {
-    const contextValue: UserContextType = {
-      currentUser: null,
-      isLoading: false,
-      error: null,
-    };
-    
-    return <UserContext.Provider value={contextValue}>{children}</UserContext.Provider>;
-  }
-
+const ClerkUserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, isLoaded: isClerkLoaded, isSignedIn } = useUser();
   const { data: rankingData, isLoading: isRankingLoading, error: rankingError } = useUserRanking();
 
@@ -44,7 +33,6 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   });
 
   useEffect(() => {
-    // The context is loading if Clerk hasn't loaded, or if the user is signed in but we're still fetching their ranking.
     const loading = !isClerkLoaded || (isSignedIn && isRankingLoading);
     
     if (loading) {
@@ -53,7 +41,6 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     
     if (isSignedIn && user) {
-      // New users might not have a ranking record yet. We provide a default.
       const ranking: UserRanking = rankingData ?? { elo: 1200, wins: 0, losses: 0, draws: 0 };
       
       setContextState({
@@ -70,7 +57,6 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         error: rankingError,
       });
     } else {
-      // Handles the signed-out state.
       setContextState({
         currentUser: null,
         isLoading: false,
@@ -80,6 +66,20 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [user, isSignedIn, isClerkLoaded, rankingData, isRankingLoading, rankingError]);
   
   return <UserContext.Provider value={contextState}>{children}</UserContext.Provider>;
+};
+
+export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  if (!CLERK_ENABLED) {
+    const contextValue: UserContextType = {
+      currentUser: null,
+      isLoading: false,
+      error: null,
+    };
+    
+    return <UserContext.Provider value={contextValue}>{children}</UserContext.Provider>;
+  }
+
+  return <ClerkUserProvider>{children}</ClerkUserProvider>;
 };
 
 export const useCurrentUser = () => {

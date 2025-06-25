@@ -6,9 +6,9 @@ export interface ApiResponse<T> {
 }
 
 export interface ApiService {
-  get<T>(endpoint: string, params?: Record<string, any>): Promise<ApiResponse<T>>;
-  post<T>(endpoint: string, body?: any): Promise<ApiResponse<T>>;
-  put<T>(endpoint: string, body?: any): Promise<ApiResponse<T>>;
+  get<T>(endpoint: string, params?: Record<string, unknown>): Promise<ApiResponse<T>>;
+  post<T>(endpoint: string, body?: unknown): Promise<ApiResponse<T>>;
+  put<T>(endpoint: string, body?: unknown): Promise<ApiResponse<T>>;
   delete<T>(endpoint: string): Promise<ApiResponse<T>>;
 }
 
@@ -19,12 +19,12 @@ export abstract class BaseApiService implements ApiService {
     this.baseUrl = baseUrl;
   }
 
-  abstract get<T>(endpoint: string, params?: Record<string, any>): Promise<ApiResponse<T>>;
-  abstract post<T>(endpoint: string, body?: any): Promise<ApiResponse<T>>;
-  abstract put<T>(endpoint: string, body?: any): Promise<ApiResponse<T>>;
+  abstract get<T>(endpoint: string, params?: Record<string, unknown>): Promise<ApiResponse<T>>;
+  abstract post<T>(endpoint: string, body?: unknown): Promise<ApiResponse<T>>;
+  abstract put<T>(endpoint: string, body?: unknown): Promise<ApiResponse<T>>;
   abstract delete<T>(endpoint: string): Promise<ApiResponse<T>>;
 
-  protected buildUrl(endpoint: string, params?: Record<string, any>): string {
+  protected buildUrl(endpoint: string, params?: Record<string, unknown>): string {
     const url = new URL(endpoint, this.baseUrl);
     if (params) {
       Object.entries(params).forEach(([key, value]) => {

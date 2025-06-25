@@ -41,9 +41,12 @@ export default function SignInForm() {
         console.error(result);
         setError('An unexpected error occurred. Please try again.');
       }
-    } catch (err: any)
-{
-      setError(err.errors?.[0]?.message || 'Invalid email or password.');
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('An unexpected error occurred.');
+      }
     }
   };
 

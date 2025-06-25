@@ -9,13 +9,13 @@ import { BaseApiService } from '../../services/api/ApiService';
 
 // Simple fetch-based API service implementation
 class FetchApiService extends BaseApiService {
-  async get<T>(endpoint: string, params?: Record<string, any>) {
+  async get<T>(endpoint: string, params?: Record<string, unknown>) {
     const url = this.buildUrl(endpoint, params);
     const response = await fetch(url);
     return this.handleResponse<T>(response);
   }
 
-  async post<T>(endpoint: string, body?: any) {
+  async post<T>(endpoint: string, body?: unknown) {
     const response = await fetch(`${this.baseUrl}${endpoint}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -24,7 +24,7 @@ class FetchApiService extends BaseApiService {
     return this.handleResponse<T>(response);
   }
 
-  async put<T>(endpoint: string, body?: any) {
+  async put<T>(endpoint: string, body?: unknown) {
     const response = await fetch(`${this.baseUrl}${endpoint}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },

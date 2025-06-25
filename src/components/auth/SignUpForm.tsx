@@ -34,8 +34,12 @@ export default function SignUpForm() {
       });
       await signUp.prepareEmailAddressVerification({ strategy: 'email_code' });
       setPendingVerification(true);
-    } catch (err: any) {
-      setError(err.errors?.[0]?.message || 'An error occurred during sign up.');
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('An unexpected error occurred.');
+      }
     }
   };
 
@@ -56,8 +60,12 @@ export default function SignUpForm() {
       } else {
         setError('Verification failed. Please try again.');
       }
-    } catch (err: any) {
-      setError(err.errors?.[0]?.message || 'Invalid verification code.');
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('An unexpected error occurred.');
+      }
     }
   };
 

@@ -104,7 +104,7 @@ describe('BottomActionMenu', () => {
           return await response.json();
         }
         return null;
-      } catch (error) {
+      } catch {
         return null;
       }
     });
