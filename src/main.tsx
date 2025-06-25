@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App.tsx';
@@ -7,6 +6,7 @@ import * as Sentry from "@sentry/react";
 import { ClerkProvider } from '@clerk/clerk-react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { ProtectedRoute } from './components/auth/ProtectedRoute.tsx';
+import { CLERK_ENABLED, CLERK_PUBLISHABLE_KEY } from './config/clerk.ts';
 
 // Only initialize Sentry if DSN is provided
 const sentryDsn = import.meta.env.VITE_SENTRY_DSN;
@@ -87,13 +87,6 @@ const ErrorFallback = ({ error, resetError }: { error: unknown; resetError: () =
   );
 };
 
-// Get Clerk Publishable Key
-const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
-
-if (!PUBLISHABLE_KEY) {
-  throw new Error("Missing VITE_CLERK_PUBLISHABLE_KEY in .env.local");
-}
-
 // Define DashboardPage placeholder
 const DashboardPage = () => <div><h1>Dashboard</h1><p>This is a protected page.</p></div>;
 
@@ -101,41 +94,45 @@ const DashboardPage = () => <div><h1>Dashboard</h1><p>This is a protected page.<
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <App />, // App will contain the main layout and navigation
+    element: <App />,
     children: [
       {
         path: "/",
-        // Placeholder for home page content, Sentry will wrap this via App
         element: <div><h1>Home Page</h1><p>This is the public home page.</p></div>,
       },
       {
         path: "/dashboard",
-        element: <ProtectedRoute />,
-        children: [
+        element: CLERK_ENABLED ? <ProtectedRoute /> : <div><h1>Dashboard</h1><p>Clerk is not enabled. Please configure VITE_CLERK_PUBLISHABLE_KEY.</p></div>,
+        children: CLERK_ENABLED ? [
           {
             path: "/dashboard",
             element: <DashboardPage />,
           }
-        ]
+        ] : [],
       }
     ]
   }
 ]);
 
-// Application component with Sentry Error Boundary
-const AppWithSentryAndRouter = () => (
-  <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
-    <RouterProvider router={router} />
+// Application component with router
+const AppWithRouter = () => <RouterProvider router={router} />;
+
+// Conditionally wrap with ClerkProvider if enabled
+const AppWithClerk = CLERK_ENABLED ? (
+  <ClerkProvider publishableKey={CLERK_PUBLISHABLE_KEY}>
+    <AppWithRouter />
   </ClerkProvider>
+) : (
+  <AppWithRouter />
 );
 
-// Use Sentry ErrorBoundary if available, otherwise use a simple fallback
+// Use Sentry ErrorBoundary if available
 const AppToRender = sentryDsn ? (
   <Sentry.ErrorBoundary fallback={ErrorFallback}>
-    <AppWithSentryAndRouter />
+    <AppWithClerk />
   </Sentry.ErrorBoundary>
 ) : (
-  <AppWithSentryAndRouter />
+  <AppWithClerk />
 );
 
 root.render(
