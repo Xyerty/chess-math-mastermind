@@ -1,16 +1,13 @@
-
 // No import statements to ensure pure CommonJS execution.
 // Vercel types are inferred or can be handled as 'any' to avoid module conflicts.
 
 // Use CommonJS require for runtime dependencies
-const { Clerk } = require('@clerk/clerk-sdk-node');
 const { createClient } = require('@supabase/supabase-js');
 
-const clerk = Clerk({ secretKey: process.env.CLERK_SECRET_KEY });
 const PLAYFAB_TITLE_ID = process.env.PLAYFAB_TITLE_ID;
 const PLAYFAB_SECRET_KEY = process.env.PLAYFAB_SECRET_KEY;
 
-// Initialize Supabase client with the service role key to check sanctions
+// Initialize Supabase client with the service role key
 const supabase = createClient(
     process.env.SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -22,7 +19,7 @@ module.exports = async function handler(req: any, res: any) {
         return res.status(405).json({ error: 'Method Not Allowed' });
     }
 
-    if (!PLAYFAB_TITLE_ID || !PLAYFAB_SECRET_KEY || !process.env.CLERK_SECRET_KEY || !process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    if (!PLAYFAB_TITLE_ID || !PLAYFAB_SECRET_KEY || !process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
         console.error('One or more required environment variables are not set.');
         return res.status(500).json({ error: 'Server configuration error.' });
     }
@@ -34,18 +31,22 @@ module.exports = async function handler(req: any, res: any) {
         }
         
         const token = authHeader.split(' ')[1];
-        const claims = await clerk.verifyToken(token);
         
-        if (!claims.sub) {
-            return res.status(401).json({ error: 'Invalid token, no user ID.' });
-        }
-        const clerkUserId = claims.sub;
+        // Verify token with Supabase
+        const { data: { user }, error: userError } = await supabase.auth.getUser(token);
 
-        // --- New Sanction Check ---
+        if (userError || !user) {
+            console.error('Supabase auth error:', userError?.message);
+            return res.status(401).json({ error: 'Authentication failed.', details: userError?.message });
+        }
+        
+        const supabaseUserId = user.id;
+
+        // --- Sanction Check ---
         const { data: activeSanction, error: sanctionError } = await supabase
             .from('account_sanctions')
             .select('sanction_type, reason, expires_at')
-            .eq('user_id', clerkUserId)
+            .eq('user_id', supabaseUserId)
             .eq('is_active', true)
             .or('expires_at.is.null,expires_at.gt.now()')
             .maybeSingle();
@@ -73,7 +74,7 @@ module.exports = async function handler(req: any, res: any) {
                 'X-SecretKey': PLAYFAB_SECRET_KEY,
             },
             body: JSON.stringify({
-                CustomId: clerkUserId,
+                CustomId: supabaseUserId,
                 CreateAccount: true,
                 TitleId: PLAYFAB_TITLE_ID,
             }),
@@ -93,9 +94,6 @@ module.exports = async function handler(req: any, res: any) {
 
     } catch (error: any) {
         console.error('Error in playfab-login handler:', error);
-        if (error.clerkError) {
-             return res.status(401).json({ error: 'Authentication failed.', details: error.message });
-        }
         return res.status(500).json({ error: 'An unexpected error occurred.', details: error.message });
     }
 }
