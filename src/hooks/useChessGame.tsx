@@ -1,181 +1,114 @@
-import React, { useState, useCallback, useEffect } from 'react';
-import { ChessGameState, ChessMove, GameStatus, ChessPiece, GameMode, Player } from '../features/chess/types';
-import { defaultPosition } from '../features/chess/constants';
-import { isKingInCheck, hasAnyValidMoves } from '../features/chess/utils/board';
-import { isValidMoveInternal } from '../features/chess/utils/moveValidation';
-
-type HandleSquareClickResult = 
-  | { type: 'selected'; payload: { row: number; col: number } }
-  | { type: 'deselected' }
-  | { type: 'move_attempt'; payload: { from: { row: number; col: number }; to: { row: number; col: number } } };
-
-const getInitialTime = (gameMode: GameMode) => {
-  switch (gameMode) {
-    case 'speed':
-      return 180; // 3 minutes
-    case 'classic':
-    case 'math-master':
-    default:
-      return 600; // 10 minutes
-  }
-};
+import { useOpponent } from '../contexts/OpponentContext';
+import { GameMode } from '../features/chess/types';
+import { useGameState } from './useGameState';
+import { useGameTimer } from './useGameTimer';
+import { useAIEngine } from './useAIEngine';
+import { useMoveHandler } from './useMoveHandler';
+import { useHint } from './useHint';
+import { useMathChallenge } from './useMathChallenge';
 
 export const useChessGame = (aiDifficulty: 'easy' | 'medium' | 'hard', gameMode: GameMode) => {
-  const [gameState, setGameState] = useState<ChessGameState>(() => {
-    const initialTime = getInitialTime(gameMode);
-    return {
-      board: defaultPosition.map(row => [...row]),
-      currentPlayer: 'white',
-      gameStatus: 'playing',
-      moveHistory: [],
-      selectedSquare: null,
-      lastMove: null,
-      isInCheck: false,
-      gameStartTime: Date.now(),
-      moveCount: 1,
-      time: { white: initialTime, black: initialTime },
-      aiStats: null,
-    };
+  const { opponentType, playerColor } = useOpponent();
+  
+  const {
+    gameState,
+    setGameState,
+    resetGame,
+    resignGame,
+    clearSelection,
+  } = useGameState(gameMode);
+
+  useGameTimer({ gameState, setGameState });
+
+  const {
+    isAIThinking,
+    usingPythonEngine,
+  } = useAIEngine({
+    gameState,
+    setGameState,
+    aiDifficulty,
+    gameMode,
+    opponentType,
+    playerColor
   });
 
-  useEffect(() => {
-    if (gameState.gameStatus !== 'playing' && gameState.gameStatus !== 'check') {
-      return;
+  const {
+    mathState,
+    startMathChallenge,
+    completeMathChallenge,
+    cancelMathChallenge,
+    resetMathStats,
+    accuracy,
+  } = useMathChallenge({
+    gameMode,
+    moveCount: gameState.moveCount,
+  });
+
+  const {
+    makeMove,
+    handleSquareClick,
+  } = useMoveHandler({
+    gameState,
+    setGameState,
+    gameMode,
+    opponentType,
+    playerColor,
+    isAIThinking,
+    onMathChallenge: (from, to) => startMathChallenge({ from, to }),
+  });
+
+  const {
+    currentHint,
+    isAnalyzing,
+    hintsUsed,
+    maxHints,
+    canRequestHint,
+    requestHint,
+    clearHint,
+    resetHints,
+  } = useHint({
+    gameState,
+    gameMode,
+    aiDifficulty,
+    usingPythonEngine
+  });
+
+  const handleResetGame = () => {
+    resetGame();
+    resetHints();
+    resetMathStats();
+  };
+
+  const executePendingMove = () => {
+    if (mathState.pendingMove) {
+      const success = makeMove(mathState.pendingMove.from, mathState.pendingMove.to);
+      return success;
     }
-    const timer = setInterval(() => {
-      setGameState(prev => {
-        if (prev.gameStatus !== 'playing' && prev.gameStatus !== 'check') {
-            clearInterval(timer);
-            return prev;
-        }
-        const newTime = { ...prev.time };
-        const newCurrentPlayerTime = newTime[prev.currentPlayer] - 1;
-
-        if (newCurrentPlayerTime <= 0) {
-          clearInterval(timer);
-          return { ...prev, time: { ...newTime, [prev.currentPlayer]: 0 }, gameStatus: 'timeout' };
-        }
-        return { ...prev, time: { ...newTime, [prev.currentPlayer]: newCurrentPlayerTime } };
-      });
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, [gameState.gameStatus, gameState.currentPlayer]);
-
-  const makeMove = useCallback((from: { row: number; col: number }, to: { row: number; col: number }): boolean => {
-    if (gameState.gameStatus !== 'playing' && gameState.gameStatus !== 'check') return false;
-    if (!isValidMoveInternal(gameState.board, from, to)) return false;
-
-    const tempBoard = gameState.board.map(row => [...row]);
-    const piece = tempBoard[from.row][from.col];
-    const captured = gameState.board[to.row][to.col];
-
-    tempBoard[to.row][to.col] = piece;
-    tempBoard[from.row][from.col] = null;
-
-    if (isKingInCheck(tempBoard, gameState.currentPlayer)) {
-      console.log("Illegal move: king would be in check.");
-      return false;
-    }
-
-    const newBoard = tempBoard;
-    const nextPlayer = gameState.currentPlayer === 'white' ? 'black' : 'white';
-
-    const newIsInCheck = isKingInCheck(newBoard, nextPlayer);
-    const opponentHasMoves = hasAnyValidMoves(newBoard, nextPlayer); 
-
-    let newGameStatus: GameStatus = 'playing';
-    if (!opponentHasMoves) {
-      newGameStatus = newIsInCheck ? 'checkmate' : 'stalemate';
-    } else if (newIsInCheck) {
-      newGameStatus = 'check';
-    }
-
-    const move: ChessMove = { from, to, piece, captured, timestamp: Date.now() };
-
-    setGameState(prev => {
-      const newTime = { ...prev.time };
-      if (gameMode === 'speed') {
-        newTime[prev.currentPlayer] += 2; // +2s increment
-      }
-
-      return {
-        ...prev,
-        board: newBoard,
-        currentPlayer: nextPlayer,
-        moveHistory: [...prev.moveHistory, move],
-        selectedSquare: null,
-        lastMove: move,
-        isInCheck: newIsInCheck,
-        gameStatus: newGameStatus,
-        moveCount: prev.currentPlayer === 'black' ? prev.moveCount + 1 : prev.moveCount,
-        time: newTime,
-        aiStats: null, // AI is disabled
-      }
-    });
-
-    return true;
-  }, [gameState, gameMode]);
-
-  const handleSquareClick = useCallback((row: number, col: number): HandleSquareClickResult | null => {
-    if (gameState.gameStatus !== 'playing' && gameState.gameStatus !== 'check') {
-        return null;
-    }
-
-    const piece = gameState.board[row][col];
-    
-    if (gameState.selectedSquare) {
-      if (gameState.selectedSquare.row === row && gameState.selectedSquare.col === col) {
-        setGameState(prev => ({ ...prev, selectedSquare: null }));
-        return { type: 'deselected' };
-      } else {
-        return { type: 'move_attempt', payload: { from: gameState.selectedSquare, to: { row, col } } };
-      }
-    } else {
-      if (piece && piece[0] === gameState.currentPlayer[0]) {
-        setGameState(prev => ({ ...prev, selectedSquare: { row, col } }));
-        return { type: 'selected', payload: { row, col } };
-      }
-    }
-    return null;
-  }, [gameState.board, gameState.selectedSquare, gameState.currentPlayer, gameState.gameStatus]);
-
-  const clearSelection = useCallback(() => {
-    setGameState(prev => ({ ...prev, selectedSquare: null }));
-  }, []);
-  
-  const resignGame = useCallback(() => {
-    setGameState(prev => {
-        if (prev.gameStatus === 'playing' || prev.gameStatus === 'check') {
-            return { ...prev, gameStatus: 'resigned' };
-        }
-        return prev;
-    });
-  }, []);
-
-  const resetGame = useCallback(() => {
-    const initialTime = getInitialTime(gameMode);
-    setGameState({
-      board: defaultPosition.map(row => [...row]),
-      currentPlayer: 'white',
-      gameStatus: 'playing',
-      moveHistory: [],
-      selectedSquare: null,
-      lastMove: null,
-      isInCheck: false,
-      gameStartTime: Date.now(),
-      moveCount: 1,
-      time: { white: initialTime, black: initialTime },
-      aiStats: null,
-    });
-  }, [gameMode]);
+    return false;
+  };
 
   return {
     gameState,
     handleSquareClick,
     makeMove,
     clearSelection,
-    resetGame,
+    resetGame: handleResetGame,
     resignGame,
+    isAIThinking,
+    usingPythonEngine,
+    // Hint functionality
+    currentHint,
+    isAnalyzing,
+    hintsUsed,
+    maxHints,
+    canRequestHint,
+    requestHint,
+    clearHint,
+    // Math challenge functionality
+    mathState,
+    completeMathChallenge,
+    cancelMathChallenge,
+    executePendingMove,
+    mathAccuracy: accuracy,
   };
 };

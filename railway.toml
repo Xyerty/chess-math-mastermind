@@ -1,0 +1,24 @@
+
+[build]
+builder = "nixpacks"
+
+[deploy]
+startCommand = "pnpm start"
+healthcheckPath = "/"
+healthcheckTimeout = 300
+
+[[services]]
+name = "web"
+source = "."
+
+[services.web.variables]
+NODE_ENV = "production"
+VITE_PYTHON_ENGINE_URL = "${{python-engine.RAILWAY_PUBLIC_DOMAIN}}"
+
+[[services]]
+name = "python-engine"
+source = "./python_engine"
+
+[services.python-engine.variables]
+FLASK_ENV = "production"
+PORT = "8000"

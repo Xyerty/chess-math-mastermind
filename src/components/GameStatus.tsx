@@ -1,15 +1,20 @@
-
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Clock, User, Trophy } from "lucide-react";
+import { User, Trophy } from "lucide-react";
 import { useLanguage } from "../contexts/LanguageContext";
+import { useOpponent } from "../contexts/OpponentContext";
 import type { GameStatus } from "../features/chess/types";
+import AIThinkingIndicator from "./AIThinkingIndicator";
 
 interface GameStatusProps {
   currentPlayer: 'white' | 'black';
   gameStatus: GameStatus;
   moveCount: number;
   time: { white: number, black: number };
+  aiStats?: { score: number; thinkingTime: number } | null;
+  isAIThinking?: boolean;
+  aiDifficulty?: string;
+  usingPythonEngine?: boolean;
 }
 
 const GameStatus: React.FC<GameStatusProps> = ({
@@ -17,8 +22,11 @@ const GameStatus: React.FC<GameStatusProps> = ({
   gameStatus,
   moveCount,
   time,
+  isAIThinking = false,
+  aiDifficulty = 'medium',
 }) => {
   const { t } = useLanguage();
+  const { opponentType, playerColor } = useOpponent();
 
   const formatTime = (seconds: number) => {
     if (seconds < 0) seconds = 0;
@@ -50,8 +58,28 @@ const GameStatus: React.FC<GameStatusProps> = ({
     }
   };
 
+  const getPlayerLabel = (color: 'white' | 'black') => {
+    if (opponentType === 'ai') {
+      const aiPlayer = playerColor === 'white' ? 'black' : 'white';
+      if (color === aiPlayer) {
+        return `AI (${aiDifficulty.charAt(0).toUpperCase() + aiDifficulty.slice(1)})`;
+      }
+      return 'You';
+    }
+    return color === 'white' ? t('game.whiteTime') : 'Black Player';
+  };
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 animate-fade-in [animation-delay:200ms]">
+      {/* AI Thinking Indicator */}
+      {opponentType === 'ai' && isAIThinking && (
+        <div className="sm:col-span-2">
+          <AIThinkingIndicator 
+            isThinking={isAIThinking}
+          />
+        </div>
+      )}
+
       {/* Game Status */}
       <Card className="sm:col-span-2 animate-fade-in [animation-delay:300ms]">
         <CardHeader className="pb-3">
@@ -67,7 +95,7 @@ const GameStatus: React.FC<GameStatusProps> = ({
           {gameStatus === 'playing' || gameStatus === 'check' ? (
             <div className="flex items-center gap-3 mt-2">
               <div className={`w-6 h-6 rounded-full ${currentPlayer === 'white' ? 'bg-white border-2 border-slate-400' : 'bg-black'}`} />
-              <span className="font-semibold text-lg capitalize">{currentPlayer}'s Turn</span>
+              <span className="font-semibold text-lg capitalize">{getPlayerLabel(currentPlayer)}'s Turn</span>
             </div>
           ) : null}
           <div className="mt-2">
@@ -81,7 +109,7 @@ const GameStatus: React.FC<GameStatusProps> = ({
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-lg">
             <User className="h-5 w-5" />
-            {t('game.whiteTime')}
+            {getPlayerLabel('white')}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -96,7 +124,7 @@ const GameStatus: React.FC<GameStatusProps> = ({
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-lg">
             <User className="h-5 w-5" />
-            {t('game.blackTime')}
+            {getPlayerLabel('black')}
           </CardTitle>
         </CardHeader>
         <CardContent>

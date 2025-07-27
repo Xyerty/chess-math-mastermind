@@ -1,4 +1,3 @@
-
 export const es = {
   // Navegación
   'nav.backToMenu': 'Volver al Menú',
@@ -8,11 +7,33 @@ export const es = {
   'mainMenu.title': 'Ajedrez Matemático',
   'mainMenu.subtitle': 'Maestro',
   'mainMenu.description': '¡Desafía tu mente con movimientos de ajedrez que requieren resolver problemas matemáticos!',
+  'mainMenu.appDescription': 'Donde la estrategia se encuentra con el cálculo. Desafía tu mente con un ajedrez que requiere tanto pensamiento táctico como precisión matemática.',
   'mainMenu.playGame': 'Jugar',
+  'mainMenu.playGameDescription': 'Inicia una nueva partida de ajedrez con desafíos matemáticos',
   'mainMenu.howToPlay': 'Cómo Jugar',
+  'mainMenu.howToPlayDescription': 'Aprende las reglas y domina las estrategias',
   'mainMenu.settings': 'Configuración',
+  'mainMenu.settingsDescription': 'Personaliza tu experiencia de juego',
   'mainMenu.statistics': 'Estadísticas',
+  'mainMenu.statisticsDescription': 'Sigue tu progreso y rendimiento',
   'mainMenu.footer': '¡Piensa rápido, mueve inteligente, resuelve matemáticas!',
+  'mainMenu.strategicThinkingTitle': 'Pensamiento Estratégico',
+  'mainMenu.strategicThinkingDescription': 'Planifica tus movimientos con cuidado',
+  'mainMenu.mathChallengesTitle': 'Desafíos Matemáticos',
+  'mainMenu.mathChallengesDescription': 'Resuelve para desbloquear movimientos',
+  'mainMenu.skillBuildingTitle': 'Desarrollo de Habilidades',
+  'mainMenu.skillBuildingDescription': 'Mejora con cada partida',
+
+  // Auth
+  'auth.loginSignUp': 'Iniciar Sesión / Registrarse',
+
+  // Welcome Section
+  'welcome.goodMorning': 'Buenos días',
+  'welcome.goodAfternoon': 'Buenas tardes',
+  'welcome.goodEvening': 'Buenas noches',
+  'welcome.challengePrompt': '¿Listo para tu próximo desafío de ajedrez?',
+  'welcome.levelUp': 'Sube de nivel tu juego',
+  'welcome.quickGames': 'Partidas rápidas disponibles',
 
   // Game Setup
   'gameSetup.title': 'Configuración de Partida',
@@ -137,4 +158,7 @@ export const es = {
   'stats.progressOverTime': 'Progreso en el Tiempo',
   'stats.accuracyAndSpeed': 'Precisión y Velocidad (últimas 10 partidas)',
   'stats.noData': 'No hay suficientes datos para mostrar estadísticas. ¡Juega algunas partidas!',
+  
+  // Footer
+  'footer.builtWith': 'Hecho con orgullo con',
 };

@@ -1,110 +1,108 @@
-
-import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
+import { Difficulty, useDifficulty } from "../contexts/DifficultyContext";
+import { useState } from "react";
+import { useLanguage } from "../contexts/LanguageContext";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useLanguage } from '../contexts/LanguageContext';
-import { useDifficulty, Difficulty } from '../contexts/DifficultyContext';
-import { useGameMode } from '../contexts/GameModeContext';
-import { GameMode } from '../features/chess/types';
-import { BrainCircuit, Calculator, Play, Clock } from 'lucide-react';
+import { Loader2, Search, XCircle } from "lucide-react";
+import type { Tables } from "@/integrations/supabase/types";
 
 interface GameSetupModalProps {
   isOpen: boolean;
   onClose: () => void;
   onStartGame: (mathDifficulty: Difficulty, aiDifficulty: Difficulty) => void;
+  onFindMatch: () => void;
+  onCancelMatch: () => void;
+  ticket: Tables<'matchmaking_tickets'> | null | undefined;
+  isTicketLoading: boolean;
 }
 
-const GameSetupModal: React.FC<GameSetupModalProps> = ({ isOpen, onClose, onStartGame }) => {
+const GameSetupModal = ({ isOpen, onClose, onStartGame, onFindMatch, onCancelMatch, ticket, isTicketLoading }: GameSetupModalProps) => {
+  const { mathDifficulty, aiDifficulty } = useDifficulty();
+  const [currentMathDifficulty, setCurrentMathDifficulty] = useState<Difficulty>(mathDifficulty);
+  const [currentAiDifficulty, setCurrentAiDifficulty] = useState<Difficulty>(aiDifficulty);
   const { t } = useLanguage();
-  const { mathDifficulty: currentMathDifficulty, aiDifficulty: currentAiDifficulty } = useDifficulty();
-  const { gameMode: currentGameMode, setGameMode } = useGameMode();
-  
-  const [mathDifficulty, setMathDifficulty] = useState<Difficulty>(currentMathDifficulty);
-  const [aiDifficulty, setAiDifficulty] = useState<Difficulty>(currentAiDifficulty);
-  const [localGameMode, setLocalGameMode] = useState<GameMode>(currentGameMode);
 
   const handleStart = () => {
-    setGameMode(localGameMode);
-    onStartGame(mathDifficulty, aiDifficulty);
+    onStartGame(currentMathDifficulty, currentAiDifficulty);
     onClose();
   };
 
+  const isSearching = ticket?.status === 'searching';
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[480px] bg-card/80 backdrop-blur-sm border-border/50 shadow-2xl rounded-2xl animate-scale-in">
+      <DialogContent className="sm:max-w-[480px]">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold text-center text-primary flex items-center justify-center gap-2">
-            <Play className="h-6 w-6" />
-            {t('gameSetup.title')}
-          </DialogTitle>
-          <DialogDescription className="text-center text-muted-foreground pt-2">
-            {t('gameSetup.description')}
-          </DialogDescription>
+          <DialogTitle>{t('gameSetup.title')}</DialogTitle>
+          <DialogDescription>{t('gameSetup.description')}</DialogDescription>
         </DialogHeader>
-        
-        <div className="grid gap-6 py-6">
-          {/* Game Mode */}
-          <div className="grid grid-cols-4 items-center gap-4">
-            <label htmlFor="game-mode" className="text-right col-span-1 flex items-center justify-end gap-2 text-sm font-medium">
-              <Clock className="h-4 w-4 text-muted-foreground" />
-              {t('gameSetup.gameMode')}
-            </label>
-            <Select value={localGameMode} onValueChange={(value: GameMode) => setLocalGameMode(value)}>
-              <SelectTrigger id="game-mode" className="col-span-3">
-                <SelectValue placeholder="Select game mode" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="classic">{t('gameMode.classic')}</SelectItem>
-                <SelectItem value="speed">{t('gameMode.speed')}</SelectItem>
-                <SelectItem value="math-master">{t('gameMode.mathMaster')}</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Math Difficulty */}
-          <div className="grid grid-cols-4 items-center gap-4">
-            <label htmlFor="math-difficulty" className="text-right col-span-1 flex items-center justify-end gap-2 text-sm font-medium">
-              <Calculator className="h-4 w-4 text-muted-foreground" />
-              {t('settings.mathDifficulty')}
-            </label>
-            <Select value={mathDifficulty} onValueChange={(value: Difficulty) => setMathDifficulty(value)}>
-              <SelectTrigger id="math-difficulty" className="col-span-3">
-                <SelectValue placeholder={t('settings.mathDifficulty')} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="easy">Easy</SelectItem>
-                <SelectItem value="medium">Medium</SelectItem>
-                <SelectItem value="hard">Hard</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* AI Strength */}
-          <div className="grid grid-cols-4 items-center gap-4">
-            <label htmlFor="ai-difficulty" className="text-right col-span-1 flex items-center justify-end gap-2 text-sm font-medium">
-                <BrainCircuit className="h-4 w-4 text-muted-foreground" />
-              {t('settings.aiStrength')}
-            </label>
-            <Select value={aiDifficulty} onValueChange={(value: Difficulty) => setAiDifficulty(value)}>
-              <SelectTrigger id="ai-difficulty" className="col-span-3">
-                <SelectValue placeholder={t('settings.aiStrength')} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="easy">Easy</SelectItem>
-                <SelectItem value="medium">Medium</SelectItem>
-                <SelectItem value="hard">Hard</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-
-        <DialogFooter>
-          <Button onClick={handleStart} className="w-full text-lg h-12 bg-primary hover:bg-primary/90">
-            <Play className="mr-2 h-5 w-5" />
-            {t('gameSetup.startGame')}
-          </Button>
-        </DialogFooter>
+        <Tabs defaultValue="practice" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="practice">{t('gameSetup.practice')}</TabsTrigger>
+            <TabsTrigger value="ranked">{t('gameSetup.ranked')}</TabsTrigger>
+          </TabsList>
+          <TabsContent value="practice" className="space-y-4 pt-4">
+            <div className="space-y-2">
+              <h3 className="text-lg font-medium">{t('gameSetup.mathDifficulty')}</h3>
+              <Select value={currentMathDifficulty} onValueChange={(value) => setCurrentMathDifficulty(value as Difficulty)}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder={t(`difficulty.${currentMathDifficulty}`)} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="easy">{t('difficulty.easy')}</SelectItem>
+                  <SelectItem value="medium">{t('difficulty.medium')}</SelectItem>
+                  <SelectItem value="hard">{t('difficulty.hard')}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <h3 className="text-lg font-medium">{t('gameSetup.aiDifficulty')}</h3>
+              <Select value={currentAiDifficulty} onValueChange={(value) => setCurrentAiDifficulty(value as Difficulty)}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder={t(`difficulty.${currentAiDifficulty}`)} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="easy">{t('difficulty.easy')}</SelectItem>
+                  <SelectItem value="medium">{t('difficulty.medium')}</SelectItem>
+                  <SelectItem value="hard">{t('difficulty.hard')}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <DialogFooter>
+              <Button onClick={handleStart}>{t('gameSetup.startGame')}</Button>
+            </DialogFooter>
+          </TabsContent>
+          <TabsContent value="ranked" className="space-y-4 pt-4 text-center">
+            <h3 className="font-semibold text-lg">1v1 Ranked Match</h3>
+            <p className="text-sm text-muted-foreground">
+              Challenge another player and climb the leaderboard. Your Elo rating will be on the line!
+            </p>
+            {isTicketLoading && <div className="flex justify-center items-center p-8"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>}
+            
+            {!isTicketLoading && (
+              <>
+                {isSearching ? (
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-center text-primary font-semibold animate-pulse">
+                      <Search className="mr-2 h-5 w-5" />
+                      Searching for opponent...
+                    </div>
+                    <Button variant="destructive" onClick={onCancelMatch} className="w-full">
+                      <XCircle className="mr-2 h-4 w-4"/>
+                      Cancel Search
+                    </Button>
+                  </div>
+                ) : (
+                  <Button onClick={onFindMatch} size="lg" className="w-full">
+                    Find Match
+                  </Button>
+                )}
+              </>
+            )}
+          </TabsContent>
+        </Tabs>
       </DialogContent>
     </Dialog>
   );

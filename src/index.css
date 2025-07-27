@@ -100,6 +100,17 @@
     @apply min-h-[44px] min-w-[44px];
   }
 
+  /* Background Grid Pattern */
+  .bg-grid-slate-100 {
+    background-image: linear-gradient(rgb(241 245 249 / 0.5) 1px, transparent 1px),
+                      linear-gradient(90deg, rgb(241 245 249 / 0.5) 1px, transparent 1px);
+  }
+
+  .dark .bg-grid-slate-700\/25 {
+    background-image: linear-gradient(rgb(51 65 85 / 0.25) 1px, transparent 1px),
+                      linear-gradient(90deg, rgb(51 65 85 / 0.25) 1px, transparent 1px);
+  }
+
   /* Reduced Motion Support */
   @media (prefers-reduced-motion: reduce) {
     *,
@@ -112,4 +123,3 @@
     }
   }
 }
-

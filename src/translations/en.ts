@@ -1,4 +1,3 @@
-
 export const en = {
   // Navigation
   'nav.backToMenu': 'Back to Menu',
@@ -8,11 +7,33 @@ export const en = {
   'mainMenu.title': 'Chess Math',
   'mainMenu.subtitle': 'Mastermind',
   'mainMenu.description': 'Challenge your mind with chess moves that require solving math problems!',
+  'mainMenu.appDescription': 'Where strategy meets calculation. Challenge your mind with chess that requires both tactical thinking and mathematical precision.',
   'mainMenu.playGame': 'Play Game',
+  'mainMenu.playGameDescription': 'Start a new chess game with mathematical challenges',
   'mainMenu.howToPlay': 'How to Play',
+  'mainMenu.howToPlayDescription': 'Learn the rules and master the strategies',
   'mainMenu.settings': 'Settings',
+  'mainMenu.settingsDescription': 'Customize your game experience',
   'mainMenu.statistics': 'Statistics',
+  'mainMenu.statisticsDescription': 'Track your progress and performance',
   'mainMenu.footer': 'Think fast, move smart, solve math!',
+  'mainMenu.strategicThinkingTitle': 'Strategic Thinking',
+  'mainMenu.strategicThinkingDescription': 'Plan your moves carefully',
+  'mainMenu.mathChallengesTitle': 'Math Challenges',
+  'mainMenu.mathChallengesDescription': 'Solve to unlock moves',
+  'mainMenu.skillBuildingTitle': 'Skill Building',
+  'mainMenu.skillBuildingDescription': 'Improve with every game',
+
+  // Auth
+  'auth.loginSignUp': 'Login / Sign Up',
+
+  // Welcome Section
+  'welcome.goodMorning': 'Good morning',
+  'welcome.goodAfternoon': 'Good afternoon',
+  'welcome.goodEvening': 'Good evening',
+  'welcome.challengePrompt': 'Ready for your next chess challenge?',
+  'welcome.levelUp': 'Level up your game',
+  'welcome.quickGames': 'Quick games available',
   
   // Game Setup
   'gameSetup.title': 'Game Setup',
@@ -137,4 +158,7 @@ export const en = {
   'stats.progressOverTime': 'Progress Over Time',
   'stats.accuracyAndSpeed': 'Accuracy & Speed (last 10 games)',
   'stats.noData': 'Not enough data to display statistics. Play a few games!',
+  
+  // Footer
+  'footer.builtWith': 'Proudly built with',
 };
