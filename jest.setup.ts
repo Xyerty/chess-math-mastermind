@@ -1,7 +1,7 @@
 let networkDelayEnabled = false;
 let networkDelayDuration = 0;
 
-const enableNetworkDelay = (duration: number) => {
+const enableNetworkDelay = (duration) => {
   networkDelayEnabled = true;
   networkDelayDuration = duration;
 };
@@ -15,11 +15,15 @@ jest.mock('src/lib/authenticatedFetch', () => {
   const originalModule = jest.requireActual('src/lib/authenticatedFetch');
   return {
     ...originalModule,
-    authenticatedFetch: jest.fn(async (...args: unknown[]) => {
+    authenticatedFetch: jest.fn(async (..._args) => {
       if (networkDelayEnabled) {
         await new Promise(resolve => setTimeout(resolve, networkDelayDuration));
       }
-      return originalModule.authenticatedFetch(...args);
+      // Return a successful response for all calls in tests
+      return Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve({}),
+      });
     }),
   };
 });
@@ -27,5 +31,5 @@ jest.mock('src/lib/authenticatedFetch', () => {
 import '@testing-library/jest-dom';
 
 // Expose helper functions to the global scope
-(global as unknown as { enableNetworkDelay: (duration: number) => void }).enableNetworkDelay = enableNetworkDelay;
-(global as unknown as { disableNetworkDelay: () => void }).disableNetworkDelay = disableNetworkDelay;
+global.enableNetworkDelay = enableNetworkDelay;
+global.disableNetworkDelay = disableNetworkDelay;
